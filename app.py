@@ -17,6 +17,7 @@ MPOS_FILE = os.path.join(BASE_DIR, 'mpos.json')
 COMMITTEES_FILE = os.path.join(BASE_DIR, 'committees.json')
 STUDENTS_FILE = os.path.join(BASE_DIR, 'students.json')
 RESULTS_FILE = os.path.join(BASE_DIR, 'results.json')
+ROUTINE_FILE = os.path.join(BASE_DIR, 'routine.json')
 
 UPLOAD_DIRS = {
     'gallery': os.path.join(BASE_DIR, 'static', 'images', 'gallery'),
@@ -24,7 +25,8 @@ UPLOAD_DIRS = {
     'mpos': os.path.join(BASE_DIR, 'static', 'images', 'mpos'),
     'committees': os.path.join(BASE_DIR, 'static', 'images', 'committees'),
     'students': os.path.join(BASE_DIR, 'static', 'images', 'students'), 
-    'results' : os.path.join(BASE_DIR, 'static', 'files', 'results')
+    'results' : os.path.join(BASE_DIR, 'static', 'files', 'results'),
+    'routine' : os.path.join(BASE_DIR, 'static', 'files', 'routine')
 }
 ADMIN_PASSWORD = 'S118044'
 nonews = "No published news right now"
@@ -68,18 +70,19 @@ def admin_required(view):
 def ping():
     return 'pong' 
 
-@app.route('/routine')
-def routine():
-    return render_template('routine.html')
-
 @app.route('/contact')
 def contact():
     return render_template('contact.html')
 
 @app.route('/results')
 def results():
-    items = sorted(load_json(RESULTS_FILE), key=lambda x: x['timestamp'], reverse=True)
+    items = load_json(RESULTS_FILE)
     return render_template('results.html', results_items=items)
+
+@app.route('/routine')
+def routine():
+    items = load_json(ROUTINE_FILE)
+    return render_template('routine.html', routine_items=items)
 
 @app.route('/')
 def home():
@@ -89,12 +92,12 @@ def home():
 
 @app.route('/news')
 def news():
-    items = sorted(load_json(NEWS_FILE), key=lambda x: x['timestamp'], reverse=True)
+    items = load_json(NEWS_FILE)
     return render_template('news.html', news_items=items)
 
 @app.route('/gallery')
 def gallery():
-    items = sorted(load_json(GALLERY_FILE), key=lambda x: x['timestamp'], reverse=True)
+    items = load_json(GALLERY_FILE)
     return render_template('gallery.html', gallery_items=items)
 
 @app.route('/teachers')
@@ -115,7 +118,6 @@ def committees():
 @app.route('/students')
 def students():
     items = load_json(STUDENTS_FILE)
-
     return render_template('students.html', student_items=items)
 
 @app.route('/logout')
@@ -143,7 +145,7 @@ def login():
 # News detail
 @app.route('/news/<int:idx>')
 def news_detail(idx):
-    items = sorted(load_json(NEWS_FILE), key=lambda x: x['timestamp'], reverse=True)
+    items = load_json(NEWS_FILE)
     if idx < 0 or idx >= len(items):
         return redirect(url_for('news'))
     return render_template('news_detail.html', item=items[idx])
@@ -151,7 +153,7 @@ def news_detail(idx):
 # Gallery detail
 @app.route('/gallery/<int:idx>')
 def gallery_detail(idx):
-    items = sorted(load_json(GALLERY_FILE), key=lambda x: x['timestamp'], reverse=True)
+    items = load_json(GALLERY_FILE)
     if idx < 0 or idx >= len(items):
         return redirect(url_for('gallery'))
     return render_template('gallery_detail.html', item=items[idx])
@@ -252,7 +254,16 @@ res_view, res_action = admin_crud(
 )
 app.add_url_rule('/admin/results', 'result_admin', admin_required(res_view), methods=['GET'])
 app.add_url_rule('/admin/results', 'result_admin_post', admin_required(res_action), methods=['POST'])
+# Routine admin
+rou_view, rou_action = admin_crud(
+    ROUTINE_FILE,
+    UPLOAD_DIRS['routine'],
+    template_name='routine_admin.html'
+)
+app.add_url_rule('/admin/routine', 'routine_admin', admin_required(rou_view), methods=['GET'])
+app.add_url_rule('/admin/routine', 'routine_admin_post', admin_required(rou_action), methods=['POST'])
 
+# Gallery admin
 @app.route('/admin/gallery', methods=['GET', 'POST'])
 @admin_required
 def gallery_admin():
@@ -331,10 +342,10 @@ app.add_url_rule('/admin/students', 'student_admin', admin_required(stud_view), 
 app.add_url_rule('/admin/students', 'student_admin_post', admin_required(stud_action), methods=['POST'])
 
 if __name__ == '__main__':
-    # app.run(debug=True)
-    import os
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(debug=True)
+    # import os
+    # port = int(os.environ.get('PORT', 5000))
+    # app.run(host='0.0.0.0', port=port)
 
 
 

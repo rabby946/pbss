@@ -2,7 +2,7 @@
 {% block title %}Teachers : Palashbaria Secondary School{% endblock %}
 
 {% block content %}
-  <h1 class="teachers-heading">Our Teachers and Officials</h1>
+  <h1 class="teachers-headin">Our Teachers and Officials</h1>
 
   {# first row: just 2 cards #}
   <div class="teachers-grid two-col">
@@ -13,7 +13,7 @@
           <img src="{{ url_for('static', filename='images/teachers/' + teacher.filename) }}"
                alt="{{ teacher.title }}">
         </div>
-        <h3 class="teacher-name">{{ teacher.title }}</h3>
+        <h3 class="teacher-name" style="color: black;">{{ teacher.title }}</h3>
       </a>
     {% endfor %}
   </div>
@@ -27,7 +27,7 @@
           <img src="{{ url_for('static', filename='images/teachers/' + teacher.filename) }}"
                alt="{{ teacher.title }}">
         </div>
-        <h3 class="teacher-name">{{ teacher.title }}</h3>
+        <h3 class="teacher-name" style="color: black;">{{ teacher.title }}</h3>
       </a>
     {% endfor %}
   </div>

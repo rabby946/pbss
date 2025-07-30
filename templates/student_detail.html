@@ -1,48 +1,19 @@
 {% extends 'base.html' %}
 {% block title %}{{ student.name }} : Palashbaria Secondary School{% endblock %}
 {% block content %}
-<style>
 
-  body {
-  background: 
-    linear-gradient(to bottom, rgba(10, 93, 89, 0.525), rgba(31, 36, 4, 0.42)),
-    url("{{ url_for('static', filename='images/hero-bg.jpg') }}") 
-    no-repeat center center fixed;
-  background-size: cover;
-  color: var(--text);
-}
-
-
-  .page-heading {
-    font-size: 2.2rem;
-    color: var(--primary);
-    text-align: center;
-    margin: 2rem 0 1rem;
-    position: relative;
-  }
-  .page-heading::after {
-    content: '';
-    display: block;
-    width: 80px;
-    height: 4px;
-    background: var(--accent);
-    margin: 0.5rem auto 0;
-    border-radius: 2px;
-  }
-
-  .about-section {
-    padding: 2rem;
-    font-size: 1rem;
-    color: var(--text);
-    line-height: 1.8;
-  }
-
-  .image-grid:hover {
-  transform: translateY(-2px); /* Move button up slightly on hover */
-  cursor: pointer;
-}
-</style>
-<div class="glass-card detail-card">
+<!-- About Section -->
+<div class="container" style="padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 1rem; 
+         box-shadow: 0 4px 12px rgba(70, 3, 3, 0.413); background-color: rgba(231, 186, 123, 0.258);">
+  <div class="about-section">
+    <h2 class="page-heading" style="color: black;">{{ student.title }}</h2>
+    <p style="color: black;">
+      {{ student.description }}
+    </p>
+  </div>
+</div>
+<div class="detail-card" style="padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 1rem; 
+         box-shadow: 0 4px 12px rgba(70, 3, 3, 0.413); background-color: rgba(218, 198, 169, 0.258); background-blend-mode: darken;">
     <div class="image-grid">
       <div class="img-card">
         <img src="{{ url_for('static', filename='images/students/' + student.filename) }}" alt="{{ student.name }}" onclick="openLightbox('{{ url_for('static', filename='images/students/' + student.filename) }}')">
@@ -51,15 +22,7 @@
   
 </div>
 </div>
-<!-- About Section -->
-<div class="container">
-  <div class="glass-card about-section">
-    <h2 class="page-heading">{{ student.title }}</h2>
-    <p>
-      {{ student.description }}
-    </p>
-  </div>
-</div>
+
 <a href="{{ url_for('students') }}">← Back to Students</a>
   <!-- Lightbox modal -->
   <div id="lightbox" onclick="closeLightbox()">
@@ -67,10 +30,5 @@
     <img id="lightbox-img" class="lightbox-content">
   </div>
 </div>
-  <!-- Lightbox modal -->
-  <div id="lightbox" onclick="closeLightbox()">
-    <span class="close">&times;</span>
-    <img id="lightbox-img" class="lightbox-content">
-  </div>
-</div>
+
 {% endblock %}

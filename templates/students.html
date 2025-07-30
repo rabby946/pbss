@@ -2,11 +2,12 @@
 {% block title %}Students : Palashbaria Secondary School{% endblock %}
 {% block content %}
 <h1>Our Students</h1>
-<div class="teachers-grid">
+<div class="teachers-grid" >
   {% for student in student_items %}
-  <a href="{{ url_for('student_detail', idx=loop.index0) }}" class="glass-card teacher-card">
+  <a href="{{ url_for('student_detail', idx=loop.index0) }}" class="glass-card teacher-card" style="padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 1rem; 
+         box-shadow: 0 4px 12px rgba(70, 3, 3, 0.413); background-color: rgba(231, 186, 123, 0.258); color: black;">
     <img src="{{ url_for('static', filename='images/students/' + student.filename) }}" alt="{{ student.name }}">
-    <h3>{{ student.title }}</h3>
+    <h3 style="color: black;">{{ student.title }}</h3>
   </a>
   {% endfor %}
 </div>

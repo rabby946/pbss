@@ -1,62 +1,22 @@
 {% extends 'base.html' %}
 {% block title %}{{ teacher.name }} : Palashbaria Secondary School{% endblock %}
 {% block content %}
-<style>
 
-  body {
-  background: 
-    linear-gradient(to bottom, rgba(10, 93, 89, 0.525), rgba(31, 36, 4, 0.42)),
-    url("{{ url_for('static', filename='images/hero-bg.jpg') }}") 
-    no-repeat center center fixed;
-  background-size: cover;
-  color: var(--text);
-}
-
-
-  .page-heading {
-    font-size: 2.2rem;
-    color: var(--primary);
-    text-align: center;
-    margin: 2rem 0 1rem;
-    position: relative;
-  }
-  .page-heading::after {
-    content: '';
-    display: block;
-    width: 80px;
-    height: 4px;
-    background: var(--accent);
-    margin: 0.5rem auto 0;
-    border-radius: 2px;
-  }
-
-  .about-section {
-    padding: 2rem;
-    font-size: 1rem;
-    color: var(--text);
-    line-height: 1.8;
-  }
-  
-  .detail-card:hover {
-  cursor: pointer;
-  transform: translateY(-6px); /* Move button up slightly on hover */
-}
-</style>
-<div class="glass-card detail-card">
+<div style="padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 1rem; 
+         box-shadow: 0 4px 12px rgba(70, 3, 3, 0.413); background-color: rgba(231, 186, 123, 0.258);">
   <img src="{{ url_for('static', filename='images/teachers/' + teacher.filename) }}" alt="{{ teacher.name }}" onclick="openLightbox('{{ url_for('static', filename='images/teachers/' + teacher.filename) }}')">
   
   
   
 </div>
 <!-- About Section -->
-<div class="container">
-  <div class="glass-card about-section">
+<div class="glass-card about-section"  style="padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 1rem; 
+         box-shadow: 0 4px 12px rgba(70, 3, 3, 0.413); background-color: rgba(231, 186, 123, 0.258);">
     <h2 class="page-heading">{{ teacher.title }}</h2>
     <p>
       {{ teacher.description }}
     </p>
   </div>
-</div>
 <a href="{{ url_for('teachers') }}">← Back to Teachers</a>
   <!-- Lightbox modal -->
   <div id="lightbox" onclick="closeLightbox()">

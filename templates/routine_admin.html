@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Manage Routines : Palashbaria Secondary School{% endblock %}
+{% block content %}
+<div class="admin-form">
+  <h2>Manage Routines</h2>
+  <form method="post" enctype="multipart/form-data">
+    <div class="form-group">
+      <label>Password:</label>
+      <input type="password" name="password" required>
+    </div>
+    <div class="form-group">
+      <label>Title (e.g. “Class routine - 2024”):</label>
+      <input type="text" name="title" >
+    </div>
+    <div class="form-group">
+      <label>Description:</label>
+      <textarea name="description" rows="3" ></textarea>
+    </div>
+    <div class="form-group">
+      <label>PDF File:</label>
+      <input type="file" name="photo" accept="application/pdf" required>
+    </div>
+    <div class="form-actions">
+      {% if last %}
+        <button type="submit" name="action" value="delete" class="btn btn-danger">
+          Delete Last Routine
+        </button>
+      {% endif %}
+      <button type="submit" name="action" value="post" class="btn btn-primary">
+        Upload New Routine
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,74 +1,16 @@
 {% extends 'base.html' %}
 {% block title %}Home : Palashbaria Secondary School{% endblock %}
 {% block content %}
+<!-- middle the logo  -->
 
-<!-- Scoped styles for homepage -->
-<style>
-
-  body {
-  background: 
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.9)),
-    url("{{ url_for('static', filename='images/hero-bg.jpg') }}") 
-    no-repeat center center fixed;
-  background-size: cover;
-  color: var(--text);
-}
-
-
-  .page-heading {
-    font-size: 2.2rem;
-    color: var(--primary);
-    text-align: center;
-    margin: 2rem 0 1rem;
-    position: relative;
-  }
-  .page-heading::after {
-    content: '';
-    display: block;
-    width: 80px;
-    height: 4px;
-    background: var(--accent);
-    margin: 0.5rem auto 0;
-    border-radius: 2px;
-  }
-
-  .about-section {
-    padding: 2rem;
-    font-size: 1rem;
-    color: var(--text);
-    line-height: 1.8;
-  }
-</style>
-<div class="hot-news">
-    <p class="news-label">Latest News</p>
-  </a>  <div class="scroll-container">
-    <div class="scroll-text"> {{text}} </div>
-  </div>
+<div id="box"> </div>  
+<div class="myMarquee" position="absolute" style="top: 0; left: 0; width: 100%; height: 50px; overflow: hidden;">
+	<div class="scroller">
+		<div>{{text}} <a href="{{ url_for('news') }}">links</a>.</div>
+		<div>{{text}}. Read full news from  <a href="{{ url_for('news') }}"> links</a>.</div>
+	</div>
 </div>
 
-<!-- Hero Section -->
-<div class="home-hero">
-  <div class="hero-content glass-card text-center">
-    <!-- Logo -->
-    <img src="{{ url_for('static', filename='images/logo.png') }}"
-         alt="Palashbaria School Logo"
-         class="logo animate-logo">
-
-    <!-- Welcome Heading -->
-    <h1 class="hero-title animate-fade-in" style="color: rgb(57, 7, 7);">পলাশবাড়িয়া মাধ্যমিক বিদ্যালয়ে স্বাগতম</h1>
-
-    <!-- Tagline -->
-    <p class="hero-subtitle animate-fade-in delay-1" style="color: rgb(9, 45, 9);">
-      "যেখানে শিক্ষা বিকশিত হয়, ভবিষ্যৎ তৈরি হয়"
-    </p>
-
-    <!-- Action Button -->
-    <a class="btn btn-warning btn-lg mt-4 animate-bounce delay-2"
-       href="{{ url_for('news') }}" role="button">
-      সংবাদ দেখুন&nbsp;<i class="bi bi-arrow-right-circle"></i>
-    </a>
-  </div>
-</div>
 
 <!-- About Section -->
 <div class="container">

@@ -1,111 +1,21 @@
 {% extends 'base.html' %}
-{% block title %}Class Routine{% endblock %}
-
+{% block title %}Routine : Palashbaria Secondary School{% endblock %}
 {% block content %}
-<h1 class="text-center">Class Routine:</h1>
-<div class="container">
-  {% for day in [
-    ('রবিবার', 'Sunday'),
-    ('সোমবার', 'Monday'),
-    ('মঙ্গলবার', 'Tuesday'),
-    ('বুধবার', 'Wednesday'),
-    ('বৃহস্পতিবার', 'Thursday')
-  ] %}
-  <div class="routine-section glass-card">
-    <h2>{{ day[0] }} ({{ day[1] }})</h2>
-    <div class="routine-table-wrapper">
-      <table class="routine-table" style="border: px;">
-        <thead>
-          <tr>
-            <th>সময়<br>Time</th>
-            <th>৬ষ্ঠ (ক)<br>Class-6 (A)</th>
-            <th>৬ষ্ঠ (খ)<br>Class-6 (B)</th>
-            <th>৭ম<br>Class-7</th>
-            <th>৮ম<br>Class-8</th>
-            <th>৯ম<br>Class-9</th>
-            <th>১০ম<br>Class-10</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>10:00–10:25<br><small>সমাবেশ/Assembly</small></td>
-            <td colspan="6">সমাবেশ</td>
-          </tr>
-          <tr>
-            <td>10:30–11:20<br>১ম ঘন্টা</td>
-            <td>বাংলা ১+২<br><small>আইরিন</small></td>
-            <td>বাংলা ১+২<br><small>সেলিম</small></td>
-            <td>গণিত<br><small>প্রদ্যুৎ</small></td>
-            <td>গণিত<br><small>তুসার</small></td>
-            <td>ইংরেজি ১ম<br><small>দুলাল ঘোষ</small></td>
-            <td>গণিত<br><small>রুহল আমিন</small></td>
-          </tr>
-          <tr>
-            <td>11:20–12:05<br>২য় ঘন্টা</td>
-            <td>গণিত<br><small>স্বপন</small></td>
-            <td>তথ্য প্রযুক্তি<br><small>জাহাঙ্গীর</small></td>
-            <td>ধর্ম শিক্ষা<br><small>ওহিদ/নমিতা</small></td>
-            <td>বিশ্ব পরিচয়<br><small>কল্পনা</small></td>
-            <td>ইতিহাস<br><small>মনিরুল</small></td>
-            <td>তথ্য প্রযুক্তি<br><small>জান্নাতুল শীলা</small></td>
-          </tr>
-          <tr>
-            <td>12:05–12:45<br>৩য় ঘন্টা</td>
-            <td>বিশ্ব পরিচয়<br><small>সেলিম</small></td>
-            <td>গণিত<br><small>রুহল আমিন</small></td>
-            <td>বাংলা ১+২<br><small>আইরিন</small></td>
-            <td>ইংরেজি ২য়<br><small>দুলাল ঘোষ</small></td>
-            <td>পদার্থ<br><small>সুইটি</small></td>
-            <td>ইংরেজি ১ম<br><small>দুলাল ঘোষ</small></td>
-          </tr>
-          <tr>
-            <td>12:45–01:25<br>৪র্থ ঘন্টা</td>
-            <td>তথ্য প্রযুক্তি<br><small>আকাশ</small></td>
-            <td>বিজ্ঞান<br><small>হাসান</small></td>
-            <td>বিশ্ব পরিচয়<br><small>প্রদ্যুৎ</small></td>
-            <td>বিজ্ঞান<br><small>প্রদ্যুৎ</small></td>
-            <td>ব্যবসা<br><small>হাসান</small></td>
-            <td>বিজ্ঞান<br><small>সুইটি</small></td>
-          </tr>
-          <tr>
-            <td>01:25–02:15<br><small>বিরতি Break</small></td>
-            <td colspan="6">বিরতি</td>
-          </tr>
-          <tr>
-            <td>02:15–03:00<br>৫ম ঘন্টা</td>
-            <td>ইংরেজি ১+২<br><small>সেলিম</small></td>
-            <td>ইংরেজি ১+২<br><small>মনিরুল</small></td>
-            <td>ইংরেজি ২য়<br><small>দুলাল ঘোষ</small></td>
-            <td>ইংরেজি ২য়<br><small>সঃ প্রঃ শিঃ</small></td>
-            <td>বাংলা<br><small>শ্যামলি</small></td>
-            <td>সামাজিক<br><small>কল্পনা</small></td>
-          </tr>
-          <tr>
-            <td>03:00–03:45<br>৬ষ্ঠ ঘন্টা</td>
-            <td>বিজ্ঞান<br><small>হাসান</small></td>
-            <td>বিজ্ঞান<br><small>হাসান</small></td>
-            <td>বিজ্ঞান<br><small>সুইটি</small></td>
-            <td>তথ্য প্রযুক্তি<br><small>জাহাঙ্গীর</small></td>
-            <td>রসায়ন<br><small>স্বপন</small></td>
-            <td>অর্থনীতি<br><small>কল্পনা</small></td>
-          </tr>
-          <tr>
-            <td>03:45–04:30<br>৭ম ঘন্টা</td>
-            <td>সাধারণ জ্ঞান<br><small>আইরিন</small></td>
-            <td>সাধারণ জ্ঞান<br><small>আকাশ</small></td>
-            <td>সাধারণ জ্ঞান<br><small>রুহল আমিন</small></td>
-            <td>সাধারণ জ্ঞান<br><small>মনিরুল</small></td>
-            <td>ভূগোল<br><small>জাহাঙ্গীর</small></td>
-            <td>জীববিজ্ঞান<br><small>প্রদ্যুৎ</small></td>
-          </tr>
-        </tbody>
-      </table>
+<h1>Routine</h1>
+<div class="grid-2" ">
+  {% for r in routine_items %}
+    <div class="glass-card" style="padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 1rem; 
+         box-shadow: 0 4px 12px rgba(70, 3, 3, 0.413); background-color: rgba(231, 186, 123, 0.258);">
+      <h3>{{ r.title }}</h3>
+      <small>Uploaded: {{ r.timestamp[:10] }}</small>
+      <p>{{ r.description }}</p>
+      <a href="{{ url_for('static', filename='files/routine/' ~ r.filename) }}"
+         target="_blank" class="btn btn-secondary mt-2">
+        📄 Download / View PDF
+      </a>
     </div>
-  </div>
+  {% else %}
+    <p>No result sheets published yet.</p>
   {% endfor %}
-
-  <div style="text-align:center;">
-    <a class="print-btn" onclick="window.print()">⬇ Download / Print Routine</a>
-  </div>
 </div>
 {% endblock %}

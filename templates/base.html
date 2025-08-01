@@ -9,17 +9,26 @@
 </head>
 
 <body class="main-body">
-<div class="logo" style="margin-left: 32px;">
-  <a href="{{ url_for('home') }}" style="position: sticky;">
+
+
+<div class="logo" style="margin-left: 32px; padding-top: 5px;">
+  <a href="{{url_for('home') }}" style="position: sticky;">
     <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Palashbaria School Logo"> 
     পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়
   </a>
 </div>
 <header class="site-header">
+  <div class="logo" style="margin-left: 32px;">
+  <a href="{{url_for('home') }}" style="position: sticky;">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Palashbaria School Logo"> 
+    পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়
+  </a>
+  <div class="hamburger" onclick="toggleDrawer()" >☰</div>
+</div>
   <div class="header-container">
-    <div class="hamburger" onclick="toggleDrawer()">☰</div>
+    
     <nav class="main-nav" id="nav-drawer">
-      <ul>
+      <ul >
         <li><a href="{{ url_for('home') }}" class="{% if request.endpoint=='home' %}active{% endif %}">Home</a></li>
         <li><a href="{{ url_for('news') }}" class="{% if request.endpoint=='news' %}active{% endif %}">News</a></li>
         <li><a href="{{ url_for('teachers') }}" class="{% if request.endpoint=='teachers' %}active{% endif %}">Teachers</a></li>

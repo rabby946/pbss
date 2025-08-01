@@ -24,4 +24,23 @@
     </div>
   </form>
 </div>
+<div>
+  <p>
+    -
+  </p>
+</div>
+<h1>All News</h1>
+    <div class="news-grid glass-card" style="background-color: rgba(200, 249, 225, 0.712);">
+      {% for news in last %}
+          <a href="{{ url_for('news_detail', idx=loop.index0) }}">
+
+          <h3 style="color: black;">{{ news.title }}</h3>
+          <!-- Optionally an image if you have one in news.json -->
+          <small>{{ news.timestamp[:10] }}</small>
+        </a>
+      {% else %}
+        <p>No news yet.</p>
+      {% endfor %}
+    </div>
+
 {% endblock %}

@@ -6,7 +6,7 @@
   {% for mpo in mpo_items %}
   <a href="{{ url_for('mpo_detail', idx=loop.index0) }}" class="glass-card teacher-card">
     <img src="{{ url_for('static', filename='images/mpos/' + mpo.filename) }}" alt="{{ mpo.title }}">
-    <h3>{{ mpo.title }}</h3>
+    <h3 style="color: black;">{{ mpo.title }}</h3>
   </a>
   {% endfor %}
 </div>

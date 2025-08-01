@@ -200,7 +200,7 @@ def admin_crud(json_file, upload_dir=None, template_name=None):
     def view():
         items = load_json(json_file)
         last = items[0] if items else None
-        return render_template(tpl, last=last)
+        return render_template(tpl, last=items)
 
     def action():
         items = load_json(json_file)
@@ -224,20 +224,22 @@ def admin_crud(json_file, upload_dir=None, template_name=None):
 
         # Post new
         if act == 'post':
-            
+            # if mo photo and no files uploaded, return error
+            if not request.files.get('file') and not request.files.get('photo') and json_file != NEWS_FILE:
+                flash('No file uploaded.', 'error')
+                return redirect(request.path)
             title = request.form.get('title', '').strip()
             desc = request.form.get('description', '').strip()
             if not title or not desc:
-                flash('All fields are required.', 'error')
+                flash('Title and description are required.', 'error')
                 return redirect(request.path)
-
             new_item = {'timestamp': datetime.utcnow().isoformat(), 'title': title, 'description': desc}
             if upload_dir and 'photo' in request.files:
                 file = request.files['photo']
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(upload_dir, filename))
                 new_item['filename'] = filename
-            else:
+            elif json_file != NEWS_FILE:
                 flash('No file uploaded.', 'error')
                 return redirect(request.path)
             items.insert(0, new_item)

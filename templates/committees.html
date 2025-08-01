@@ -6,7 +6,7 @@
   {% for committee in committee_items %}
   <a href="{{ url_for('committee_detail', idx=loop.index0) }}" class="glass-card teacher-card">
     <img src="{{ url_for('static', filename='images/committees/' + committee.filename) }}" alt="{{ committee.title }}">
-    <h3>{{ committee.title }}</h3>
+    <h3 style="color: black;">{{ committee.title }}</h3>
   </a>
   {% endfor %}
 </div>

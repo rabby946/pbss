@@ -18,7 +18,7 @@
     </div>
     <div class="form-group">
       <label>Photo:</label>
-      <input type="file" name="photo" accept="image/*" required>
+      <input type="file" name="photo" accept="image/*" >
     </div>
     <div class="form-actions">
       {% if last %}
@@ -27,5 +27,23 @@
       <button type="submit" name="action" value="post" class="btn btn-primary">Add Accreditation </button>
     </div>
   </form>
+</div>
+<div>
+<p>
+  <br> <br>
+</p>
+<h1>Our files</h1>
+
+<div class="teachers-grid">
+  {% for mpo in last %}
+  <a href="{{ url_for('mpo_detail', idx=loop.index0) }}" class="glass-card teacher-card">
+    <h3 style="color: black;">{{ mpo.title }}</h3>
+    <h3 style="color: black;">serial number : {{ loop.index }}</h3>
+    <img src="{{ url_for('static', filename='images/mpos/' + mpo.filename) }}" alt="{{ mpo.title }}">
+    
+  </a>
+  {% endfor %}
+</div>
+
 </div>
 {% endblock %}

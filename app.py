@@ -123,7 +123,7 @@ def students():
 @app.route('/logout')
 def logout():
     session["admin"] = False
-    flash('Logged out successfully.', 'w')
+    flash('Logged out successfully. ✔️', 'success')
     return redirect(url_for('home'))
 
 # Admin Login
@@ -136,9 +136,9 @@ def login():
     if request.method == 'POST':
         if request.form.get('password') == ADMIN_PASSWORD:
             session['admin'] = True
-            flash('Logged in successfully.', 'w')
+            flash('Logged in successfully. ✔️', 'success')
             return redirect(url_for('base_admin'))
-        flash('Invalid password.', 'error')
+        flash('Invalid password.❌', 'error')
         
     return render_template('login.html')
 
@@ -207,13 +207,13 @@ def admin_crud(json_file, upload_dir=None, template_name=None):
 
         # authorizing password
         if request.form.get('password') != ADMIN_PASSWORD:
-            flash('Invalid password.', 'error')
+            flash('Invalid password.❌', 'error')
             return redirect(request.path)
 
         act = request.form.get('action')
         if act == 'delete':
             if sl <= 0 or sl > len(items):
-                flash('Position value doesn\'t exists.', 'error')
+                flash('Position value doesn\'t exists.❌', 'error')
                 return redirect(request.path)   
             items.pop(sl - 1)
             save_json(json_file, items)
@@ -224,12 +224,12 @@ def admin_crud(json_file, upload_dir=None, template_name=None):
         if act == 'post':
             # if mo photo and no files uploaded, return error
             if not request.files.get('file') and not request.files.get('photo') and json_file != NEWS_FILE:
-                flash('No file uploaded.', 'error')
+                flash('No file uploaded.❌', 'error')
                 return redirect(request.path)
             title = request.form.get('title', '').strip()
             desc = request.form.get('description', '').strip()
             if not title or not desc:
-                flash('Title and description are required.', 'error')
+                flash('Title and description are required.❌', 'error')
                 return redirect(request.path)
             new_item = {'timestamp': datetime.utcnow().isoformat(), 'title': title, 'description': desc}
             if upload_dir and 'photo' in request.files:
@@ -238,7 +238,7 @@ def admin_crud(json_file, upload_dir=None, template_name=None):
                 file.save(os.path.join(upload_dir, filename))
                 new_item['filename'] = filename
             elif json_file != NEWS_FILE:
-                flash('No file uploaded.', 'error')
+                flash('No file uploaded.❌', 'error')
                 return redirect(request.path)
             
             if sl is None or sl <= 0:
@@ -248,10 +248,10 @@ def admin_crud(json_file, upload_dir=None, template_name=None):
 
             items.insert(sl - 1, new_item)
             save_json(json_file, items)
-            flash('New item added!', 'success')
+            flash('New item added! ✔️', 'success')
             return redirect(request.path)
         
-        flash("Unknown action.", "error")
+        flash("Unknown action.❌", "error")
         return redirect(request.path)
     
     return view, action
@@ -283,7 +283,7 @@ def gallery_admin():
     if request.method == 'POST':
         # 1) Authenticate
         if request.form.get('password') != ADMIN_PASSWORD:
-            flash('Invalid password.', 'error')
+            flash('Invalid password.❌', 'error')
             return redirect(url_for('gallery_admin', gallery_items=items))
 
         action = request.form.get('action')
@@ -296,7 +296,7 @@ def gallery_admin():
                     pass
             items.pop(0)
             save_json(GALLERY_FILE, items)
-            flash('Last gallery item deleted.', 'success')
+            flash('Last gallery item deleted. ✔️', 'success')
             return redirect(url_for('gallery_admin', gallery_items=items))
 
         # 3) Add new (multiple photos)
@@ -305,7 +305,7 @@ def gallery_admin():
         files = request.files.getlist('photos')
         
         if not title or not desc or len(files) == 0:
-            flash('All fields are required.', 'error')
+            flash('All fields are required.❌', 'error')
             return redirect(url_for('gallery_admin', gallery_items=items))
 
         saved = []
@@ -315,7 +315,7 @@ def gallery_admin():
                 file.save(os.path.join(UPLOAD_DIRS['gallery'], fn))
                 saved.append(fn)
         if len(saved) == 0:
-            flash('At least one photo are required.', 'error')
+            flash('At least one photo are required. ❌', 'error')
             return redirect(url_for('gallery_admin', gallery_items=items))
         new_item = {
             'timestamp': datetime.utcnow().isoformat(),
@@ -325,7 +325,7 @@ def gallery_admin():
         }
         items.insert(0, new_item)
         save_json(GALLERY_FILE, items)
-        flash('Gallery item posted!', 'success')
+        flash('Gallery item posted! ✔️', 'success')
         return redirect(url_for('gallery_admin', gallery_items=items))
 
     return render_template('gallery_admin.html', gallery_items=items)

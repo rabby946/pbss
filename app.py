@@ -199,27 +199,25 @@ def admin_crud(json_file, upload_dir=None, template_name=None):
 
     def view():
         items = load_json(json_file)
-        last = items[0] if items else None
         return render_template(tpl, last=items)
 
     def action():
         items = load_json(json_file)
-        last = items[0] if items else None
+        sl = request.form.get('sl', type=int)
+
+        # authorizing password
         if request.form.get('password') != ADMIN_PASSWORD:
             flash('Invalid password.', 'error')
             return redirect(request.path)
 
         act = request.form.get('action')
-        # Delete last
-        if act == 'delete' and last:
-            if upload_dir:
-                try:
-                    os.remove(os.path.join(upload_dir, last.get('filename', '')))
-                except OSError:
-                    pass
-            items.pop(0)
+        if act == 'delete':
+            if sl <= 0 or sl > len(items):
+                flash('Position value doesn\'t exists.', 'error')
+                return redirect(request.path)   
+            items.pop(sl - 1)
             save_json(json_file, items)
-            flash('Deleted last item.', 'success')
+            flash('Deleted item ✔️', 'success')
             return redirect(request.path)
 
         # Post new
@@ -242,12 +240,22 @@ def admin_crud(json_file, upload_dir=None, template_name=None):
             elif json_file != NEWS_FILE:
                 flash('No file uploaded.', 'error')
                 return redirect(request.path)
-            items.insert(0, new_item)
+            
+            if sl is None or sl <= 0:
+                sl = 1  # put at the start
+            elif sl > len(items):
+                sl = len(items) + 1  # put at the end
+
+            items.insert(sl - 1, new_item)
             save_json(json_file, items)
             flash('New item added!', 'success')
             return redirect(request.path)
-
+        
+        flash("Unknown action.", "error")
+        return redirect(request.path)
+    
     return view, action
+
 # Results admin
 res_view, res_action = admin_crud(
     RESULTS_FILE,
@@ -276,7 +284,7 @@ def gallery_admin():
         # 1) Authenticate
         if request.form.get('password') != ADMIN_PASSWORD:
             flash('Invalid password.', 'error')
-            return redirect(url_for('gallery_admin'))
+            return redirect(url_for('gallery_admin', gallery_items=items))
 
         action = request.form.get('action')
         # 2) Delete last
@@ -289,15 +297,16 @@ def gallery_admin():
             items.pop(0)
             save_json(GALLERY_FILE, items)
             flash('Last gallery item deleted.', 'success')
-            return redirect(url_for('gallery_admin'))
+            return redirect(url_for('gallery_admin', gallery_items=items))
 
         # 3) Add new (multiple photos)
         title = request.form.get('title','').strip()
         desc  = request.form.get('description','').strip()
         files = request.files.getlist('photos')
-        if not title or not desc or not files:
-            flash('All fields and at least one photo are required.', 'error')
-            return redirect(url_for('gallery_admin'))
+        
+        if not title or not desc or len(files) == 0:
+            flash('All fields are required.', 'error')
+            return redirect(url_for('gallery_admin', gallery_items=items))
 
         saved = []
         for file in files:
@@ -305,7 +314,9 @@ def gallery_admin():
                 fn = secure_filename(file.filename)
                 file.save(os.path.join(UPLOAD_DIRS['gallery'], fn))
                 saved.append(fn)
-
+        if len(saved) == 0:
+            flash('At least one photo are required.', 'error')
+            return redirect(url_for('gallery_admin', gallery_items=items))
         new_item = {
             'timestamp': datetime.utcnow().isoformat(),
             'title': title,
@@ -315,9 +326,9 @@ def gallery_admin():
         items.insert(0, new_item)
         save_json(GALLERY_FILE, items)
         flash('Gallery item posted!', 'success')
-        return redirect(url_for('gallery_admin'))
+        return redirect(url_for('gallery_admin', gallery_items=items))
 
-    return render_template('gallery_admin.html', last=last)
+    return render_template('gallery_admin.html', gallery_items=items)
 
 
 # Register CRUD routes
@@ -344,6 +355,7 @@ app.add_url_rule('/admin/students', 'student_admin', admin_required(stud_view), 
 app.add_url_rule('/admin/students', 'student_admin_post', admin_required(stud_action), methods=['POST'])
 
 if __name__ == '__main__':
+    # app.run(debug=True)
     import os
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)

@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
-{% block title %}Manage Committee : Palashbaria Secondary School{% endblock %}
+{% block title %}Manage committees : Palashbaria Secondary School{% endblock %}
 {% block content %}
-<div class="admin-form">
-  <h2>Manage Committee</h2>
+<div class="admin-container">
+  <div class="admin-form">
+    <!-- form content -->
+     <h2>Manage committees</h2>
   <form method="post" enctype="multipart/form-data">
     <div class="form-group">
       <label>Password:</label>
@@ -18,36 +20,34 @@
     </div>
     <div class="form-group">
       <label>Photo:</label>
-      <input type="file" name="photo" accept="image/*">
+      <input type="file" name="photo" accept="image/*"  >
+    </div>
+    <div class="form-group">
+      <label>Position:</label>
+      <input type="number" name="sl" placeholder="Enter position where you want to add/delete"> 
     </div>
     <div class="form-actions">
       {% if last %}
-      <div class="form-group">
-        <label>Delete the position :</label>
-        <input type="number" name="position" placeholder="Give the position number to delete" required>
-      </div>
-        <button type="submit" name="action" value="delete" class="btn btn-danger">Delete Last member</button>
+
+        <button type="submit" name="action" value="delete" class="btn btn-danger">Delete Last committee</button>
       {% endif %}
-      <button type="submit" name="action" value="post" class="btn btn-primary">Add member</button>
+      <button type="submit" name="action" value="post" class="btn btn-primary">Add committee</button>
     </div>
   </form>
-</div>
-<div>
-<p>
-  <br> <br>
-</p>
-<h1>Our Committee</h1>
+  </div>
+  <div class="admin-news glass-card">
+    <h1>Our committee</h1>
 
 <div class="teachers-grid">
   {% for committee in last %}
   <a href="{{ url_for('committee_detail', idx=loop.index0) }}" class="glass-card teacher-card">
     <h3 style="color: black;">{{ committee.title }}</h3>
-    <h3 style="color: black;">serial number : {{ loop.index }}</h3>
-    <img src="{{ url_for('static', filename='images/committees/' + committee.filename) }}" alt="{{ committee.title }}">
     
+    <img src="{{ url_for('static', filename='images/committees/' + committee.filename) }}" alt="{{ committee.title }}">
+    <h3 style="color: black; text-align: center;">Position : {{ loop.index }}</h3>
   </a>
   {% endfor %}
 </div>
-
+  </div>
 </div>
 {% endblock %}

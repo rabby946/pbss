@@ -18,7 +18,7 @@
     </div>
     <div class="form-group">
       <label>Photos:</label>
-      <input type="file" name="photos" multiple accept="image/*" required>
+      <input type="file" name="photos" multiple accept="image/*" >
     </div>
     <div class="form-actions">
       {% if last %}
@@ -27,7 +27,27 @@
       <button type="submit" name="action" value="post" class="btn btn-primary">Post to Gallery</button>
     </div>
   </form>
+</div>
 
-
+<div>
+  <p>
+    -
+  </p>
+</div>
+<h1 class="text-center">Gallery</h1>
+<div class="gallery-grid">
+  {% for idx, item in enumerate(gallery_items) %}
+    <a href="{{ url_for('gallery_detail', idx=idx) }}" class="gallery-link">
+      <div class="gallery-card">
+        <img
+          src="{{ url_for('static', filename='images/gallery/' + item.images[0]) }}"
+          alt="{{ item.title }}"
+          class="gallery-img">
+        <h3 style="text-align: center;">{{ item.title }}</h3>
+        <!-- print item number -->
+         <p style="text-align: center;">{{ idx + 1 }}</p>
+      </div>
+    </a>
+  {% endfor %}
 </div>
 {% endblock %}

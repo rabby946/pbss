@@ -193,6 +193,7 @@ def base_admin():
     return render_template('base_admin.html')
 
 # Generic CRUD factory
+
 def admin_crud(json_file, upload_dir=None, template_name=None):
     # Determine template
     tpl = template_name or f"{os.path.splitext(os.path.basename(json_file))[0]}_admin.html"
@@ -205,42 +206,60 @@ def admin_crud(json_file, upload_dir=None, template_name=None):
         items = load_json(json_file)
         sl = request.form.get('sl', type=int)
 
-        # authorizing password
+        # Authorize password
         if request.form.get('password') != ADMIN_PASSWORD:
             flash('Invalid password.❌', 'error')
             return redirect(request.path)
 
         act = request.form.get('action')
+        
+        # DELETE
         if act == 'delete':
-            if sl <= 0 or sl > len(items):
-                flash('Position value doesn\'t exists.❌', 'error')
-                return redirect(request.path)   
+            if not items or sl <= 0 or sl > len(items):
+                flash('Position value doesn\'t exist.❌', 'error')
+                return redirect(request.path)
             items.pop(sl - 1)
             save_json(json_file, items)
             flash('Deleted item ✔️', 'success')
             return redirect(request.path)
 
-        # Post new
+        # POST
         if act == 'post':
-            # if mo photo and no files uploaded, return error
-            if not request.files.get('file') and not request.files.get('photo') and json_file != NEWS_FILE:
-                flash('No file uploaded.❌', 'error')
-                return redirect(request.path)
             title = request.form.get('title', '').strip()
             desc = request.form.get('description', '').strip()
+
             if not title or not desc:
                 flash('Title and description are required.❌', 'error')
                 return redirect(request.path)
-            new_item = {'timestamp': datetime.utcnow().isoformat(), 'title': title, 'description': desc}
+
+            new_item = {
+                'timestamp': datetime.utcnow().isoformat(),
+                'title': title,
+                'description': desc
+            }
+
+            # Handle file upload if required
             if upload_dir and 'photo' in request.files:
                 file = request.files['photo']
-                filename = secure_filename(file.filename)
-                file.save(os.path.join(upload_dir, filename))
-                new_item['filename'] = filename
+                if file and file.filename:
+                    filename = secure_filename(file.filename)
+                    
+                    # Ensure unique filename
+                    base, ext = os.path.splitext(filename)
+                    unique_filename = f"{base}_{int(datetime.utcnow().timestamp())}{ext}"
+                    
+                    path = os.path.join(upload_dir, unique_filename)
+                    file.save(path)
+                    
+                    new_item['filename'] = unique_filename
+                else:
+                    flash('No file uploaded.❌', 'error')
+                    return redirect(request.path)
             elif json_file != NEWS_FILE:
                 flash('No file uploaded.❌', 'error')
                 return redirect(request.path)
-            
+
+            # Clamp SL value
             if sl is None or sl <= 0:
                 sl = 1  # put at the start
             elif sl > len(items):
@@ -273,12 +292,11 @@ rou_view, rou_action = admin_crud(
 app.add_url_rule('/admin/routine', 'routine_admin', admin_required(rou_view), methods=['GET'])
 app.add_url_rule('/admin/routine', 'routine_admin_post', admin_required(rou_action), methods=['POST'])
 
-# Gallery admin
 @app.route('/admin/gallery', methods=['GET', 'POST'])
 @admin_required
 def gallery_admin():
     items = load_json(GALLERY_FILE)
-    last = items[0] if items else None
+    sl = request.form.get('sl', type=int)
 
     if request.method == 'POST':
         # 1) Authenticate
@@ -287,24 +305,35 @@ def gallery_admin():
             return redirect(url_for('gallery_admin', gallery_items=items))
 
         action = request.form.get('action')
-        # 2) Delete last
-        if action == 'delete' and last:
+
+        # 2) Delete gallery item
+        if action == 'delete':
+            if not items or sl <= 0 or sl > len(items):
+                flash('No items to delete.❌', 'error')
+                return redirect(url_for('gallery_admin', gallery_items=items))
+
+            last = items[sl - 1]
             for fn in last.get('images', []):
                 try:
                     os.remove(os.path.join(UPLOAD_DIRS['gallery'], fn))
                 except OSError:
                     pass
-            items.pop(0)
+            items.pop(sl - 1)
             save_json(GALLERY_FILE, items)
-            flash('Last gallery item deleted. ✔️', 'success')
+            flash('Gallery item deleted. ✔️', 'success')
             return redirect(url_for('gallery_admin', gallery_items=items))
 
         # 3) Add new (multiple photos)
-        title = request.form.get('title','').strip()
-        desc  = request.form.get('description','').strip()
+        if sl <= 0:
+            sl = 1
+        if sl > len(items):
+            sl = len(items) + 1
+
+        title = request.form.get('title', '').strip()
+        desc  = request.form.get('description', '').strip()
         files = request.files.getlist('photos')
-        
-        if not title or not desc or len(files) == 0:
+
+        if not title or not desc or not files:
             flash('All fields are required.❌', 'error')
             return redirect(url_for('gallery_admin', gallery_items=items))
 
@@ -312,18 +341,25 @@ def gallery_admin():
         for file in files:
             if file and file.filename:
                 fn = secure_filename(file.filename)
+                # Ensure unique filenames
+                path = os.path.join(UPLOAD_DIRS['gallery'], fn)
+                if os.path.exists(path):
+                    name, ext = os.path.splitext(fn)
+                    fn = f"{name}_{int(datetime.utcnow().timestamp())}{ext}"
                 file.save(os.path.join(UPLOAD_DIRS['gallery'], fn))
                 saved.append(fn)
-        if len(saved) == 0:
-            flash('At least one photo are required. ❌', 'error')
+
+        if not saved:
+            flash('At least one photo is required. ❌', 'error')
             return redirect(url_for('gallery_admin', gallery_items=items))
+
         new_item = {
             'timestamp': datetime.utcnow().isoformat(),
             'title': title,
             'description': desc,
             'images': saved
         }
-        items.insert(0, new_item)
+        items.insert(sl - 1, new_item)
         save_json(GALLERY_FILE, items)
         flash('Gallery item posted! ✔️', 'success')
         return redirect(url_for('gallery_admin', gallery_items=items))

@@ -34,9 +34,11 @@
     <h1>All News</h1>
     <div class="news-grid glass-card">
       {% for news in last %}
+      
         <a href="{{ url_for('news_detail', idx=loop.index0) }}">
           <h3>{{ news.title }}</h3>
           <small>{{ news.timestamp[:10] }}</small>
+          <h3 style="color: black; text-align: center;">Position : {{ loop.index }}</h3>
         </a>
       {% else %}
         <p>No news yet.</p>

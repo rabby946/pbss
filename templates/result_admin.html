@@ -43,6 +43,7 @@
     <h1>Results</h1>
 <div class="grid-2">
   {% for r in last %}
+  
     <div class="glass-card" style="padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 1rem; 
          box-shadow: 0 4px 12px rgba(168, 56, 56, 0.413); background-color: rgba(173, 231, 123, 0.258);">
       <h3>{{ r.title }}</h3>
@@ -52,6 +53,7 @@
          target="_blank" class="btn btn-secondary mt-2">
         📄 Download / View PDF
       </a>
+      <h3 style="color: black; text-align: center;">Position : {{ loop.index }}</h3>
     </div>
   {% else %}
     <p>No result sheets published yet.</p>

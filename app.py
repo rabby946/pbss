@@ -434,7 +434,7 @@ app.add_url_rule('/admin/students', 'student_admin', admin_required(stud_view), 
 app.add_url_rule('/admin/students', 'student_admin_post', admin_required(stud_action), methods=['POST'])
 
 if __name__ == '__main__':
-    app.run(debug=True)
-    # import os
-    # port = int(os.environ.get('PORT', 5000))
-    # app.run(host='0.0.0.0', port=port)
+    # app.run(debug=True)
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)

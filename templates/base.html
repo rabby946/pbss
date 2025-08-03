@@ -78,5 +78,332 @@
   }
 </script>
 <script src="{{ url_for('static', filename='script.js') }}"></script>
+<!-- Enhanced Chatbot -->
+<style>
+  #chatbot-icon {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: linear-gradient(135deg, #1e90ff, #0066cc);
+    color: white;
+    border-radius: 50%;
+    padding: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 999;
+    box-shadow: 0 4px 20px rgba(30, 144, 255, 0.4);
+    transition: all 0.3s ease;
+    border: none;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #chatbot-icon:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(30, 144, 255, 0.6);
+  }
+
+  #chat-popup {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    width: 350px;
+    height: 500px;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+    z-index: 999;
+    border: 1px solid #e0e0e0;
+  }
+
+  #chat-header {
+    background: linear-gradient(135deg, #1e90ff, #0066cc);
+    color: white;
+    padding: 15px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  #chat-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s;
+  }
+
+  #chat-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  #chat-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    font-size: 14px;
+    background: #f8f9fa;
+    line-height: 1.4;
+  }
+
+  .message {
+    margin-bottom: 15px;
+    max-width: 80%;
+    word-wrap: break-word;
+  }
+
+  .message.user {
+    text-align: right;
+    margin-left: auto;
+  }
+
+  .message.bot {
+    text-align: left;
+  }
+
+  .message-content {
+    padding: 10px 15px;
+    border-radius: 18px;
+    display: inline-block;
+  }
+
+  .message.user .message-content {
+    background: #1e90ff;
+    color: white;
+  }
+
+  .message.bot .message-content {
+    background: white;
+    color: #333;
+    border: 1px solid #e0e0e0;
+  }
+
+  #chat-input-area {
+    display: flex;
+    border-top: 1px solid #e0e0e0;
+    background: white;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  #chat-input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    outline: none;
+    font-size: 14px;
+  }
+
+  #chat-input:focus {
+    border-color: #1e90ff;
+  }
+
+  #send-btn {
+    padding: 10px 15px;
+    background: linear-gradient(135deg, #1e90ff, #0066cc);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    min-width: 60px;
+  }
+
+  #send-btn:hover {
+    background: linear-gradient(135deg, #0066cc, #004c99);
+    transform: translateY(-1px);
+  }
+
+  #send-btn:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .typing-indicator {
+    display: none;
+    padding: 10px 15px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 18px;
+    color: #666;
+    font-style: italic;
+    margin-bottom: 15px;
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 480px) {
+    #chat-popup {
+      width: calc(100vw - 20px);
+      right: 10px;
+      left: 10px;
+      height: 450px;
+    }
+    
+    #chatbot-icon {
+      right: 20px;
+      bottom: 20px;
+    }
+  }
+</style>
+
+<div id="chatbot-icon">
+  💬
+
+</div>
+
+<div id="chat-popup">
+  <div id="chat-header">
+    <span>Palashbaria School AI Assistant</span>
+    <button id="chat-close">×</button>
+  </div>
+  <div id="chat-messages">
+    <div class="message bot">
+      <div class="message-content">
+        Hello! I'm here to help you learn about Palashbaria Secondary School. Ask me anything about the school's history, facilities, staff, or programs!
+      </div>
+    </div>
+  </div>
+  <div class="typing-indicator" id="typing-indicator">AI is typing...</div>
+  <div id="chat-input-area">
+    <input type="text" id="chat-input" placeholder="Ask me about the school..." />
+    <button id="send-btn">Send</button>
+  </div>
+</div>
+
+<script>
+  const chatIcon = document.getElementById('chatbot-icon');
+  const chatPopup = document.getElementById('chat-popup');
+  const chatClose = document.getElementById('chat-close');
+  const sendBtn = document.getElementById('send-btn');
+  const chatInput = document.getElementById('chat-input');
+  const chatMessages = document.getElementById('chat-messages');
+  const typingIndicator = document.getElementById('typing-indicator');
+
+  // Toggle chat popup
+  chatIcon.addEventListener('click', () => {
+    chatPopup.style.display = chatPopup.style.display === 'flex' ? 'none' : 'flex';
+    if (chatPopup.style.display === 'flex') {
+      chatInput.focus();
+    }
+  });
+
+  // Close chat popup
+  chatClose.addEventListener('click', () => {
+    chatPopup.style.display = 'none';
+  });
+
+  // Send message on button click
+  sendBtn.addEventListener('click', sendMessage);
+
+  // Send message on Enter key press
+  chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  async function sendMessage() {
+    const userMsg = chatInput.value.trim();
+    if (!userMsg || sendBtn.disabled) return;
+
+    // Add user message
+    addMessage('user', userMsg);
+    chatInput.value = '';
+    
+    // Disable input while processing
+    sendBtn.disabled = true;
+    sendBtn.textContent = 'Sending...';
+    chatInput.disabled = true;
+    
+    // Show typing indicator
+    typingIndicator.style.display = 'block';
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    try {
+      const res = await fetch('/ai-chat', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ message: userMsg }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const data = await res.json();
+      
+      // Hide typing indicator
+      typingIndicator.style.display = 'none';
+      
+      // Add AI response
+      addMessage('bot', data.answer || data.response || 'Sorry, I couldn\'t understand that.');
+      
+    } catch (err) {
+      console.error('Chat error:', err);
+      typingIndicator.style.display = 'none';
+      addMessage('bot', 'Sorry, I\'m having trouble connecting right now. Please try again later.');
+    } finally {
+      // Re-enable input
+      sendBtn.disabled = false;
+      sendBtn.textContent = 'Send';
+      chatInput.disabled = false;
+      chatInput.focus();
+    }
+  }
+
+  function addMessage(sender, message) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}`;
+    
+    const messageContent = document.createElement('div');
+    messageContent.className = 'message-content';
+    messageContent.textContent = message;
+    
+    messageDiv.appendChild(messageContent);
+    chatMessages.appendChild(messageDiv);
+    
+    // Scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  // Auto-focus input when popup opens
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+        if (chatPopup.style.display === 'flex') {
+          setTimeout(() => chatInput.focus(), 100);
+        }
+      }
+    });
+  });
+
+  observer.observe(chatPopup, {
+    attributes: true,
+    attributeFilter: ['style']
+  });
+</script>
+
 </body>
 </html>

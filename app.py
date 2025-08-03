@@ -5,6 +5,48 @@ from werkzeug.utils import secure_filename
 from functools import wraps
 
 app = Flask(__name__)
+from ai import ai_chat
+app.register_blueprint(ai_chat)
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route("/ai-chat", methods=["POST"])
+def ai_chat():
+    data = request.get_json()
+    message = data.get("message", "").lower()
+
+    categories = {
+        "teachers": ["teacher", "teachers"],
+        "students": ["student", "students"],
+        "news": ["news"],
+        "committee": ["committee"],
+        "routine": ["routine"],
+        "result": ["results", "result"],
+        "gallery": ["achievement", "campus", "facility", "extra-curricular"],
+        "contact": ["complain", "issue", "report", "information", "contact", "contacts", "phone", "mobile"],
+        "accreditation": ["mpo", "proof", "documents"],
+        "login": ["admin", "control panel"],
+        "option" : ["option", 'menu'],
+        "hi" : ["hi", "hello"],
+        "head" : ["head"]
+    }
+
+    for category, keywords in categories.items():
+        for keyword in keywords:
+            if keyword in message:
+                if category  == "head" : 
+                    return jsonify({"response": "Seems like you are asking about our head teacher who is Farid Ahmed (MSC MED in math)"})
+                if category == "hi" :
+                    return jsonify({"response": "Hello, how can I help you?"})
+                if category == "option" : 
+                    return jsonify({"response": "You are in the home page. Menu is in the top right corner. Please select an option."})
+                return jsonify({
+                    "answer": f"It seems you're asking about {category}. Please visit our {category} page to learn more."
+                })
+
+    return jsonify({"answer": "Sorry, I couldn't understand that. Please try asking about teachers, students, results, or any school topic."})
+
 app.secret_key = 'super-secret-key'
 app.jinja_env.globals.update(enumerate=enumerate)
 BASE_DIR = os.path.dirname(__file__)
@@ -64,6 +106,7 @@ def admin_required(view):
             return redirect(url_for('login'))
         return view(*args, **kwargs)
     return wrapped
+
 
 # Public Routes
 @app.route('/ping')
@@ -391,10 +434,7 @@ app.add_url_rule('/admin/students', 'student_admin', admin_required(stud_view), 
 app.add_url_rule('/admin/students', 'student_admin_post', admin_required(stud_action), methods=['POST'])
 
 if __name__ == '__main__':
-    # app.run(debug=True)
-    import os
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
-
-
-
+    app.run(debug=True)
+    # import os
+    # port = int(os.environ.get('PORT', 5000))
+    # app.run(host='0.0.0.0', port=port)

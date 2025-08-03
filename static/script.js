@@ -26,3 +26,4 @@ const autoType = ()=>{
 
 // Setting Intervals
 const m = setInterval(autoType,100);
+

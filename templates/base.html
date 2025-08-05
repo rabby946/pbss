@@ -39,13 +39,13 @@
         <li><a href="{{ url_for('gallery') }}" class="{% if request.endpoint=='gallery' %}active{% endif %}">Gallery</a></li>
         <li><a href="{{ url_for('mpos') }}" class="{% if request.endpoint=='mpos' %}active{% endif %}">Accreditations</a></li>
         <li><a href="{{ url_for('contact') }}" class="{% if request.endpoint=='contact' %}active{% endif %}">Contact</a></li>
-        <li><a href="{{ url_for('login') }}" class="{% if request.endpoint == 'login' %}active{% endif %}">Login</a></li>
+        <li><a href="{{ url_for('login') }}" class="{% if request.endpoint == 'login' %}active{% endif %}">Admin Panel</a></li>
       </ul>
     </nav>
   </div>
 </header>
 
-<main class="container">
+<main class="container" style="padding-top: 40px;">
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% for category, msg in messages %}
       <div class="glass-card message-card" style="color: {% if category == 'error' %}red{% else %}green{% endif %};">{{ msg }}</div>
@@ -84,7 +84,7 @@
     position: fixed;
     bottom: 30px;
     right: 30px;
-    background: linear-gradient(135deg, #1e90ff, #0066cc);
+    background: linear-gradient(135deg, #5accdc, #0066cc);
     color: white;
     border-radius: 50%;
     padding: 15px;

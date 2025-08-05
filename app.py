@@ -1,55 +1,31 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
-import json, os
+# --- Standard Libraries ---
+import json
+import os
 from datetime import datetime
-from werkzeug.utils import secure_filename
 from functools import wraps
 
+# --- Third-Party Libraries ---
+from flask import (Flask, render_template, request, redirect, url_for, 
+                   flash, session, jsonify)
+from dotenv import load_dotenv
+from werkzeug.utils import secure_filename
+import google.generativeai as genai
+
+# --- Application Setup ---
+load_dotenv()
 app = Flask(__name__)
-from ai import ai_chat
-app.register_blueprint(ai_chat)
-from flask import Flask, request, jsonify
-
-app = Flask(__name__)
-
-@app.route("/ai-chat", methods=["POST"])
-def ai_chat():
-    data = request.get_json()
-    message = data.get("message", "").lower()
-
-    categories = {
-        "teachers": ["teacher", "teachers"],
-        "students": ["student", "students"],
-        "news": ["news"],
-        "committee": ["committee"],
-        "routine": ["routine"],
-        "result": ["results", "result"],
-        "gallery": ["achievement", "campus", "facility", "extra-curricular"],
-        "contact": ["complain", "issue", "report", "information", "contact", "contacts", "phone", "mobile"],
-        "accreditation": ["mpo", "proof", "documents"],
-        "login": ["admin", "control panel"],
-        "option" : ["option", 'menu'],
-        "hi" : ["hi", "hello"],
-        "head" : ["head"]
-    }
-
-    for category, keywords in categories.items():
-        for keyword in keywords:
-            if keyword in message:
-                if category  == "head" : 
-                    return jsonify({"response": "Seems like you are asking about our head teacher who is Farid Ahmed (MSC MED in math)"})
-                if category == "hi" :
-                    return jsonify({"response": "Hello, how can I help you?"})
-                if category == "option" : 
-                    return jsonify({"response": "You are in the home page. Menu is in the top right corner. Please select an option."})
-                return jsonify({
-                    "answer": f"It seems you're asking about {category}. Please visit our {category} page to learn more."
-                })
-
-    return jsonify({"answer": "Sorry, I couldn't understand that. Please try asking about teachers, students, results, or any school topic."})
-
 app.secret_key = 'super-secret-key'
 app.jinja_env.globals.update(enumerate=enumerate)
 BASE_DIR = os.path.dirname(__file__)
+
+# --- Gemini API Configuration ---
+try:
+    genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+except Exception as e:
+    print(f"Error configuring Gemini API: {e}. Make sure GOOGLE_API_KEY is set in your .env file.")
+
+
+
 
 # Data files
 NEWS_FILE = os.path.join(BASE_DIR, 'news.json')
@@ -60,6 +36,7 @@ COMMITTEES_FILE = os.path.join(BASE_DIR, 'committees.json')
 STUDENTS_FILE = os.path.join(BASE_DIR, 'students.json')
 RESULTS_FILE = os.path.join(BASE_DIR, 'results.json')
 ROUTINE_FILE = os.path.join(BASE_DIR, 'routine.json')
+SCHOOL_INFO_FILE = os.path.join(BASE_DIR, 'school_info.json')
 
 UPLOAD_DIRS = {
     'gallery': os.path.join(BASE_DIR, 'static', 'images', 'gallery'),
@@ -432,6 +409,78 @@ app.add_url_rule('/admin/committees', 'committee_admin_post', admin_required(com
 stud_view, stud_action = admin_crud(STUDENTS_FILE, UPLOAD_DIRS['students'], 'student_admin.html')
 app.add_url_rule('/admin/students', 'student_admin', admin_required(stud_view), methods=['GET'])
 app.add_url_rule('/admin/students', 'student_admin_post', admin_required(stud_action), methods=['POST'])
+
+
+# --- THE ULTIMATE AI CHAT FUNCTION ---
+@app.route("/ai-chat", methods=["POST"])
+def ai_chat():
+    try:
+        data = request.get_json()
+        user_input = data.get("message", "").strip()
+
+        if not user_input:
+            return jsonify({"answer": "No message received."}), 400
+
+        school_info = load_json(SCHOOL_INFO_FILE)
+        news_data = load_json(NEWS_FILE)
+        teachers_data = load_json(TEACHERS_FILE)
+        committees_data = load_json(COMMITTEES_FILE)
+        students_data = load_json(STUDENTS_FILE)
+        accreditations_data = load_json(MPOS_FILE)
+
+        context_parts = []
+        if school_info:
+            context_parts.append(f"### About Palashbaria Secondary School\n- Name: {school_info.get('school_name', 'N/A')}\n- EIIN: {school_info.get('eiin', 'N/A')}\n- Location: {school_info.get('location', 'N/A')}\n- History & Mission: {school_info.get('about_us', 'N/A')}")
+            if school_info.get('head_teacher_message'):
+                context_parts.append(f"### Message from the Head Teacher ({school_info['head_teacher_message'].get('name', 'N/A')})\n{school_info['head_teacher_message'].get('message', 'N/A')}")
+            if school_info.get('president_message'):
+                context_parts.append(f"### Message from the President ({school_info['president_message'].get('name', 'N/A')})\n{school_info['president_message'].get('message', 'N/A')}")
+        if teachers_data:
+            teacher_names = ", ".join([t.get('title', 'N/A') for t in teachers_data])
+            context_parts.append(f"### Teachers Information\n- Total Teachers: {len(teachers_data)}\n- Teacher Names: {teacher_names}")
+        if students_data:
+            context_parts.append(f"### Student Information\n- Total Students: {len(students_data)}. For privacy, details about individual students are not available.")
+        if committees_data:
+            committee_titles = ", ".join([c.get('title', 'N/A') for c in committees_data])
+            context_parts.append(f"### School Committees\n- Committees include: {committee_titles}")
+        if news_data:
+            news_headlines = "\n".join([f"- \"{n.get('title', 'No Title')}\"" for n in news_data[:3]])
+            context_parts.append(f"### Recent News & Announcements\n{news_headlines}")
+        if accreditations_data:
+            accreditation_titles = ", ".join([a.get('title', 'N/A') for a in accreditations_data])
+            context_parts.append(f"### Accreditations (MPO)\n- Our accreditations include: {accreditation_titles}")
+        
+        school_context = "\n\n".join(context_parts)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        
+        prompt = f"""
+        You are a helpful, respectful, and knowledgeable AI assistant for "Palashbaria Secondary School".
+        Your main goal is to answer questions accurately using ONLY the information provided in the "SCHOOL INFORMATION" section below.
+        
+        Instructions:
+        1. Base all your answers strictly on the provided "SCHOOL INFORMATION".
+        2. If the user's question cannot be answered from the context, politely say: "I'm sorry, I don't have specific information about that."
+        3. Do not make up information.
+        4. Keep your answers concise.
+        5. If asked about students, try to find information from students page where I put 8 group photo of 8 different classes of regular and vocational, and in every card I have added the the total students of that class.
+        6. If want to know about achievement try to find achievements from gallery section and remember "চ্যম্পিয়ন- দূর্নীতি দমন কমিশন কর্তৃক আয়োজিত বিতর্ক প্রতিযোগিতায় পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয় মহম্মদপুর উপজেলা চ্যাম্পিয়ন হওয়ার গৌরব অর্জন করেছে at july month 2025।"
+        7. If want to know about student try to find information from students page where I put 8 group photo of 8 different classes of regular and vocational, and in every card I have added the the total students of that class.
+        
+
+
+        --- SCHOOL INFORMATION ---
+        {school_context}
+        --------------------------
+
+        User's question: "{user_input}"
+        """
+        response = model.generate_content(prompt)
+        return jsonify({"answer": response.text})
+
+    except Exception as e:
+        print(f"Error during AI chat: {e}")
+        return jsonify({"answer": "I'm sorry, I'm having trouble connecting to my brain right now."}), 500
+
 
 if __name__ == '__main__':
     # app.run(debug=True)

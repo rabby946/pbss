@@ -24,7 +24,7 @@
     </div>
     <div class="form-group">
       <label>Position:</label>
-      <input type="number" name="sl" placeholder="Enter position where you want to add/delete"required> 
+      <input type="number" name="sl" placeholder="Enter position where you want to add/delete"> 
     </div>
     <div class="form-actions">
       {% if last %}
@@ -32,6 +32,18 @@
         <button type="submit" name="action" value="delete" class="btn btn-danger">Delete </button>
       {% endif %}
       <button type="submit" name="action" value="post" class="btn btn-primary">Add </button>
+      {%if last|length > 1 %}
+        <button type="submit" name="action" value="swap" class="btn btn-danger">Swap</button>
+      {% endif %}
+    </div>
+    <br>
+    <div class="form-group">
+      {%if last|length > 1 %}
+        <span>
+          <input type="number" name="idx1" placeholder="swap position 1"> 
+        <input type="number" name="idx2" placeholder="swap position 2"> 
+        </span>
+      {% endif %}
     </div>
   </form>
   </div>

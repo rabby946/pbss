@@ -213,7 +213,6 @@ def base_admin():
     return render_template('base_admin.html')
 
 # Generic CRUD factory
-
 def admin_crud(json_file, upload_dir=None, template_name=None):
     # Determine template
     tpl = template_name or f"{os.path.splitext(os.path.basename(json_file))[0]}_admin.html"
@@ -224,7 +223,6 @@ def admin_crud(json_file, upload_dir=None, template_name=None):
 
     def action():
         items = load_json(json_file)
-        sl = request.form.get('sl', type=int)
 
         # Authorize password
         if request.form.get('password') != ADMIN_PASSWORD:
@@ -232,10 +230,11 @@ def admin_crud(json_file, upload_dir=None, template_name=None):
             return redirect(request.path)
 
         act = request.form.get('action')
-        
+
         # DELETE
         if act == 'delete':
-            if not items or sl <= 0 or sl > len(items):
+            sl = request.form.get('sl', type=int)
+            if sl is None or sl <= 0 or sl > len(items):
                 flash('Position value doesn\'t exist.❌', 'error')
                 return redirect(request.path)
             items.pop(sl - 1)
@@ -245,11 +244,12 @@ def admin_crud(json_file, upload_dir=None, template_name=None):
 
         # POST
         if act == 'post':
+            sl = request.form.get('sl', type=int)
             title = request.form.get('title', '').strip()
             desc = request.form.get('description', '').strip()
 
-            if not title or not desc:
-                flash('Title and description are required.❌', 'error')
+            if not title or not desc or sl is None:
+                flash('Title, description, and position are required.❌', 'error')
                 return redirect(request.path)
 
             new_item = {
@@ -263,14 +263,10 @@ def admin_crud(json_file, upload_dir=None, template_name=None):
                 file = request.files['photo']
                 if file and file.filename:
                     filename = secure_filename(file.filename)
-                    
-                    # Ensure unique filename
                     base, ext = os.path.splitext(filename)
                     unique_filename = f"{base}_{int(datetime.utcnow().timestamp())}{ext}"
-                    
                     path = os.path.join(upload_dir, unique_filename)
                     file.save(path)
-                    
                     new_item['filename'] = unique_filename
                 else:
                     flash('No file uploaded.❌', 'error')
@@ -280,20 +276,37 @@ def admin_crud(json_file, upload_dir=None, template_name=None):
                 return redirect(request.path)
 
             # Clamp SL value
-            if sl is None or sl <= 0:
-                sl = 1  # put at the start
+            if sl <= 0:
+                sl = 1
             elif sl > len(items):
-                sl = len(items) + 1  # put at the end
+                sl = len(items) + 1
 
             items.insert(sl - 1, new_item)
             save_json(json_file, items)
             flash('New item added! ✔️', 'success')
             return redirect(request.path)
-        
-        flash("Unknown action.❌", "error")
-        return redirect(request.path)
-    
+
+        # SWAP
+        if act == "swap":
+            idx1 = request.form.get('idx1', type=int)
+            idx2 = request.form.get('idx2', type=int)
+            idx1 -= 1
+            idx2 -= 1
+            if (
+                idx1 is None or idx2 is None or
+                idx1 < 0 or idx2 < 0 or
+                idx1 >= len(items) or idx2 >= len(items) or
+                idx1 == idx2
+            ):
+                flash('Invalid swap positions.❌', 'error')
+                return redirect(request.path)
+            items[idx1], items[idx2] = items[idx2], items[idx1]
+            save_json(json_file, items)
+            flash('Items swapped! ✔️', 'success')
+            return redirect(request.path)
+
     return view, action
+
 
 # Results admin
 res_view, res_action = admin_crud(
@@ -459,13 +472,13 @@ def ai_chat():
         
         Instructions:
         1. Base all your answers strictly on the provided "SCHOOL INFORMATION".
-        2. If the user's question cannot be answered from the context, politely say: "I'm sorry, I don't have specific information about that."
+        2. If the user's question cannot be answered from the context, ask them to contact with the school authorities , give contact information from contact page or politely say: "I'm sorry, I don't have specific information about that." 
         3. Do not make up information.
         4. Keep your answers concise.
         5. If asked about students, try to find information from students page where I put 8 group photo of 8 different classes of regular and vocational, and in every card I have added the the total students of that class.
         6. If want to know about achievement try to find achievements from gallery section and remember "চ্যম্পিয়ন- দূর্নীতি দমন কমিশন কর্তৃক আয়োজিত বিতর্ক প্রতিযোগিতায় পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয় মহম্মদপুর উপজেলা চ্যাম্পিয়ন হওয়ার গৌরব অর্জন করেছে at july month 2025।"
         7. If want to know about student try to find information from students page where I put 8 group photo of 8 different classes of regular and vocational, and in every card I have added the the total students of that class.
-        
+        8. 
 
 
         --- SCHOOL INFORMATION ---

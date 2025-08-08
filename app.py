@@ -290,16 +290,17 @@ def admin_crud(json_file, upload_dir=None, template_name=None):
         if act == "swap":
             idx1 = request.form.get('idx1', type=int)
             idx2 = request.form.get('idx2', type=int)
-            idx1 -= 1
-            idx2 -= 1
+            
             if (
                 idx1 is None or idx2 is None or
-                idx1 < 0 or idx2 < 0 or
-                idx1 >= len(items) or idx2 >= len(items) or
+                idx1 <= 0 or idx2 <= 0 or
+                idx1 > len(items) or idx2 > len(items) or
                 idx1 == idx2
             ):
                 flash('Invalid swap positions.❌', 'error')
                 return redirect(request.path)
+            idx1 -= 1
+            idx2 -= 1
             items[idx1], items[idx2] = items[idx2], items[idx1]
             save_json(json_file, items)
             flash('Items swapped! ✔️', 'success')
@@ -341,7 +342,7 @@ def gallery_admin():
 
         # 2) Delete gallery item
         if action == 'delete':
-            if not items or sl <= 0 or sl > len(items):
+            if not items or sl is None or sl <= 0 or sl > len(items):
                 flash('No items to delete.❌', 'error')
                 return redirect(url_for('gallery_admin', gallery_items=items))
 
@@ -356,8 +357,37 @@ def gallery_admin():
             flash('Gallery item deleted. ✔️', 'success')
             return redirect(url_for('gallery_admin', gallery_items=items))
 
-        # 3) Add new (multiple photos)
-        if sl <= 0:
+        # 3) Swap between 2 positions (with all images)
+        elif action == 'swap':
+            idx1 = request.form.get('idx1', type=int)
+            idx2 = request.form.get('idx2', type=int)
+
+            # Validate they are provided
+            if idx1 is None or idx2 is None:
+                flash('Please provide both positions to swap.❌', 'error')
+                return redirect(url_for('gallery_admin', gallery_items=items))
+
+            # Convert 1-based to 0-based indexes
+            idx1 -= 1
+            idx2 -= 1
+
+            # Validate index range
+            if (
+                idx1 < 0 or idx2 < 0 or
+                idx1 >= len(items) or idx2 >= len(items) or
+                idx1 == idx2
+            ):
+                flash('Invalid swap positions.❌', 'error')
+                return redirect(url_for('gallery_admin', gallery_items=items))
+
+            # Perform swap
+            items[idx1], items[idx2] = items[idx2], items[idx1]
+            save_json(GALLERY_FILE, items)
+            flash('Gallery items swapped! ✔️', 'success')
+            return redirect(url_for('gallery_admin', gallery_items=items))
+
+        # 4) Add new (multiple photos)
+        if sl is None or sl <= 0:
             sl = 1
         if sl > len(items):
             sl = len(items) + 1

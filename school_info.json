@@ -9,11 +9,14 @@
   "about_us": "Palashbaria Secondary School, located in a remote area of Magura, was established in 1964 with the aim of spreading the light of education. Starting with only 17 students, it has grown significantly. The school achieved MPO status for its secondary branch in 2004 and for the J.S.C branch in 2010. With the relentless efforts of the managing committee, teachers, and the cooperation of the local community, the school has established itself as a notable institution in the upazila, achieving good results in public examinations. The school is committed to building students into ideal citizens by providing quality education and fostering moral values.",
   "head_teacher_message": {
     "name": "Farid ahmed",
-    "message": "Education is the backbone of a nation. To build a poverty-free, prosperous, and enlightened Bangladesh, there is no alternative to quality education. In the age of globalization and information technology, the world has become a global village. To keep pace with the modern world, it is essential to be educated in technology. Palashbaria Secondary School is committed to this goal. With the sincere efforts of the managing committee, experienced teachers, and the cooperation of the respected parents, we are determined to transform this institution into a model school. We seek everyone's prayers and support."
+    "message": "Education is the backbone of a nation. To build a poverty-free, prosperous, and enlightened Bangladesh, there is no alternative to quality education. In the age of globalization and information technology, the world has become a global village. To keep pace with the modern world, it is essential to be educated in technology. Palashbaria Secondary School is committed to this goal. With the sincere efforts of the managing committee, experienced teachers, and the cooperation of the respected parents, we are determined to transform this institution into a model school. We seek everyone's prayers and support.",
+    "email":"faridahmedsimu@gmail.com"
   },
   "president_message": {
     "name": "Farid ahmed",
     "message": "I am delighted to know that Palashbaria Secondary School has launched its own website. In this era of globalization, the importance of a dynamic website for an educational institution is immense. This website will play a significant role in providing various information about the school to students, parents, and the general public quickly and easily. I believe that through this initiative, the school's overall activities will become more transparent, dynamic, and accountable. I wish the website and the school continued success."
+  },
+  "admission": {
+    "start" : "admission will start from january 2026, currently no admission going on"
   }
-  
 }

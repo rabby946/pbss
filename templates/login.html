@@ -1,21 +1,98 @@
 {% extends 'base.html' %}
-{% block title %}Admin log in : Palashbaria Secondary School{% endblock %}
+{% block title %}Admin Login : Palashbaria Secondary School{% endblock %}
 {% block content %}
-<div class="login-page" >
-  <div class="admin-form glass-card" style="background-color: rgba(217, 224, 163, 0.281)">
+<style>
+  @import url(https://fonts.googleapis.com/css?family=Roboto:300);
+  
+  /* This is a good practice to ensure consistent layout */
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    background: #ceeabf; /* fallback for old browsers */
+    background: rgb(51, 72, 38);
+    background: linear-gradient(90deg, rgb(190, 231, 239) 0%, rgb(194, 232, 172) 50%);
+    font-family: "Roboto", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;      
+  }
+
+  .login-page {
+    width: 360px;
+    padding: 8% 0 0;
+    margin: auto;
+  }
+
+  .form {
+    position: relative;
+    z-index: 1;
+    background: #FFFFFF;
+    max-width: 360px;
+    margin: 0 auto 100px;
+    padding: 45px;
+    text-align: center;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+  }
+
+  .form input {
+    font-family: "Roboto", sans-serif;
+    outline: 0;
+    background: #f2f2f2;
+    width: 100%;
+    border: 0;
+    margin: 0 0 15px;
+    padding: 15px;
+    box-sizing: border-box;
+    font-size: 14px;
+  }
+
+  .form button {
+    font-family: "Roboto", sans-serif;
+    text-transform: uppercase;
+    outline: 0;
+    background: #4CAF50;
+    width: 100%;
+    border: 0;
+    padding: 15px;
+    color: #FFFFFF; /* Changed for better contrast */
+    font-size: 14px;
+    -webkit-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .form button:hover,.form button:active,.form button:focus {
+    background: #43A047; /* Darker green on hover */
+  }
+  
+  /* --- RESPONSIVE STYLES FOR MOBILE --- */
+  /* This code will only apply on screens 480px wide or smaller */
+  @media (max-width: 480px) {
+    .login-page {
+      /* Remove fixed width and use padding to keep it off the edges */
+      width: 100%;
+      padding: 20px;
+      box-sizing: border-box; /* Ensures padding doesn't add to the width */
+    }
+
+    .form {
+      /* Reduce padding on small screens to give more space */
+      padding: 30px;
+      margin-bottom: 50px;
+    }
+  }
+
+</style>
+
+<div class="login-page">
+  <div class="form">
     <h2>Admin Login</h2>
-    <form method="post">
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input id="password" type="password" name="password" required>
-      </div>
-      <button type="submit" class="btn btn-primary">Login</button>
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for cat, msg in messages %}
-          <div class="flash {{ cat }}">{{ msg }}</div>
-        {% endfor %}
-      {% endwith %}
+    <form class="login-form" method="post">
+      <input id="password" type="password" name="password" placeholder="Enter password" required>
+      <button type="submit" style="color: #FFFFFF;"><b>login</b></button>
     </form>
   </div>
 </div>
+
 {% endblock %}

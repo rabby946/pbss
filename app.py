@@ -1,7 +1,7 @@
 # --- Standard Libraries ---
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import wraps
 
 # --- Third-Party Libraries ---
@@ -17,7 +17,7 @@ app = Flask(__name__)
 app.secret_key = 'super-secret-key'
 app.jinja_env.globals.update(enumerate=enumerate)
 BASE_DIR = os.path.dirname(__file__)
-
+app.permanent_session_lifetime = timedelta(hours=12)
 # --- Gemini API Configuration ---
 try:
     genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
@@ -107,8 +107,9 @@ def routine():
 @app.route('/')
 def home():
     items = sorted(load_json(NEWS_FILE), key=lambda x: x['timestamp'], reverse=True)
-    Headline["news"] = items[0]['title'] if items else nonews
-    return render_template('home.html', text=Headline["news"])
+    headline = items[0]['title'] if items else nonews
+    headline2 = items[0]['description'] if items else nonews
+    return render_template('home.html', text=headline, text2=headline2)
 
 @app.route('/news')
 def news():

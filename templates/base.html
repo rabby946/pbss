@@ -1,29 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
+  
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %} : Palashbaria Secondary School{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap" rel="stylesheet">
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<!------ Include the above in your HEAD tag ---------->
+
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>  
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 </head>
 
-<body class="main-body">
+<body class="main-body" >
 
-
-<div class="logo" style="margin-left: 32px; padding-top: 5px;">
+<!-- <div class="logo" style="margin-left: 32px; padding-top: 5px;">
   <a href="{{url_for('home') }}" style="position: sticky;">
     <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Palashbaria School Logo"> 
     পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়
   </a>
-</div>
+</div> -->
 <header class="site-header">
   <div class="logo" style="margin-left: 32px;">
   <a href="{{url_for('home') }}" style="position: sticky;">
-    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Palashbaria School Logo"> 
-    পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Palashbaria School Logo" style="font-size: larger;"> 
+    <b>
+      পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়
+    </b>
   </a>
-  <div class="hamburger" onclick="toggleDrawer()" >☰</div>
+  <div class="hamburger" onclick="toggleDrawer()" style="position: fixed; top: 15px; right: 15px; z-index: 1000; cursor: pointer;">☰</div>
 </div>
   <div class="header-container">
     
@@ -39,12 +51,14 @@
         <li><a href="{{ url_for('gallery') }}" class="{% if request.endpoint=='gallery' %}active{% endif %}">Gallery</a></li>
         <li><a href="{{ url_for('mpos') }}" class="{% if request.endpoint=='mpos' %}active{% endif %}">Accreditations</a></li>
         <li><a href="{{ url_for('contact') }}" class="{% if request.endpoint=='contact' %}active{% endif %}">Contact</a></li>
-        <li><a href="{{ url_for('login') }}" class="{% if request.endpoint == 'login' %}active{% endif %}">Admin Panel</a></li>
+        <li><a href="{{ url_for('base_admin') }}" class="{% if request.endpoint == 'base_admin' %}active{% endif %}">Admin Panel</a></li>
+        <li><a href="{{ url_for('login') }}" class="{% if request.endpoint == 'login' %}active{% endif %}">Login</a></li>
+
       </ul>
     </nav>
   </div>
 </header>
-
+ 
 <main class="container" style="padding-top: 40px;">
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% for category, msg in messages %}
@@ -78,191 +92,7 @@
   }
 </script>
 <script src="{{ url_for('static', filename='script.js') }}"></script>
-<!-- Enhanced Chatbot -->
-<style>
-  #chatbot-icon {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background: linear-gradient(135deg, #5accdc, #0066cc);
-    color: white;
-    border-radius: 50%;
-    padding: 15px;
-    font-size: 24px;
-    cursor: pointer;
-    z-index: 999;
-    box-shadow: 0 4px 20px rgba(30, 144, 255, 0.4);
-    transition: all 0.3s ease;
-    border: none;
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
 
-  #chatbot-icon:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 25px rgba(30, 144, 255, 0.6);
-  }
-
-  #chat-popup {
-    position: fixed;
-    bottom: 100px;
-    right: 30px;
-    width: 350px;
-    height: 500px;
-    background-color: white;
-    border-radius: 15px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-    display: none;
-    flex-direction: column;
-    z-index: 999;
-    border: 1px solid #e0e0e0;
-  }
-
-  #chat-header {
-    background: linear-gradient(135deg, #1e90ff, #0066cc);
-    color: white;
-    padding: 15px;
-    font-weight: bold;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  #chat-close {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 20px;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.3s;
-  }
-
-  #chat-close:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
-
-  #chat-messages {
-    flex: 1;
-    padding: 15px;
-    overflow-y: auto;
-    font-size: 14px;
-    background: #f8f9fa;
-    line-height: 1.4;
-  }
-
-  .message {
-    margin-bottom: 15px;
-    max-width: 80%;
-    word-wrap: break-word;
-  }
-
-  .message.user {
-    text-align: right;
-    margin-left: auto;
-  }
-
-  .message.bot {
-    text-align: left;
-  }
-
-  .message-content {
-    padding: 10px 15px;
-    border-radius: 18px;
-    display: inline-block;
-  }
-
-  .message.user .message-content {
-    background: #1e90ff;
-    color: white;
-  }
-
-  .message.bot .message-content {
-    background: white;
-    color: #333;
-    border: 1px solid #e0e0e0;
-  }
-
-  #chat-input-area {
-    display: flex;
-    border-top: 1px solid #e0e0e0;
-    background: white;
-    padding: 10px;
-    gap: 10px;
-  }
-
-  #chat-input {
-    flex: 1;
-    padding: 10px 15px;
-    border: 1px solid #ddd;
-    border-radius: 20px;
-    outline: none;
-    font-size: 14px;
-  }
-
-  #chat-input:focus {
-    border-color: #1e90ff;
-  }
-
-  #send-btn {
-    padding: 10px 15px;
-    background: linear-gradient(135deg, #1e90ff, #0066cc);
-    color: white;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    min-width: 60px;
-  }
-
-  #send-btn:hover {
-    background: linear-gradient(135deg, #0066cc, #004c99);
-    transform: translateY(-1px);
-  }
-
-  #send-btn:disabled {
-    background: #bdc3c7;
-    cursor: not-allowed;
-    transform: none;
-  }
-
-  .typing-indicator {
-    display: none;
-    padding: 10px 15px;
-    background: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 18px;
-    color: #666;
-    font-style: italic;
-    margin-bottom: 15px;
-  }
-
-  /* Mobile responsiveness */
-  @media (max-width: 480px) {
-    #chat-popup {
-      width: calc(100vw - 20px);
-      right: 10px;
-      left: 10px;
-      height: 450px;
-    }
-    
-    #chatbot-icon {
-      right: 20px;
-      bottom: 20px;
-    }
-  }
-</style>
 
 <div id="chatbot-icon">
   💬
@@ -404,6 +234,145 @@
     attributeFilter: ['style']
   });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // --- Staggered Animation for Cards ---
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.animationDelay = `${entry.target.dataset.index * 0.08}s`;
+        entry.target.classList.add('in-view');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.content-card').forEach((card, index) => {
+    card.dataset.index = index;
+    observer.observe(card);
+  });
+
+  // --- Live Filter for Teachers/Students ---
+  const filterInput = document.getElementById('filter-input');
+  if (filterInput) {
+    const cards = document.querySelectorAll('.person-card');
+    const noResultsMessage = document.getElementById('no-results-message');
+
+    filterInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const name = card.querySelector('h3').textContent.toLowerCase();
+        if (name.includes(searchTerm)) {
+          card.style.display = 'block';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      
+      noResultsMessage.style.display = visibleCount === 0 ? 'block' : 'none';
+    });
+  }
+});
+// --- Contact Page Interactivity ---
+const contactForm = document.getElementById('contact-form');
+
+if (contactForm) {
+  const formResult = document.getElementById('form-result');
+
+  // --- Copy to Clipboard ---
+  document.querySelectorAll('.copy-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      const textToCopy = button.dataset.copy;
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const originalIcon = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        setTimeout(() => {
+          button.innerHTML = originalIcon;
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy: ', err);
+      });
+    });
+  });
+
+  // --- Form Validation & Submission ---
+  contactForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    let isValid = true;
+    formResult.style.display = 'none';
+
+    // Simple validation
+    ['name', 'email', 'subject', 'message'].forEach(id => {
+      const field = document.getElementById(id);
+      const errorEl = document.getElementById(`${id}-error`);
+      if (!field.value.trim()) {
+        errorEl.style.display = 'block';
+        isValid = false;
+      } else {
+        errorEl.style.display = 'none';
+      }
+    });
+
+    // Email format validation
+    const emailField = document.getElementById('email');
+    const emailError = document.getElementById('email-error');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (emailField.value.trim() && !emailRegex.test(emailField.value)) {
+      emailError.textContent = 'Please enter a valid email address.';
+      emailError.style.display = 'block';
+      isValid = false;
+    }
+
+    if (!isValid) return;
+
+    // --- AJAX Submission ---
+    const submitBtn = document.getElementById('submit-btn');
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Sending...';
+
+    const formData = new FormData(contactForm);
+    
+    // NOTE: You need to create a backend endpoint (e.g., in Flask) at '/submit-contact' to receive this data.
+    fetch('/submit-contact', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      formResult.style.display = 'block';
+      if (data.success) {
+        formResult.className = 'success';
+        formResult.textContent = 'Thank you! Your message has been sent successfully.';
+        contactForm.reset();
+      } else {
+        formResult.className = 'error';
+        formResult.textContent = 'Sorry, there was an error. Please try again later.';
+      }
+    })
+    .catch(error => {
+      formResult.style.display = 'block';
+      formResult.className = 'error';
+      formResult.textContent = 'An unexpected error occurred. Please check your connection.';
+      console.error('Error:', error);
+    })
+    .finally(() => {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalBtnText;
+    });
+  });
+}
+
+</script>
+<style>
+  /* This small style block is for the JS animation to work */
+  .content-card { opacity: 0; }
+  .content-card.in-view { opacity: 1; transform: translateY(0); }
+</style>
 
 </body>
 </html>

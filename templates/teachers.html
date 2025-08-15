@@ -1,34 +1,27 @@
 {% extends 'base.html' %}
 {% block title %}Teachers : Palashbaria Secondary School{% endblock %}
-
 {% block content %}
-  <h1 class="teachers-headin">Our Teachers and Officials</h1>
+<div class="page-container">
+  <div class="page-header">
+    <h1 style="color: black;">Our Teachers & Officials</h1>
+  </div>
 
-  {# first row: just 2 cards #}
-  <div class="teachers-grid two-col">
-    {% for teacher in teacher_items[:2] %}
-      <a href="{{ url_for('teacher_detail', idx=loop.index0) }}"
-         class="glass-card teacher-card">
-        <div class="teacher-image">
-          <img src="{{ url_for('static', filename='images/teachers/' + teacher.filename) }}"
-               alt="{{ teacher.title }}">
+  <div class="filter-container">
+    <input type="text" id="filter-input" class="filter-input" placeholder=" Search by name...">
+  </div>
+
+  <div class="content-grid" id="teachers-grid">
+    {% for teacher in teacher_items %}
+      <a href="{{ url_for('teacher_detail', idx=loop.index0) }}" class="content-card person-card">
+        <div class="person-image-wrapper">
+          <img src="{{ url_for('static', filename='images/teachers/' + teacher.filename) }}" alt="{{ teacher.title }}">
         </div>
-        <h3 class="teacher-name" style="color: black;">{{ teacher.title }}</h3>
+        <div class="person-info">
+          <h3>{{ teacher.title }}</h3>
+        </div>
       </a>
     {% endfor %}
   </div>
-
-  {# remaining rows: 5 per row #}
-  <div class="teachers-grid five-col">
-    {% for teacher in teacher_items[2:] %}
-      <a href="{{ url_for('teacher_detail', idx=loop.index0 + 2) }}"
-         class="glass-card teacher-card">
-        <div class="teacher-image">
-          <img src="{{ url_for('static', filename='images/teachers/' + teacher.filename) }}"
-               alt="{{ teacher.title }}">
-        </div>
-        <h3 class="teacher-name" style="color: black;">{{ teacher.title }}</h3>
-      </a>
-    {% endfor %}
-  </div>
+  <p id="no-results-message">No teachers or officials found with that name.</p>
+</div>
 {% endblock %}

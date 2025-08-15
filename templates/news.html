@@ -1,18 +1,19 @@
 {% extends 'base.html' %}
 {% block title %}News : Palashbaria Secondary School{% endblock %}
 {% block content %}
-  <h1>All News</h1>
-    <div class="news-grid glass-card" style="background-color: rgba(179, 232, 200, 0.199);">
-      {% for news in news_items %}
-          <a href="{{ url_for('news_detail', idx=loop.index0) }}">
-
-          <h3 style="color: black;">{{ news.title }}</h3>
-          <!-- Optionally an image if you have one in news.json -->
-          <small>{{ news.timestamp[:10] }}</small>
-        </a>
-      {% else %}
-        <p>No news yet.</p>
-      {% endfor %}
-    </div>
-
+<div class="page-header" >
+    <h1 style="color: rgba(0, 0, 0, 0.622);">All News</h1>
+  </div>
+<div class="page-container">
+  <div class="content-grid">
+    {% for news in news_items %}
+      <a href="{{ url_for('news_detail', idx=loop.index0) }}" class="content-card news-card">
+        <h3>{{ news.title }}</h3>
+        <small>Published: {{ news.timestamp[:10] }}</small>
+      </a>
+    {% else %}
+      <p>No news has been published yet.</p>
+    {% endfor %}
+  </div>
+</div>
 {% endblock %}

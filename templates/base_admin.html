@@ -3,75 +3,176 @@
 {% block content %}
 
 <style>
-  .admin-dashboard {
+  /* --- CSS Variables for Easy Theming --- */
+  :root {
+    --card-bg: rgba(200, 190, 149, 0.264);
+    --card-border-color: rgba(182, 120, 34, 0.25);
+    --primary-text: #120808;
+    --secondary-text: #9e9354;
+    --hover-bg: rgba(0, 123, 255, 0.7);
+    --hover-border-color: rgba(0, 123, 255, 1);
+    --logout-hover-bg: rgba(220, 53, 69, 0.7);
+    --logout-hover-border-color: rgba(220, 53, 69, 1);
+    /* -o-animation-delay: 1.5s; */
+    padding: auto;
+    padding-bottom: 90%;
+    /* padding-top: 1; */
+  }
+
+  .admin-dashboard-container {
     display: flex;
     justify-content: center;
-    padding: 2rem;
+    align-items: center;
+    min-height: 99vh; /* Ensures it's centered vertically */
+    padding: 4rem;
+    padding-bottom: 60%;
   }
 
   .dashboard-card {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    padding: 2rem 3rem;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border-color);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px); /* For Safari */
+    padding: 2.5rem;
     border-radius: 1.5rem;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
     width: 100%;
-    max-width: 500px;
+    max-width: 800px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.5s 0.2s forwards;
   }
 
-  .dashboard-card h2 {
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .dashboard-header {
     text-align: center;
-    margin-bottom: 2rem;
-    font-size: 2rem;
-    color: #222;
+    margin-bottom: 2.5rem;
+  }
+
+  .dashboard-header h2 {
+    font-size: 2.5rem;
+    color: #fff;
+    font-weight: 600;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  }
+
+  .dashboard-header p {
+    font-size: 1.1rem;
+    color: var(--secondary-text);
+    margin-top: 0.5rem;
+  }
+
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem;
   }
 
   .admin-link {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    padding: 0.75rem 1rem;
-    margin-bottom: 1rem;
-    background-color: #f8f9fa;
-    border-radius: 0.75rem;
+    justify-content: center;
+    padding: 1.5rem;
+    background: transparent;
+    border: 1px solid var(--card-border-color);
+    border-radius: 1rem;
     text-decoration: none;
-    font-size: 1.1rem;
-    color: #333;
-    transition: all 0.2s ease-in-out;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--primary-text);
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 
   .admin-link:hover {
-    background-color: #007bff;
+    background: var(--hover-bg);
     color: #fff;
-    transform: translateX(5px);
+    transform: translateY(-8px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    border-color: var(--hover-border-color);
   }
 
-  .admin-link span {
-    margin-right: 0.75rem;
-    font-weight: bold;
-    color: #007bff;
-    transition: color 0.2s;
+  .admin-link i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
   }
 
-  .admin-link:hover span {
-    color: #d21010;
+  .admin-link:hover i {
+    transform: scale(1.1);
   }
+  
+  /* Special style for Logout button */
+  .admin-link.logout:hover {
+      background: var(--logout-hover-bg);
+      border-color: var(--logout-hover-border-color);
+  }
+
 </style>
 
-<div class="admin-dashboard">
+<div class="admin-dashboard-container">
   <div class="dashboard-card">
-    <h2>⚙ Admin Dashboard</h2>
-    <a href="{{ url_for('news_admin') }}" class="admin-link"><span>📰</span> Manage News</a>
-    <a href="{{ url_for('gallery_admin') }}" class="admin-link"><span>🖼️</span> Manage Gallery</a>
-    <a href="{{ url_for('teacher_admin') }}" class="admin-link"><span>👨‍🏫</span> Manage Teachers</a>
-    <a href="{{ url_for('committee_admin') }}" class="admin-link"><span>🏬</span> Manage Committees</a>
-    <a href="{{ url_for('student_admin') }}" class="admin-link"><span>👨‍🎓</span> Manage Students</a>
-    <a href="{{ url_for('mpo_admin') }}" class="admin-link"><span>👉🏼</span> Manage Accreditations</a>
-    <a href="{{ url_for('routine_admin') }}" class="admin-link"><span>📊</span> Manage Routine
-    <a href="{{ url_for('result_admin') }}" class="admin-link"><span>📊</span> Manage Results</a>
-    <a href="{{ url_for('logout') }}" class="admin-link" style="color: red;"><span>🔓</span> <b>Logout</b></a>
+    <div class="dashboard-header">
+      <h1><i class="fas fa-user-shield"></i> Admin Panel</h1>
+      <p id="greeting">Welcome back, Admin!</p>
+    </div>
+
+    <div class="dashboard-grid">
+      <a href="{{ url_for('news_admin') }}" class="admin-link">
+        <i class="fas fa-newspaper"></i> Manage News
+      </a>
+      <a href="{{ url_for('gallery_admin') }}" class="admin-link">
+        <i class="fas fa-images"></i> Manage Gallery
+      </a>
+      <a href="{{ url_for('teacher_admin') }}" class="admin-link">
+        <i class="fas fa-chalkboard-teacher"></i> Manage Teachers
+      </a>
+      <a href="{{ url_for('committee_admin') }}" class="admin-link">
+        <i class="fas fa-sitemap"></i> Manage Committees
+      </a>
+      <a href="{{ url_for('student_admin') }}" class="admin-link">
+        <i class="fas fa-user-graduate"></i> Manage Students
+      </a>
+      <a href="{{ url_for('mpo_admin') }}" class="admin-link">
+        <i class="fas fa-award"></i> Manage Accreditations
+      </a>
+      <a href="{{ url_for('routine_admin') }}" class="admin-link">
+        <i class="fas fa-calendar-alt"></i> Manage Routine
+      </a>
+      <a href="{{ url_for('result_admin') }}" class="admin-link">
+        <i class="fas fa-poll"></i> Manage Results
+      </a>
+      <a href="{{ url_for('logout') }}" class="admin-link logout">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
+    </div>
   </div>
 </div>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const greetingElement = document.getElementById('greeting');
+    const currentHour = new Date().getHours();
+    let greetingText = 'Welcome back, Admin!';
+
+    if (currentHour < 12) {
+      greetingText = 'Good Morning, Admin!';
+    } else if (currentHour < 18) {
+      greetingText = 'Good Afternoon, Admin!';
+    } else {
+      greetingText = 'Good Evening, Admin!';
+    }
+
+    greetingElement.textContent = greetingText;
+  });
+</script>
 
 {% endblock %}

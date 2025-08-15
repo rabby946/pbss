@@ -1,21 +1,28 @@
+
+
 {% extends 'base.html' %}
-{% block title %}Routine : Palashbaria Secondary School{% endblock %}
+{% block title %}routine : Palashbaria Secondary School{% endblock %}
 {% block content %}
-<h1>Routine</h1>
-<div class="grid-2" ">
-  {% for r in routine_items %}
-    <div class="glass-card" style="padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 1rem; 
-         box-shadow: 0 4px 12px rgba(70, 3, 3, 0.413); background-color: rgba(231, 186, 123, 0.047);">
-      <h3>{{ r.title }}</h3>
-      <small>Uploaded: {{ r.timestamp[:10] }}</small>
-      <p>{{ r.description }}</p>
-      <a href="{{ url_for('static', filename='files/routine/' ~ r.filename) }}"
-         target="_blank" class="btn btn-secondary mt-2">
-        📄 Download / View PDF
-      </a>
-    </div>
-  {% else %}
-    <p>No routine sheets published yet.</p>
-  {% endfor %}
+<div class="page-header" >
+    <h1 style="color: rgb(46, 35, 24);">Published routine</h1>
+    <div class="content-grid">
+    {% for r in routine_items %}
+      <div class="content-card result-card">
+        <h3>{{ r.title }}</h3>
+        <small style="color: rgba(255, 255, 255, 0.663);">Uploaded: {{ r.timestamp[:10] }}</small>
+        <p>{{ r.description }}</p>
+        <a href="{{ url_for('static', filename='files/routine/' ~ r.filename) }}" target="_blank" class="btn-download">
+          📄 Download / View PDF
+        </a>
+      </div>
+    {% else %}
+      <p>No result sheets have been published yet.</p>
+    {% endfor %}
+  </div>
 </div>
+
+<!-- <div class="page-container">
+  
+</div> -->
+
 {% endblock %}

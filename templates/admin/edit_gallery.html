@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% block title %}Edit Gallery Item{% endblock %}
+
+{% block content %}
+<style>
+    /* Using the same stylish CSS from before, as it was not the source of the issue */
+    :root {
+        --font-sans: 'Inter', sans-serif;
+        --color-accent: #8B5CF6; /* Vibrant Purple */
+        --color-accent-light: #A78BFA;
+        --color-text-dark: #111827;
+        --color-text-light: #6B7280;
+        --color-bg-canvas: #F9FAFB;
+        --color-border: #D1D5DB;
+        --color-danger: #EF4444;
+    }
+    .canvas-wrapper { max-width: 1200px; margin: 2rem auto; padding: 1rem; font-family: var(--font-sans); }
+    .canvas-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; background-color: var(--color-bg-canvas); padding: 2rem; border-radius: 1.5rem; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1); }
+    @media (min-width: 1024px) { .canvas-grid { grid-template-columns: 1fr 1fr; gap: 3rem; padding: 3rem; } }
+    .canvas-form__header { font-size: 2.25rem; font-weight: 700; color: var(--color-text-dark); margin-bottom: 2rem; }
+    .float-group { position: relative; margin-bottom: 2rem; }
+    .float-input, .float-textarea { width: 100%; padding: 0.75rem 0; font-size: 1.1rem; border: none; border-bottom: 2px solid var(--color-border); background-color: transparent; color: var(--color-text-dark); transition: border-color 0.3s ease; }
+    .float-input:focus, .float-textarea:focus { outline: none; border-color: var(--color-accent); }
+    .float-label { position: absolute; top: -1.25rem; left: 0; font-size: 0.875rem; color: var(--color-accent); pointer-events: none; transition: all 0.3s ease; }
+    .float-textarea { resize: vertical; min-height: 80px; }
+    .canvas-actions { display: flex; gap: 1rem; margin-top: 2rem; }
+    .canvas-btn { padding: 0.8rem 2rem; font-weight: 600; border-radius: 0.75rem; text-decoration: none; border: none; cursor: pointer; transition: all 0.3s ease; }
+    .canvas-btn--primary { background-image: linear-gradient(to right, var(--color-accent), var(--color-accent-light)); color: white; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
+    .canvas-btn--primary:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4); }
+    .canvas-btn--secondary { background-color: #E5E7EB; color: var(--color-text-dark); }
+    .canvas-btn--secondary:hover { background-color: #D1D5DB; }
+    .canvas-preview__header { font-size: 1.5rem; font-weight: 600; color: var(--color-text-dark); margin-bottom: 1rem; }
+    .preview-label { font-size: 1rem; color: var(--color-text-light); margin-bottom: 1rem; display: block; font-weight: 500; }
+    #drop-area { border: 2px dashed var(--color-border); border-radius: 1rem; padding: 1.5rem; text-align: center; color: var(--color-text-light); transition: all 0.3s ease; cursor: pointer; }
+    #drop-area.is-active { border-color: var(--color-accent); background-color: rgba(139, 92, 246, 0.05); }
+    #drop-area-icon { font-size: 2.5rem; color: var(--color-accent); margin-bottom: 0.5rem; }
+    #drop-area p { margin: 0; font-weight: 500; }
+    #file-input { display: none; }
+    #upload-info-container { display: none; margin-top: 1rem; }
+    #upload-warning { background-color: rgba(239, 68, 68, 0.1); color: #B91C1C; padding: 0.75rem; border-radius: 0.5rem; font-size: 0.9rem; text-align: left; margin-bottom: 1rem;}
+    #clear-new-images-btn { width: 100%; padding: 0.5rem; font-size: 0.9rem; background-color: #F3F4F6; border: 1px solid var(--color-border); border-radius: 0.5rem; cursor: pointer; }
+    #previews-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+    .preview-thumbnail { position: relative; border-radius: 0.5rem; overflow: hidden; border: 1px solid var(--color-border); }
+    .preview-thumbnail img { width: 100%; height: 100px; object-fit: cover; display: block; }
+    .remove-btn { position: absolute; top: 0.25rem; right: 0.25rem; width: 1.5rem; height: 1.5rem; border-radius: 50%; background-color: var(--color-danger); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+</style>
+
+<div class="canvas-wrapper">
+    <form id="gallery-form" method="POST" enctype="multipart/form-data">
+        <div class="canvas-grid">
+
+            <div class="canvas-form">
+                <h2 class="canvas-form__header">Edit Gallery</h2>
+                <div class="float-group">
+                    <input type="text" id="title-input" name="title" value="{{ item.title }}" class="float-input" required>
+                    <label for="title-input" class="float-label">Title</label>
+                </div>
+                <div class="float-group">
+                    <textarea id="description-input" name="description" class="float-textarea">{{ item.description }}</textarea>
+                    <label for="description-input" class="float-label">Description</label>
+                </div>
+                <input type="hidden" id="images-to-keep" name="images_to_keep" value="{{ item.images }}">
+                <div class="canvas-actions">
+                    <button type="submit" class="canvas-btn canvas-btn--primary">Update Gallery</button>
+                    <a href="{{ url_for('admin.gallery') }}" class="canvas-btn canvas-btn--secondary">Cancel</a>
+                </div>
+            </div>
+
+            <div class="canvas-preview">
+                <h3 class="canvas-preview__header">Manage Media</h3>
+                
+                <p class="preview-label">Current Images</p>
+                <div id="existing-previews-container">
+                    {% for img_filename in item.images.split(',') %}
+                        {% if img_filename %}
+                        <div class="preview-thumbnail" data-filename="{{ img_filename }}">
+                            <img src="{{ img_filename }}" alt="Existing gallery image">
+                            <button type="button" class="remove-btn" data-filename="{{ img_filename }}" title="Remove this image">&times;</button>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <hr class="my-6">
+                
+                <p class="preview-label">Upload New Images (optional)</p>
+                <div id="drop-area">
+                    <input type="file" id="file-input" name="filename" multiple>
+                    <div id="drop-area-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <p><strong>Drag & drop new images here</strong></p>
+                    <p class="text-sm">or click to select files</p>
+                </div>
+
+                <div id="new-previews-container"></div>
+                <div id="upload-info-container">
+                    <div id="upload-warning"><i class="fas fa-exclamation-triangle"></i> New images will <strong>replace all</strong> current ones.</div>
+                    <button type="button" id="clear-new-images-btn">Clear New Images</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- ROBUST SCRIPT - FINAL VERSION ---
+
+    // --- 1. HANDLE DELETION OF EXISTING IMAGES ---
+    const existingPreviewsContainer = document.getElementById('existing-previews-container');
+    const imagesToKeepInput = document.getElementById('images-to-keep');
+
+    existingPreviewsContainer.addEventListener('click', function(e) {
+        // Find the remove button that was clicked, if any
+        const removeBtn = e.target.closest('.remove-btn');
+        if (!removeBtn) return;
+
+        const thumbnail = removeBtn.parentElement;
+        const filenameToRemove = removeBtn.dataset.filename;
+
+        // 1. Visually remove the thumbnail
+        thumbnail.remove();
+
+        // 2. Update the hidden input value
+        let currentImages = imagesToKeepInput.value.split(',').map(s => s.trim()).filter(Boolean);
+        let updatedImages = currentImages.filter(img => img !== filenameToRemove);
+        imagesToKeepInput.value = updatedImages.join(',');
+    });
+
+    // --- 2. HANDLE NEW IMAGE UPLOADS ---
+    const fileInput = document.getElementById('file-input');
+    const dropArea = document.getElementById('drop-area');
+    const newPreviewsContainer = document.getElementById('new-previews-container');
+    const uploadInfoContainer = document.getElementById('upload-info-container');
+    const clearNewImagesBtn = document.getElementById('clear-new-images-btn');
+
+    // Function to generate and display previews for newly selected files
+    function displayNewPreviews() {
+        // Clear any old "new" previews
+        newPreviewsContainer.innerHTML = '';
+        
+        const files = fileInput.files;
+
+        if (files.length > 0) {
+            uploadInfoContainer.style.display = 'block'; // Show warning and clear button
+        } else {
+            uploadInfoContainer.style.display = 'none'; // Hide them if no files
+            return;
+        }
+
+        for (const file of files) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const thumb = document.createElement('div');
+                thumb.className = 'preview-thumbnail';
+                thumb.innerHTML = `<img src="${e.target.result}" alt="${file.name}">`;
+                newPreviewsContainer.appendChild(thumb);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // Event Listeners for file selection
+    dropArea.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', displayNewPreviews);
+
+    // Event Listeners for drag and drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); });
+    });
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, () => dropArea.classList.add('is-active'));
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, () => dropArea.classList.remove('is-active'));
+    });
+    dropArea.addEventListener('drop', e => {
+        fileInput.files = e.dataTransfer.files; // Assign dropped files to the input
+        displayNewPreviews(); // Trigger the preview display
+    });
+    
+    // Event Listener for the "Clear" button
+    clearNewImagesBtn.addEventListener('click', () => {
+        fileInput.value = ''; // This is the standard way to clear a file input
+        newPreviewsContainer.innerHTML = ''; // Clear visual previews
+        uploadInfoContainer.style.display = 'none'; // Hide controls
+    });
+});
+</script>
+{% endblock %}

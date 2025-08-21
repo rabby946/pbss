@@ -1,27 +1,22 @@
-{% extends 'base.html' %}
-{% block title %}Teachers : Palashbaria Secondary School{% endblock %}
+{% extends 'base_admin.html' %}
+{% block title %}Teachers{% endblock %}
 {% block content %}
-<div class="page-container">
-  <div class="page-header">
-    <h1 style="color: black;">Our Teachers & Officials</h1>
-  </div>
-
-  <div class="filter-container">
-    <input type="text" id="filter-input" class="filter-input" placeholder=" Search by name...">
-  </div>
-
-  <div class="content-grid" id="teachers-grid">
-    {% for teacher in teacher_items %}
-      <a href="{{ url_for('teacher_detail', idx=loop.index0) }}" class="content-card person-card">
-        <div class="person-image-wrapper">
-          <img src="{{ url_for('static', filename='images/teachers/' + teacher.filename) }}" alt="{{ teacher.title }}">
-        </div>
-        <div class="person-info">
-          <h3>{{ teacher.title }}</h3>
-        </div>
-      </a>
+<h2>Teachers</h2>
+<a href="{{ url_for('admin.add_teacher') }}">Add Teacher</a>
+<table class="admin-table-teachers">
+    <tr>
+        <th>ID</th><th>Title</th><th>Name</th><th>Actions</th>
+    </tr>
+    {% for t in items %}
+    <tr>
+        <td>{{ t.id }}</td>
+        <td>{{ t.title }}</td>
+        <td>{{ t.name }}</td>
+        <td>
+            <a href="{{ url_for('admin.edit_teacher', id=t.id) }}">Edit</a> |
+            <a href="{{ url_for('admin.delete_teacher', id=t.id) }}">Delete</a>
+        </td>
+    </tr>
     {% endfor %}
-  </div>
-  <p id="no-results-message">No teachers or officials found with that name.</p>
-</div>
+</table>
 {% endblock %}

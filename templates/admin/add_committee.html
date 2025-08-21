@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% block title %}Add committee{% endblock %}
+
+{% block content %}
+
+<style>
+    /* Import a clean, modern font from Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    /* Apply the standard background and base styles */
+    body {
+        background: linear-gradient(90deg, rgba(203, 235, 160, 0.524) 0%, rgba(146, 210, 232, 0.53) 50%);
+        font-family: 'Poppins', sans-serif;
+        color: #1a1a1a; /* Black text */
+        line-height: 1.6;
+    }
+
+    /* A container to center the form card on the page */
+    .page-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 2rem;
+        padding-bottom: 70%;
+    }
+
+    /* The stylish "frosted glass" card that holds the form */
+    .form-card {
+        width: 100%;
+        max-width: 600px;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        padding: 2.5rem;
+        border-radius: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    /* Styling for the main heading */
+    .form-heading {
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 2.25rem;
+        font-weight: 600;
+        color: #111;
+    }
+
+    /* Base styles for the form */
+    .admin-form-committee-add label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #333;
+    }
+
+    .admin-form-committee-add input[type="text"],
+    .admin-form-committee-add textarea {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background: rgba(249, 249, 249, 0.8);
+        font-size: 1rem;
+        font-family: 'Poppins', sans-serif;
+        color: #1a1a1a;
+        box-sizing: border-box;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .admin-form-committee-add input[type="text"]:focus,
+    .admin-form-committee-add textarea:focus {
+        outline: none;
+        border-color: #5aa9c4;
+        box-shadow: 0 0 0 3px rgba(146, 210, 232, 0.4);
+    }
+    
+    .admin-form-committee-add textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+    
+    /* Hides the default ugly file input */
+    .admin-form-committee-add input[type="file"] {
+        display: none;
+    }
+
+    /* This is the styled "button" that the user will click for file uploads */
+    .file-input-label {
+        display: block;
+        width: 100%;
+        padding: 0.8rem 1rem;
+        margin-bottom: 1.5rem;
+        border: 1px dashed #aaa;
+        border-radius: 8px;
+        background-color: #f0f0f0;
+        text-align: center;
+        cursor: pointer;
+        transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .file-input-label:hover {
+        background-color: #e0e0e0;
+        border-color: #5aa9c4;
+    }
+
+    .admin-form-committee-add button[type="submit"] {
+        width: 100%;
+        padding: 0.9rem;
+        border: none;
+        border-radius: 8px;
+        background-color: #5aa9c4;
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .admin-form-committee-add button[type="submit"]:hover {
+        background-color: #4c98b3;
+        transform: translateY(-2px);
+    }
+</style>
+
+<div class="page-container">
+    <div class="form-card">
+        <h2 class="form-heading">Add a New committee</h2>
+
+        <form method="POST" enctype="multipart/form-data" class="admin-form-committee-add">
+            
+            <label for="name-input">Name:</label>
+            <input type="text" id="name-input" name="name" required>
+
+            <label for="description-input">Position / Description:</label>
+            <textarea id="description-input" name="description" required></textarea>
+
+            <label for="photo-input">Photo:</label>
+            <label for="photo-input" class="file-input-label" id="file-label">Click to upload photo...</label>
+            <input type="file" id="photo-input" name="filename" accept="image/*" required>
+
+            <button type="submit">Add committee</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const photoInput = document.getElementById('photo-input');
+    const fileLabel = document.getElementById('file-label');
+
+    photoInput.addEventListener('change', () => {
+        if (photoInput.files.length > 0) {
+            // Display the name of the chosen file
+            fileLabel.textContent = photoInput.files[0].name;
+        } else {
+            // Reset text if no file is chosen
+            fileLabel.textContent = 'Click to upload photo...';
+        }
+    });
+</script>
+
+{% endblock %}

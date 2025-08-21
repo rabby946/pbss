@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% block title %}Admin Login{% endblock %}
+{% block content %}
+<style>
+    /* --- SCHOOL WEBSITE ADMIN LOGIN --- */
+
+    /* 1. Theme & Variables */
+    :root {
+        --font-sans: 'Poppins', sans-serif;
+        --color-bg-light: #f8f9fa;
+        --color-primary: #253582bf; /* A friendly, professional blue */
+        --color-primary-light: #EAF2FB;
+        --color-secondary: #3e7b3d; /* A vibrant, eye-catching teal accent */
+        --color-text-dark: #333A45;
+        --color-text-light: #8A94A6;
+        --color-border: #7e8996;
+        --color-white: #FFFFFF;
+        --color-error: #fa0000f9;
+        --shadow-soft: 0 4px 15px rgba(89, 27, 27, 0.6);
+        /* background: linear-gradient(90deg, rgba(203, 235, 160, 0.524) 0%, rgba(146, 210, 232, 0.53) 50%); */
+    }
+
+    /* Override base body style for this page */
+    body {
+        background-color: var(--color-bg-light);
+        font-family: var(--font-sans);
+        color: var(--color-text-dark);
+        -webkit-font-smoothing: antialiased;
+        
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* 2. Main Layout */
+    .school-login__container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 2rem;
+        padding-bottom: 50%;
+    }
+
+    /* 3. The Login Card */
+    .school-login__card {
+        width: 100%;
+        max-width: 450px;
+        padding: 3rem;
+        background-color: var(--color-white);
+        border-radius: 16px;
+        box-shadow: var(--shadow-soft);
+        text-align: center;
+        border-top: 5px solid var(--color-primary);
+        
+        /* Entrance animation */
+        opacity: 0;
+        transform: translateY(20px);
+        animation: cardFadeIn 0.5s ease-out forwards;
+    }
+    
+    @keyframes cardFadeIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .school-login__header {
+        font-size: 2.25rem; /* Big and readable */
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--color-text-dark);
+    }
+
+    .school-login__subheader {
+        font-size: 1rem;
+        color: var(--color-text-light);
+        margin-bottom: 2.5rem;
+    }
+
+    /* 4. Form Elements */
+    .school-login__form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+        text-align: left;
+    }
+
+    .school-login__label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: var(--color-text-light);
+    }
+
+    .school-login__input {
+        width: 100%;
+        height: 55px; /* Taller for easier interaction */
+        padding: 0 1.5rem;
+        font-size: 1.1rem; /* Larger font for readability */
+        font-family: var(--font-sans);
+        color: var(--color-text-dark);
+        background-color: var(--color-bg-light);
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        box-sizing: border-box; /* Ensures padding doesn't affect width */
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .school-login__input:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px var(--color-primary-light);
+    }
+    
+    /* Specific padding for password to not overlap with icon */
+    .school-login__input[type="password"],
+    .school-login__input[type="text"] {
+         padding-right: 3.5rem;
+    }
+
+    .school-login__toggle-btn {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translateY(25%);
+        background: none;
+        border: none;
+        color: var(--color-text-light);
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 0.5rem;
+    }
+
+    /* 5. Login Button & Flash Messages */
+    .school-login__button {
+        width: 100%;
+        padding: 1rem;
+        margin-top: 1rem;
+        font-family: var(--font-sans);
+        font-size: 1.1rem;
+        font-weight: 600;
+        background-color: var(--color-primary);
+        color: var(--color-white);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s;
+        background: linear-gradient(90deg, rgba(114, 27, 27, 0.787) 0%, rgba(0, 14, 164, 0.964) 50%);
+    }
+
+    .school-login__button:hover {
+        background: linear-gradient(90deg, rgba(95, 197, 75, 0.524) 0%, rgba(84, 177, 208, 0.53) 50%);
+        transform: translateY(-2px);
+    }
+    
+    .school-login__button:active {
+        transform: translateY(0);
+    }
+
+    .school-login__flash {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid var(--color-error);
+        background-color: rgba(233, 78, 119, 0.1);
+        color: var(--color-error);
+        text-align: center;
+        font-weight: 500;
+    }
+
+</style>
+
+<div class="school-login__container">
+    <div class="school-login__card">
+        <h2 class="school-login__header">Admin Portal</h2>
+        <p class="school-login__subheader">Please sign in to continue</p>
+
+        <form method="POST" action="">
+            
+
+            <div class="school-login__form-group">
+                <label for="password" class="school-login__label">Password</label>
+                <input type="password" id="password" name="password" class="school-login__input" required autocomplete="current-password">
+                <button type="button" class="school-login__toggle-btn" id="toggle-password" title="Show/Hide Password">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            
+            <button type="submit" class="school-login__button">Sign In</button>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="school-login__flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const passwordInput = document.getElementById('password');
+    const toggleButton = document.getElementById('toggle-password');
+    const toggleIcon = toggleButton.querySelector('i');
+
+    toggleButton.addEventListener('click', () => {
+        // Check the current type of the input
+        const isPassword = passwordInput.type === 'password';
+        
+        if (isPassword) {
+            // Change to text to show password
+            passwordInput.type = 'text';
+            toggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            // Change back to password to hide it
+            passwordInput.type = 'password';
+            toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    });
+});
+</script>
+{% endblock %}

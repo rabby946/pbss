@@ -72,7 +72,7 @@ img,
   position: sticky; /* Changed to sticky for better user experience */
   top: 0;
   width: 100%;
-  background: rgba(240, 255, 206, 0.88); /* #f0ffcee0 */
+  background: linear-gradient(90deg, rgba(173, 130, 130, 0.65) 0%, rgba(212, 253, 194, 0.53) 50%);
   box-shadow: 0 6px 18px rgba(125, 122, 83, 0.51);
   z-index: 1000;
   height: 65px;
@@ -820,7 +820,7 @@ button, .btn, .print-btn {
 }
 .main-body{
   background-color: #e2f0c4cf;
-  background: linear-gradient(90deg, rgba(190, 231, 239, 0.729) 0%, rgba(194, 232, 172, 0.74) 50%);
+  background: linear-gradient(90deg, rgba(203, 235, 160, 0.524) 0%, rgba(146, 210, 232, 0.53) 50%);
 }
 
 /* --- MASTER DESIGN SYSTEM: "DIGITAL INK" --- */
@@ -850,6 +850,7 @@ body {
   max-width: 1200px;
   margin: 2rem auto;
   padding: 1rem;
+  
 }
 
 .page-header h1 {
@@ -1007,11 +1008,11 @@ body {
 }
 
 :root {
-  --bg-color: #0d1117; 
+  --bg-color: #fffafaa2; 
   --card-bg: rgba(22, 27, 34, 0.5); 
-  --card-border: rgba(56, 139, 253, 0.2);
-  --text-primary: #F0F6FC;
-  --text-secondary: #C0C8D2; 
+  --card-border: rgba(56, 138, 253, 0.408);
+  --text-primary: #000203;
+  --text-secondary: #000000; 
   --accent-color: #22d3ee; /* Vibrant Cyan */
   --accent-glow: rgba(34, 211, 238, 0.3);
   --error-color: #ff5b5b;
@@ -1112,6 +1113,7 @@ body {
   font-size: 0.9rem; /* MODIFIED: Larger error text */
   margin-top: 0.5rem;
   display: none;
+  background-color: wheat;
 }
 
 .btn-submit {
@@ -1409,3 +1411,207 @@ body {
     }
   }
   
+
+    /* --- SUPER STYLISH committeeS PAGE DESIGN --- */
+
+    /* 1. Global Styles & Variables */
+    :root {
+        --font-heading: 'Poppins', sans-serif;
+        --font-body: 'Inter', sans-serif;
+        --color-primary: #059669; /* A rich green */
+        --color-primary-light: #10B981;
+        --color-edit: #3B82F6; /* Blue */
+        --color-delete: #EF4444; /* Red */
+        --color-text-dark: #1F2937;
+        --color-text-light: #4B5563;
+    }
+
+    /* 2. Page Container & Header */
+    .ts-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        font-family: var(--font-body);
+    }
+
+    .ts-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    .ts-header__title {
+        font-family: var(--font-heading);
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--color-text-dark);
+        margin-bottom: 1rem;
+    }
+    .ts-header__controls {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+    }
+    @media (min-width: 640px) {
+        .ts-header__controls {
+            flex-direction: row;
+            justify-content: space-between;
+        }
+    }
+
+    /* 3. "Add committee" Button */
+    .ts-add-btn {
+        display: inline-block;
+        background-image: linear-gradient(to right, var(--color-primary), var(--color-primary-light));
+        color: white;
+        font-family: var(--font-heading);
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.75rem;
+        text-decoration: none;
+        box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
+        transition: all 0.3s ease;
+    }
+    .ts-add-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(5, 150, 105, 0.4);
+    }
+
+    /* 4. Stylish Search Bar */
+    .ts-search-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 400px;
+    }
+    .ts-search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9CA3AF;
+    }
+    .ts-search-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 3rem;
+        border: 1px solid #D1D5DB;
+        border-radius: 0.75rem;
+        font-size: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+    .ts-search-input:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    }
+
+    /* 5. Responsive committee Grid */
+    .ts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+    }
+
+    /* 6. The Glassmorphism Profile Card */
+    .ts-card {
+        background: rgba(255, 255, 255, 0.6); /* Frosted Glass Effect */
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-radius: 1.25rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        position: relative;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+        /* Reveal Animation Setup */
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    .ts-card.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .ts-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    
+    .ts-card__image-wrapper {
+        height: 280px;
+        position: relative;
+    }
+    .ts-card__image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
+    
+    .ts-card__content {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    .ts-card__name {
+        font-family: var(--font-heading);
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--color-text-dark);
+        margin: 0;
+    }
+    .ts-card__position {
+        font-size: 1rem;
+        color: var(--color-text-light);
+        margin-top: 0.25rem;
+    }
+    
+    /* 7. Hover-Reveal Action Buttons (Bigger & Better) */
+    .ts-card__actions {
+        position: absolute;
+        bottom: 1.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 1rem;
+        opacity: 0;
+        transition: all 0.3s ease-in-out;
+        pointer-events: none; /* Not clickable when hidden */
+    }
+    .ts-card:hover .ts-card__actions {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-10px);
+        pointer-events: auto; /* Clickable on hover */
+    }
+    
+    .ts-action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        color: white;
+        text-decoration: none;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    .ts-action-btn:hover {
+        transform: scale(1.1);
+        filter: brightness(1.1);
+    }
+    .ts-action-btn--edit { background-color: var(--color-edit); }
+    .ts-action-btn--delete { background-color: var(--color-delete); }
+
+    /* 8. "No Results" Message */
+    .ts-no-results {
+        display: none;
+        text-align: center;
+        padding: 4rem 0;
+        grid-column: 1 / -1; /* Span full grid width */
+        font-size: 1.25rem;
+        color: var(--color-text-light);
+    }
+
+
+    

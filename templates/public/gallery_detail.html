@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+{% block title %}{{ item.title }} : Palashbaria Secondary School{% endblock %}
+{% block content %}
+<style>
+    /* --- PSS GALLERY DETAIL DESIGN --- */
+
+    /* 1. Theme & Variables (Digital Ink) */
+    :root {
+        --font-sans: 'Inter', sans-serif;
+        --color-accent: #22d3ee; /* Cyan */
+        --color-text-dark: #F0F6FC;
+        --color-text-light: #A1A7B1;
+        --card-bg: rgba(22, 27, 34, 0.6);
+        --card-border: rgba(56, 139, 253, 0.2);
+        --accent-glow: rgba(34, 211, 238, 0.3);
+    }
+
+    /* 2. Main Page Layout */
+    .gallery-detail__container {
+        max-width: 1100px;
+        margin: 2rem auto;
+        padding: 1rem;
+        font-family: var(--font-sans);
+    }
+    
+    /* 3. Hero Header Section */
+    .gallery-detail__header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--card-border);
+    }
+    .gallery-detail__title {
+        font-size: 2.8rem;
+        font-weight: 700;
+        color: #fff;
+        margin: 0 0 1rem 0;
+        text-shadow: 0 0 10px var(--accent-glow);
+    }
+    .gallery-detail__description {
+        font-size: 1.1rem;
+        color: var(--color-text-light);
+        max-width: 800px;
+        margin: 0 auto 1.5rem auto;
+        line-height: 1.7;
+        color: #1b0909;
+    }
+    .gallery-detail__back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--color-accent);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s ease;
+    }
+    .gallery-detail__back-btn:hover {
+        color: white;
+    }
+
+    /* 4. Responsive Image Grid */
+    .gallery-detail__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+    .gallery-detail__image-wrapper {
+        position: relative;
+        cursor: pointer;
+        overflow: hidden;
+        border-radius: 0.75rem;
+        border: 1px solid var(--card-border);
+        aspect-ratio: 1 / 1; /* Makes images square */
+    }
+    .gallery-detail__image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.4s ease;
+    }
+    .gallery-detail__image-wrapper:hover .gallery-detail__image {
+        transform: scale(1.1);
+    }
+    .gallery-detail__overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+    .gallery-detail__image-wrapper:hover .gallery-detail__overlay {
+        opacity: 1;
+    }
+
+    /* 5. The Professional Lightbox */
+    .lightbox {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(8px);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .lightbox.is-visible {
+        opacity: 1;
+        visibility: visible;
+    }
+    .lightbox__content {
+        position: relative;
+        max-width: 90vw;
+        max-height: 85vh;
+        animation: lightboxZoomIn 0.4s ease;
+    }
+    @keyframes lightboxZoomIn {
+        from { transform: scale(0.8); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+    .lightbox__image {
+        max-width: 100%;
+        max-height: 85vh;
+        display: block;
+        border-radius: 0.5rem;
+    }
+    .lightbox__close, .lightbox__nav {
+        position: absolute;
+        background: rgba(0,0,0,0.4);
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 2rem;
+        transition: background-color 0.2s ease;
+    }
+    .lightbox__close:hover, .lightbox__nav:hover {
+        background: rgba(0,0,0,0.7);
+    }
+    .lightbox__close {
+        top: 10px;
+        right: 15px;
+        padding: 0 0.75rem;
+        border-radius: 5px;
+    }
+    .lightbox__nav {
+        top: 50%;
+        transform: translateY(-50%);
+        padding: 1.5rem 1rem;
+    }
+    .lightbox__nav--prev { left: 10px; }
+    .lightbox__nav--next { right: 10px; }
+    
+    .lightbox__counter {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.5);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 5px;
+        font-size: 0.9rem;
+    }
+</style>
+
+<div class="gallery-detail__container">
+    <div class="gallery-detail__header">
+        <h2 class="gallery-detail__title">{{ item.title }}</h2>
+        <p class="gallery-detail__description">{{ item.description }}</p>
+        <a href="{{ url_for('public.gallery') }}" class="gallery-detail__back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Gallery
+        </a>
+    </div>
+
+    <div class="gallery-detail__grid">
+      {% for img in item.images %}
+        <div class="gallery-detail__image-wrapper">
+          <img src="{{ img.strip() }}" alt="Gallery Image" class="gallery-detail__image">
+          <div class="gallery-detail__overlay">
+            <i class="fas fa-search-plus"></i>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+</div>
+
+<div class="lightbox" id="galleryLightbox">
+    <button class="lightbox__close" title="Close (Esc)">&times;</button>
+    <button class="lightbox__nav lightbox__nav--prev" title="Previous (Left Arrow)">&#10094;</button>
+    <div class="lightbox__content">
+        <img src="" alt="Enlarged gallery image" id="lightboxImage" class="lightbox__image">
+        <div class="lightbox__counter" id="lightboxCounter"></div>
+    </div>
+    <button class="lightbox__nav lightbox__nav--next" title="Next (Right Arrow)">&#10095;</button>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- PROFESSIONAL LIGHTBOX SCRIPT ---
+
+    const galleryImages = document.querySelectorAll('.gallery-detail__image-wrapper');
+    const lightbox = document.getElementById('galleryLightbox');
+    const lightboxImage = document.getElementById('lightboxImage');
+    const lightboxCounter = document.getElementById('lightboxCounter');
+    const closeBtn = lightbox.querySelector('.lightbox__close');
+    const prevBtn = lightbox.querySelector('.lightbox__nav--prev');
+    const nextBtn = lightbox.querySelector('.lightbox__nav--next');
+
+    // Create an array of image URLs from the grid
+    const imageUrls = Array.from(galleryImages).map(wrapper => wrapper.querySelector('img').src);
+    let currentIndex = 0;
+
+    function showImage(index) {
+        if (index < 0 || index >= imageUrls.length) {
+            return; // Out of bounds
+        }
+        currentIndex = index;
+        lightboxImage.src = imageUrls[currentIndex];
+        lightboxCounter.textContent = `Image ${currentIndex + 1} of ${imageUrls.length}`;
+    }
+
+    function openLightbox(index) {
+        showImage(index);
+        lightbox.classList.add('is-visible');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    function closeLightbox() {
+        lightbox.classList.remove('is-visible');
+        document.body.style.overflow = 'auto';
+    }
+
+    function showNextImage() {
+        const nextIndex = (currentIndex + 1) % imageUrls.length; // Loop to start
+        showImage(nextIndex);
+    }
+
+    function showPrevImage() {
+        const prevIndex = (currentIndex - 1 + imageUrls.length) % imageUrls.length; // Loop to end
+        showImage(prevIndex);
+    }
+
+    // --- EVENT LISTENERS ---
+
+    // Open lightbox when an image is clicked
+    galleryImages.forEach((wrapper, index) => {
+        wrapper.addEventListener('click', () => openLightbox(index));
+    });
+
+    // Close lightbox events
+    closeBtn.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e) => {
+        // Close if the dark backdrop is clicked, but not the content inside it
+        if (e.target === lightbox) {
+            closeLightbox();
+        }
+    });
+
+    // Navigation events
+    nextBtn.addEventListener('click', showNextImage);
+    prevBtn.addEventListener('click', showPrevImage);
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (!lightbox.classList.contains('is-visible')) return;
+
+        if (e.key === 'ArrowRight') {
+            showNextImage();
+        } else if (e.key === 'ArrowLeft') {
+            showPrevImage();
+        } else if (e.key === 'Escape') {
+            closeLightbox();
+        }
+    });
+});
+</script>
+
+{% endblock %}

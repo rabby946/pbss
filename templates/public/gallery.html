@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+{% block title %}Gallery Management{% endblock %}
+
+{% block content %}
+<style>
+    /* --- SUPER STYLISH GALLERY ADMIN DESIGN --- */
+
+    /* 1. Theme & Variables */
+    :root {
+        --font-sans: 'Inter', sans-serif; /* A clean sans-serif font */
+        --color-primary: #0891B2; /* A rich cyan */
+        --color-primary-light: #06B6D4;
+        --color-danger: #E11D48; /* A strong red */
+        --color-danger-light: #F43F5E;
+        --color-text-dark: #1F2937;
+        --color-text-light: #6B7280;
+        --color-bg-light: #F9FAFB;
+    }
+
+    /* 2. Main Container & Header */
+    .ga-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        font-family: var(--font-sans);
+    }
+    .ga-header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding-bottom: 1.5rem;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid #E5E7EB;
+    }
+    @media (min-width: 640px) {
+        .ga-header {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+    }
+    .ga-header__title {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: var(--color-text-dark);
+    }
+    .ga-add-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background-image: linear-gradient(to right, var(--color-primary), var(--color-primary-light));
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.75rem;
+        text-decoration: none;
+        box-shadow: 0 4px 15px rgba(8, 145, 178, 0.3);
+        transition: all 0.3s ease;
+    }
+    .ga-add-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(8, 145, 178, 0.4);
+    }
+
+    /* 3. Responsive Management Grid */
+    .ga-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+    }
+
+    /* 4. The Glassmorphism Card */
+    .ga-card {
+        background: rgba(255, 255, 255, 0.65);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 1.25rem;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        /* Animation setup */
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    .ga-card.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .ga-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    /* 5. Card Content Styling */
+    .ga-card__image-preview {
+        height: 200px;
+        width: 100%;
+        object-fit: cover;
+        border-radius: 1.25rem 1.25rem 0 0;
+    }
+    .ga-card__content {
+        padding: 1.5rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .ga-card__title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--color-text-dark);
+        margin: 0 0 0.5rem 0;
+    }
+    .ga-card__description {
+        color: var(--color-text-light);
+        flex-grow: 1;
+        margin-bottom: 1.5rem;
+    }
+    .ga-card__meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #E5E7EB;
+        padding-top: 1rem;
+    }
+    .ga-card__image-count {
+        background-color: #E5E7EB;
+        color: var(--color-text-light);
+        font-weight: 500;
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.875rem;
+    }
+    .ga-card__actions {
+        display: flex;
+        gap: 0.75rem;
+    }
+    .ga-action-btn--details {
+    background-color: #6366F1; /* Indigo */
+}
+.ga-action-btn--details:hover {
+    filter: brightness(1.1);
+}
+
+    .ga-action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        color: white;
+        font-weight: 500;
+        transition: filter 0.2s ease;
+    }
+    .ga-action-btn:hover {
+        filter: brightness(1.1);
+    }
+    .ga-action-btn--edit { background-color: var(--color-primary); }
+    .ga-action-btn--delete { background-color: var(--color-danger); cursor: pointer; border: none; }
+
+    /* 6. Custom Delete Confirmation Modal */
+    .ga-modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(5px);
+        z-index: 1000;
+        display: none; /* Hidden by default */
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .ga-modal-backdrop.is-visible { display: block; }
+    
+    .ga-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.95);
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+        width: 90%;
+        max-width: 450px;
+        z-index: 1001;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        opacity: 0;
+    }
+    .ga-modal-backdrop.is-visible .ga-modal {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    
+    .ga-modal__icon { font-size: 3rem; color: var(--color-danger); margin-bottom: 1rem; }
+    .ga-modal__title { font-size: 1.5rem; font-weight: 600; color: var(--color-text-dark); margin: 0 0 0.5rem 0; }
+    .ga-modal__text { color: var(--color-text-light); margin: 0 0 1.5rem 0; }
+    .ga-modal__text strong { color: var(--color-text-dark); }
+    .ga-modal__actions { display: flex; gap: 1rem; justify-content: center; }
+    
+    .ga-modal-btn {
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .ga-modal-btn--cancel { background-color: #E5E7EB; color: var(--color-text-dark); }
+    .ga-modal-btn--cancel:hover { background-color: #D1D5DB; }
+    .ga-modal-btn--confirm {
+        background-image: linear-gradient(to right, var(--color-danger), var(--color-danger-light));
+        color: white;
+        text-decoration: none;
+    }
+</style>
+
+<div class="ga-container">
+    <header class="ga-header">
+        <h2 class="ga-header__title">Gallery </h2>
+        
+    </header>
+
+    <main>
+        {% if items %}
+        <div class="ga-grid">
+            {% for item in items %}
+            <div class="ga-card" style="transition-delay: {{ loop.index0 * 0.05 }}s;">
+                <img src="{{ item.images.split(',')[0] }}" alt="Preview for {{ item.title }}" class="ga-card__image-preview">
+                <div class="ga-card__content">
+                    <h3 class="ga-card__title">{{ item.title }}</h3>
+                    <p class="ga-card__description">{{ item.description }}</p>
+                    <div class="ga-card__meta">
+                        <span class="ga-card__image-count">
+                            <i class="fas fa-images"></i> {{ item.images.split(',')|length }} Image(s)
+                        </span>
+                        <div class="ga-card__actions">
+                            <!-- <a href="{{ url_for('public.gallery_detail', id=item.id) }}" class="ga-action-btn ga-action-btn--">
+                                <i class="fas fa-pencil-alt"></i> Details
+                            </a> -->
+                            <a href="{{ url_for('public.gallery_detail', id=item.id) }}" class="ga-action-btn ga-action-btn--details">
+    <i class="fas fa-eye"></i> View Details
+</a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+            <div class="alert alert-warning">No gallery items found! Start by adding a new one.</div>
+        {% endif %}
+    </main>
+</div>
+
+<div class="ga-modal-backdrop" id="deleteModalBackdrop">
+    <div class="ga-modal" id="deleteModal">
+        <div class="ga-modal__icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <h3 class="ga-modal__title">Confirm Deletion</h3>
+        <p class="ga-modal__text">Are you sure you want to permanently delete the gallery item: <strong id="modalItemTitle"></strong>?</p>
+        <div class="ga-modal__actions">
+            <button class="ga-modal-btn ga-modal-btn--cancel" id="cancelDelete"></button>
+            <a href="#" id="confirmDeleteLink" class="ga-modal-btn ga-modal-btn--confirm"></a>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // --- 1. Custom Delete Confirmation Modal Logic ---
+    const modalBackdrop = document.getElementById('deleteModalBackdrop');
+    const modalItemTitle = document.getElementById('modalItemTitle');
+    const confirmDeleteLink = document.getElementById('confirmDeleteLink');
+    const cancelDeleteBtn = document.getElementById('cancelDelete');
+
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            const title = this.dataset.title;
+            const url = this.dataset.url;
+
+            // Populate and show the modal
+            modalItemTitle.textContent = `'${title}'`;
+            confirmDeleteLink.href = url;
+            modalBackdrop.classList.add('is-visible');
+            setTimeout(() => modalBackdrop.style.opacity = '1', 10);
+        });
+    });
+
+    function closeModal() {
+        modalBackdrop.style.opacity = '0';
+        setTimeout(() => modalBackdrop.classList.remove('is-visible'), 300);
+    }
+
+    cancelDeleteBtn.addEventListener('click', closeModal);
+    modalBackdrop.addEventListener('click', function(event) {
+        if (event.target === this) { // Only close if backdrop is clicked, not the modal content
+            closeModal();
+        }
+    });
+
+    // --- 2. Scroll Reveal Animation ---
+    const animatedCards = document.querySelectorAll('.ga-card');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    animatedCards.forEach(card => observer.observe(card));
+
+});
+</script>
+{% endblock %}

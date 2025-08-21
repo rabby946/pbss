@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% block title %}News : Palashbaria Secondary School{% endblock %}
+{% block content %}
+<style>
+    /* --- PSS NEWS HUB DESIGN --- */
+
+    /* 1. Theme & Variables */
+    :root {
+        --font-sans: 'Inter', sans-serif;
+        --color-accent: #22d3ee; /* Cyan */
+        --color-text-dark: #F0F6FC;
+        --color-text-light: #A1A7B1;
+        --card-bg: rgba(22, 27, 34, 0.6);
+        --card-border: rgba(56, 139, 253, 0.2);
+        --accent-glow: rgba(34, 211, 238, 0.3);
+    }
+
+    /* 2. Main Container & Header */
+    .news-hub__container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        font-family: var(--font-sans);
+    }
+    .news-hub__header {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #fff;
+        text-align: center;
+        margin-bottom: 3rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--card-border);
+        position: relative;
+        text-shadow: 0 0 10px var(--accent-glow);
+    }
+    .news-hub__header::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 2px;
+        background-color: var(--color-accent);
+    }
+
+    /* 3. The News Grid */
+    .news-hub__grid {
+        display: grid;
+        grid-template-columns: 1fr; /* Default to single column */
+        gap: 2rem;
+    }
+    @media (min-width: 768px) {
+        /* On larger screens, create a responsive multi-column grid */
+        .news-hub__grid {
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        }
+    }
+
+    /* 4. Base News Card Style */
+    .news-hub__card {
+        display: flex;
+        flex-direction: column;
+        text-decoration: none;
+        background: var(--card-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--card-border);
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        /* Animation setup */
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeIn-up 0.5s ease-out forwards;
+    }
+    .news-hub__card:hover {
+        transform: translateY(-5px);
+        border-color: var(--color-accent);
+        box-shadow: 0 8px 25px var(--accent-glow);
+    }
+    @keyframes fadeIn-up { to { opacity: 1; transform: translateY(0); } }
+
+    /* 5. Featured Card (First item in the grid) */
+    .news-hub__card--featured {
+        grid-column: 1 / -1; /* Span full width of the grid */
+    }
+    @media (min-width: 768px) {
+        .news-hub__card--featured {
+            flex-direction: row; /* Side-by-side layout on desktop */
+        }
+    }
+
+    /* 6. Card Content Styling */
+    .news-hub__image-wrapper {
+        flex-shrink: 0;
+        background-color: #161b22; /* Placeholder color if image is missing */
+        overflow: hidden;
+    }
+    .news-hub__card--featured .news-hub__image-wrapper {
+        height: 300px;
+    }
+    @media (min-width: 768px) {
+        .news-hub__card--featured .news-hub__image-wrapper {
+            width: 45%;
+            height: auto;
+        }
+    }
+    .news-hub__card--standard .news-hub__image-wrapper {
+        height: 200px;
+    }
+    .news-hub__image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+    }
+    .news-hub__card:hover .news-hub__image {
+        transform: scale(1.05);
+    }
+
+    .news-hub__content {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+    .news-hub__title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--color-text-dark);
+        margin: 0 0 0.5rem 0;
+    }
+    .news-hub__card--featured .news-hub__title {
+        font-size: 1.8rem;
+    }
+    .news-hub__meta {
+        font-size: 0.9rem;
+        color: var(--color-text-light);
+        margin-bottom: 1rem;
+    }
+    .news-hub__excerpt {
+        font-size: 1rem;
+        color: var(--color-text-light);
+        line-height: 1.6;
+        flex-grow: 1;
+        margin-bottom: 1.5rem;
+    }
+    .news-hub__read-more {
+        font-weight: 600;
+        color: var(--color-accent);
+        text-decoration: none;
+        align-self: flex-start;
+    }
+    .news-hub__read-more:hover {
+        text-decoration: underline;
+    }
+    
+    /* 7. "No Items" Message */
+    .news-hub__empty-message {
+        text-align: center;
+        padding: 3rem;
+        font-size: 1.2rem;
+        color: var(--color-text-light);
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 1rem;
+    }
+</style>
+
+<div class="news-hub__container">
+    <h1 class="news-hub__header">All News</h1>
+    
+    <div class="news-hub__grid">
+    {% for news in news_items %}
+        {% if loop.first %}
+        <a href="{{ url_for('public.news_detail', id=news.id) }}" 
+           class="news-hub__card news-hub__card--featured"
+           style="animation-delay: 0s;">
+            
+            
+            <div class="news-hub__content">
+                <h3 class="news-hub__title">{{ news.title }}</h3>
+                <p class="news-hub__meta"><i class="fas fa-calendar-alt"></i> Published: {{ news.timestamp }}</p>
+                <p class="news-hub__excerpt">{{ news.excerpt or 'Click to read the full story.' }}</p>
+                <span class="news-hub__read-more">Read More &rarr;</span>
+            </div>
+        </a>
+        {% else %}
+        <a href="{{ url_for('public.news_detail', id=news.id) }}" 
+           class="news-hub__card news-hub__card--standard"
+           style="animation-delay: {{ (loop.index0 - 1) * 0.1 }}s;">
+
+          
+            <div class="news-hub__content">
+                <h3 class="news-hub__title">{{ news.title }}</h3>
+                <p class="news-hub__meta"><i class="fas fa-calendar-alt"></i> {{ news.timestamp }}</p>
+                <p class="news-hub__excerpt">{{ news.excerpt or 'Click to read more.' }}</p>
+                <span class="news-hub__read-more">Read More &rarr;</span>
+            </div>
+        </a>
+        {% endif %}
+    {% else %}
+        <div class="news-hub__empty-message">
+            <p>No news has been published yet. Please check back later.</p>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Scroll Reveal Animation for the cards
+    const animatedCards = document.querySelectorAll('.news-hub__card');
+    if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationDelay = entry.target.style.animationDelay || '0s';
+                    entry.target.classList.add('is-animated'); // A placeholder class
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        animatedCards.forEach(card => {
+            observer.observe(card);
+        });
+    }
+});
+</script>
+
+{% endblock %}

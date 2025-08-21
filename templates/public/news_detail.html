@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ item.title }} : Palashbaria Secondary School{% endblock %}
+
+{% block content %}
+<style>
+  /*
+ * ===============================================
+ * STYLES FOR THE NEWS ARTICLE VISTA
+ * ===============================================
+ */
+
+/* --- Variable Definitions for Easy Customization --- */
+:root {
+  --vista-bg-color-1: #0d023a;
+  --vista-bg-color-2: #1c0f5c;
+  --vista-glow-color-1: #ff00c1;
+  --vista-glow-color-2: #9b4aff;
+  --vista-glow-color-3: #00d9ff;
+  --vista-text-primary: #f0f0f0;
+  --vista-text-secondary: #c0c0c0;
+  --vista-border-color: rgba(255, 255, 255, 0.2);
+  --vista-card-background: rgba(22, 12, 65, 0.5);
+  --vista-font-family: 'Poppins', sans-serif;
+  --vista-animation-duration: 12s;
+}
+
+/* --- Animated Aurora Background --- */
+/* This style should be applied to the body or a full-page wrapper in your base.html */
+body {
+  background-color: var(--vista-bg-color-1);
+  background-image:
+    radial-gradient(at 20% 25%, var(--vista-glow-color-1) 0px, transparent 50%),
+    radial-gradient(at 75% 30%, var(--vista-glow-color-2) 0px, transparent 50%),
+    radial-gradient(at 50% 80%, var(--vista-glow-color-3) 0px, transparent 50%),
+    radial-gradient(at 80% 95%, var(--vista-glow-color-1) 0px, transparent 50%);
+  background-repeat: no-repeat;
+  background-size: 200% 200%;
+  color: var(--vista-text-primary);
+  font-family: var(--vista-font-family);
+  animation: aurora-flow var(--vista-animation-duration) ease-in-out infinite;
+  overflow-x: hidden; /* Prevents horizontal scrollbar */
+}
+
+@keyframes aurora-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* --- Main Container --- */
+.news-article-vista--container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh; /* Adjust as needed */
+  padding: 2rem 1rem;
+}
+
+/* --- The Glassmorphism Card --- */
+@keyframes fadeInSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.news-article-vista--card {
+  width: 100%;
+  max-width: 800px;
+  background: var(--vista-card-background);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px); /* For Safari */
+  border: 1px solid var(--vista-border-color);
+  border-radius: 20px;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Space between header, body, footer */
+  animation: fadeInSlideUp 0.8s ease-out forwards;
+}
+
+/* --- Header and Title --- */
+.news-article-vista--header {
+  text-align: center;
+  border-bottom: 1px solid var(--vista-border-color);
+  padding-bottom: 1.5rem;
+}
+
+.news-article-vista--title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 0.5rem 0;
+  background: linear-gradient(90deg, #e0e0e0, #ffffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.news-article-vista--meta {
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: var(--vista-text-secondary);
+  letter-spacing: 0.5px;
+}
+
+/* --- Body Content --- */
+.news-article-vista--body p {
+  font-size: 1.1rem;
+  font-weight: 400;
+  line-height: 1.8;
+  color: var(--vista-text-primary);
+  margin: 0;
+}
+
+/* --- Footer and Back Link --- */
+.news-article-vista--footer {
+  margin-top: 1rem;
+}
+
+.news-article-vista--back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--vista-text-primary);
+  text-decoration: none;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.news-article-vista--back-link svg {
+  transition: transform 0.3s ease;
+}
+
+.news-article-vista--back-link:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.news-article-vista--back-link:hover svg {
+  transform: translateX(-4px);
+}
+
+/* --- Media Queries for Responsiveness --- */
+@media (max-width: 768px) {
+  .news-article-vista--card {
+    padding: 1.5rem;
+  }
+  .news-article-vista--title {
+    font-size: 2rem;
+  }
+  .news-article-vista--body p {
+    font-size: 1rem;
+  }
+}
+</style>
+<div class="news-article-vista--container">
+  <article class="news-article-vista--card">
+    <header class="news-article-vista--header">
+      <h1 class="news-article-vista--title">{{ item.title }}</h1>
+      <small class="news-article-vista--meta">Published: {{ item.timestamp.strftime('%B %d, %Y') }}</small>
+    </header>
+    <div class="news-article-vista--body">
+      <p>{{ item.description }}</p>
+    </div>
+    <footer class="news-article-vista--footer">
+      <a href="{{ url_for('public.news') }}" class="news-article-vista--back-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+        </svg>
+        <span>Back to News</span>
+      </a>
+    </footer>
+  </article>
+</div>
+{% endblock %}

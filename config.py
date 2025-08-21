@@ -1,13 +1,16 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv()  # Load .env variables
 
 class Config:
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     FLASK_SECRET_KEY = os.getenv("FLASK_SECRET_KEY", "super-secret-key")
+
+    # Use Supabase Transaction Pooler / Shared Pooler URI
     DATABASE_URL = os.getenv("DATABASE_URL")
-    ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
+
+    ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "").strip()
     IMGBB_API_KEY = os.getenv("IMGBB_API_KEY")
     GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
@@ -21,3 +24,7 @@ class Config:
         'results': os.path.join(BASE_DIR, 'static', 'files', 'results'),
         'routine': os.path.join(BASE_DIR, 'static', 'files', 'routine')
     }
+
+    # SQLAlchemy settings
+    SQLALCHEMY_DATABASE_URI = DATABASE_URL
+    SQLALCHEMY_TRACK_MODIFICATIONS = False

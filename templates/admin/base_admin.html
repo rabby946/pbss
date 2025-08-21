@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %} : Palashbaria Secondary School{% endblock %}</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap" rel="stylesheet">
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+</head>
+
+<body class="main-body">
+<header class="site-header">
+  <div class="logo" style="margin-left: 32px;">
+    <a href="{{ url_for('public.home') }}" style="position: sticky;">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Palashbaria School Logo">
+      <b>পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়</b>
+    </a>
+    <div class="hamburger" onclick="toggleDrawer()" style="position: fixed; top: 15px; right: 15px; z-index: 1000; cursor: pointer;">☰</div>
+  </div>
+
+  <div class="header-container">
+    <nav class="main-nav" id="nav-drawer">
+      <ul>
+        <li><a href="{{ url_for('public.home') }}" class="{% if request.endpoint=='public.home' %}active{% endif %}">Home</a></li>
+        <li><a href="{{ url_for('public.news') }}" class="{% if request.endpoint=='public.news' %}active{% endif %}">News</a></li>
+        <li><a href="{{ url_for('public.teachers') }}" class="{% if request.endpoint=='public.teachers' %}active{% endif %}">Teachers</a></li>
+        <li><a href="{{ url_for('public.committees') }}" class="{% if request.endpoint=='public.committees' %}active{% endif %}">Committees</a></li>
+        <li><a href="{{ url_for('public.students') }}" class="{% if request.endpoint=='public.students' %}active{% endif %}">Students</a></li>
+        <li><a href="{{ url_for('public.routine') }}" class="{% if request.endpoint=='public.routine' %}active{% endif %}">Routine</a></li>
+        <li><a href="{{ url_for('public.results') }}" class="{% if request.endpoint=='public.results' %}active{% endif %}">Results</a></li>
+        <li><a href="{{ url_for('public.gallery') }}" class="{% if request.endpoint=='public.gallery' %}active{% endif %}">Gallery</a></li>
+        <li><a href="{{ url_for('public.mpos') }}" class="{% if request.endpoint=='public.mpos' %}active{% endif %}">Accreditations</a></li>
+        <li><a href="{{ url_for('public.contact') }}" class="{% if request.endpoint=='public.contact' %}active{% endif %}">Contact</a></li>
+        <li><a href="{{ url_for('admin.dashboard') }}" class="{% if request.endpoint=='admin.dashboard' %}active{% endif %}">Dashboard</a></li>
+        <li><a href="{{ url_for('admin.logout') }}" class="{% if request.endpoint=='admin.logout' %}active{% endif %}">Logout</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="container" style="padding-top: 40px;">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, msg in messages %}
+      <div class="glass-card message-card" style="color: {% if category == 'error' %}red{% else %}green{% endif %};">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

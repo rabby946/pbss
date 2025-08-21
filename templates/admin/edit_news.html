@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block title %}Edit {% endblock %}
+
+{% block content %}
+
+<style>
+    /* Import a clean, modern font from Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    /* Apply the user-specified background and base styles */
+    body {
+        background: linear-gradient(90deg, rgba(66, 77, 53, 0.895) 0%, rgba(146, 210, 232, 0.53) 50%);
+        font-family: 'Poppins', sans-serif;
+        color: #1a1a1a; /* Black text */
+        line-height: 1.6;
+    }
+
+    /* A container to center the form card on the page */
+    .page-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 2rem;
+        padding-bottom: 65%;
+    }
+
+    /* The stylish "frosted glass" card that holds the form */
+    .form-card {
+        width: 100%;
+        max-width: 600px;
+        background: rgba(255, 255, 255, 0.6); /* Semi-transparent white */
+        backdrop-filter: blur(12px); /* The frosted glass effect */
+        -webkit-backdrop-filter: blur(12px);
+        padding: 2.5rem;
+        border-radius: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        box-shadow: 0 8px 32px 0 rgba(88, 58, 58, 0.316);
+    }
+
+    /* Styling for the main heading */
+    .form-heading {
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 2.25rem;
+        font-weight: 600;
+        color: #111;
+    }
+
+    /* Targeting the form elements for styling */
+    .admin-form-mpo-edit label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #333;
+    }
+
+    .admin-form-mpo-edit input[type="text"],
+    .admin-form-mpo-edit textarea {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background: rgba(249, 249, 249, 0.8);
+        font-size: 1rem;
+        font-family: 'Poppins', sans-serif;
+        color: #1a1a1a;
+        box-sizing: border-box; /* Ensures padding doesn't affect width */
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Style for when a user clicks into a field */
+    .admin-form-mpo-edit input[type="text"]:focus,
+    .admin-form-mpo-edit textarea:focus {
+        outline: none;
+        border-color: #5aa9c4; /* A nice blue sampled from the gradient */
+        box-shadow: 0 0 0 3px rgba(146, 210, 232, 0.4);
+    }
+    
+    .admin-form-mpo-edit textarea {
+        min-height: 150px;
+        resize: vertical; /* Allows user to resize height only */
+    }
+
+    .admin-form-mpo-edit button[type="submit"] {
+        width: 100%;
+        padding: 0.9rem;
+        border: none;
+        border-radius: 8px;
+        background-color: #5aa9c4; /* Matching blue for the button */
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    /* Hover effect for the button */
+    .admin-form-mpo-edit button[type="submit"]:hover {
+        background-color: #4c98b3;
+        transform: translateY(-2px);
+    }
+</style>
+
+<div class="page-container">
+    <div class="form-card">
+        <h2 class="form-heading">Edit  Information</h2>
+
+        <form method="POST" enctype="multipart/form-data" class="admin-form-mpo-edit">
+            <label for="name-input">Name:</label>
+            <input type="text" id="name-input" name="name" value="{{ item.title }}" required>
+
+            <label for="description-input">Description:</label>
+            <textarea id="description-input" name="description" required>{{ item.description }}</textarea>
+
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

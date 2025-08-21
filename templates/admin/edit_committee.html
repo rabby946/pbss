@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% block title %}Edit committee{% endblock %}
+
+{% block content %}
+
+<style>
+    /* Import a clean, modern font from Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    /* Apply the standard background and base styles */
+    body {
+        background: linear-gradient(90deg, rgba(203, 235, 160, 0.524) 0%, rgba(146, 210, 232, 0.53) 50%);
+        font-family: 'Poppins', sans-serif;
+        color: #1a1a1a; /* Black text */
+        line-height: 1.6;
+    }
+
+    /* A container to center the form card on the page */
+    .page-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 2rem;
+        padding-bottom: 65%;
+    }
+
+    /* The stylish "frosted glass" card that holds the form */
+    .form-card {
+        width: 100%;
+        max-width: 600px;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        padding: 2.5rem;
+        border-radius: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    /* Styling for the main heading */
+    .form-heading {
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 2.25rem;
+        font-weight: 600;
+        color: #111;
+    }
+
+    /* Base styles for the form */
+    .admin-form-committee-edit label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #333;
+    }
+
+    .admin-form-committee-edit input[type="text"],
+    .admin-form-committee-edit textarea {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background: rgba(249, 249, 249, 0.8);
+        font-size: 1rem;
+        font-family: 'Poppins', sans-serif;
+        color: #1a1a1a;
+        box-sizing: border-box;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .admin-form-committee-edit input[type="text"]:focus,
+    .admin-form-committee-edit textarea:focus {
+        outline: none;
+        border-color: #5aa9c4;
+        box-shadow: 0 0 0 3px rgba(146, 210, 232, 0.4);
+    }
+    
+    .admin-form-committee-edit textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+    
+    /* --- NEW STYLES FOR PHOTO PREVIEW AND FILE INPUT --- */
+    
+    .current-photo-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background-color: rgba(0,0,0,0.05);
+        border-radius: 8px;
+    }
+
+    .current-photo {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%; /* Circular photo */
+        object-fit: cover; /* Ensures the image covers the area without distortion */
+        border: 4px solid #fff;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        margin-top: 0.5rem;
+    }
+    
+    /* Hides the default ugly file input */
+    .admin-form-committee-edit input[type="file"] {
+        display: none;
+    }
+
+    /* This is the styled "button" that the user will click */
+    .file-input-label {
+        display: block;
+        width: 100%;
+        padding: 0.8rem 1rem;
+        margin-bottom: 1.5rem;
+        border: 1px dashed #aaa;
+        border-radius: 8px;
+        background-color: #f0f0f0;
+        text-align: center;
+        cursor: pointer;
+        transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .file-input-label:hover {
+        background-color: #e0e0e0;
+        border-color: #5aa9c4;
+    }
+
+    /* --- End of New Styles --- */
+
+    .admin-form-committee-edit button[type="submit"] {
+        width: 100%;
+        padding: 0.9rem;
+        border: none;
+        border-radius: 8px;
+        background-color: #5aa9c4;
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .admin-form-committee-edit button[type="submit"]:hover {
+        background-color: #4c98b3;
+        transform: translateY(-2px);
+    }
+</style>
+
+<div class="page-container">
+    <div class="form-card">
+        <h2 class="form-heading">Edit committee Information</h2>
+
+        <form method="POST" enctype="multipart/form-data" class="admin-form-committee-edit">
+            
+            <div class="current-photo-container">
+                <label>Current Photo</label>
+                {% if item.image_url %}
+                    <img src="{{ item.image_url }}" alt="Current photo of {{ item.name }}" class="current-photo">
+                {% else %}
+                    <p style="margin-top: 0.5rem; color: #555;">No photo available.</p>
+                {% endif %}
+            </div>
+
+            <label for="name-input">Name:</label>
+            <input type="text" id="name-input" name="name" value="{{ item.name }}" required>
+
+            <label for="description-input">Position / Description:</label>
+            <textarea id="description-input" name="description" required>{{ item.designation }}</textarea>
+
+            <label for="photo-input">Change Photo (Optional):</label>
+            <label for="photo-input" class="file-input-label" id="file-label">Click to choose a new photo...</label>
+            <input type="file" id="photo-input" name="filename" accept="image/*">
+
+            <button type="submit">Update committee</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const photoInput = document.getElementById('photo-input');
+    const fileLabel = document.getElementById('file-label');
+
+    photoInput.addEventListener('change', () => {
+        if (photoInput.files.length > 0) {
+            fileLabel.textContent = photoInput.files[0].name;
+        } else {
+            fileLabel.textContent = 'Click to choose a new photo...';
+        }
+    });
+</script>
+
+{% endblock %}

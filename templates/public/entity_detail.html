@@ -5,16 +5,18 @@
 
 <style>
   /* Import elegant fonts from Google Fonts */
-  @import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=Lato:wght@300;400&display=swap');
+  @import url('https://fonts.googleapis.comcom/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400&display=swap');
 
-  /* Define our color palette and fonts using CSS Variables for easy changes */
+  /* Define our color palette using CSS Variables */
   :root {
-    --bg-color: #121212; /* A deep, dark charcoal background */
-    --text-color: #EAEAEA; /* A soft, readable off-white */
-    --text-muted: #A0A0A0; /* A muted grey for the description */
-    --accent-color: #D4AF37; /* A classy, metallic gold for accents */
-    --font-heading: 'Lora', serif;
-    --font-body: 'Lato', sans-serif;
+    --bg-color: #0d1117; /* A very dark, near-black background (like GitHub dark mode) */
+    --card-color: #161b22; /* A slightly lighter dark color for the text card */
+    --border-color: #30363d; /* A subtle border color */
+    --text-color: #c9d1d9; /* A soft, readable off-white for body text */
+    --heading-color: #ffffff; /* Pure white for the main heading */
+    --accent-color: #58a6ff; /* A vibrant blue for accents and links */
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Roboto', sans-serif;
   }
 
   /* We override the base body styles for this specific page */
@@ -24,50 +26,55 @@
     font-family: var(--font-body);
   }
 
-  /* Animation: Content fades in and slides up gently */
+  /* Animation: Content fades in */
   @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
   .page-container {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    justify-content: center;
     padding: 4rem 1rem;
     min-height: 100vh;
     width: 100%;
-    animation: fadeIn 1s ease-out forwards;
+    animation: fadeIn 0.8s ease-out forwards;
   }
 
   .content-wrapper {
-    max-width: 700px;
+    max-width: 750px;
     width: 100%;
     text-align: center;
+  }
+
+  /* The dark card for text content */
+  .text-card {
+    background-color: var(--card-color);
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    padding: 2rem 1.5rem;
+    margin-bottom: 3rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(90deg, rgba(85, 53, 53, 0.524) 0%, rgba(62, 57, 36, 0.683) 50%);
   }
 
   /* The stylish, large heading */
   .item-name {
     font-family: var(--font-heading);
-    font-size: 3rem;
-    font-weight: 600;
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--heading-color);
     margin-bottom: 1rem;
     line-height: 1.2;
   }
 
-  /* The readable, muted description */
+  /* The readable description */
   .item-description {
     font-size: 1.125rem;
-    color: var(--text-muted);
     line-height: 1.8;
-    margin-bottom: 3rem;
     font-weight: 300;
+    max-width: 600px;
+    margin: 0 auto; /* Center the text block */
   }
   
   /* The container for the clickable image */
@@ -76,31 +83,16 @@
     cursor: pointer;
     border-radius: 1rem;
     overflow: hidden;
+    border: 1px solid var(--border-color);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    margin-bottom: 3rem; /* Space between image and back link */
+    margin-bottom: 3rem;
+    max-height:70%;
   }
-
-  /* The image glow/shine effect on hover */
-  .image-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%; /* Start off-screen */
-    width: 50%;
-    height: 100%;
-    background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0) 100%);
-    transform: skewX(-25deg);
-    transition: left 0.75s ease;
-  }
-
+  
   .image-container:hover {
-    transform: scale(1.03);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
-  }
-
-  .image-container:hover::before {
-    left: 150%; /* Move shine across the image */
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(88, 166, 255, 0.2); /* Glow with accent color */
   }
 
   .item-image {
@@ -109,35 +101,34 @@
     display: block;
   }
 
-  /* The minimalist back link */
-  .back-link {
+  /* The new, bigger, more prominent "Go Back" button */
+  .back-button {
+    display: inline-block;
     font-size: 1rem;
-    color: var(--text-muted);
+    font-weight: 400;
+    color: var(--heading-color);
+    background-color: var(--accent-color);
     text-decoration: none;
-    border-bottom: 1px solid transparent;
-    transition: color 0.3s ease, border-color 0.3s ease;
+    padding: 0.8rem 2rem;
+    border-radius: 50px; /* Pill shape */
+    transition: background-color 0.3s ease, transform 0.3s ease;
   }
 
-  .back-link:hover {
-    color: var(--accent-color);
-    border-bottom-color: var(--accent-color);
+  .back-button:hover {
+    background-color: #338bff;
+    transform: scale(1.05);
   }
 
-  /* --- STYLISH LIGHTBOX --- */
+  /* --- STYLISH & FIXED LIGHTBOX --- */
   .lightbox {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0; /* A modern way to write top, right, bottom, left = 0 */
     background-color: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    
-    /* Smooth fade transition */
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.4s ease, visibility 0.4s ease;
@@ -151,7 +142,7 @@
   .lightbox-content {
     max-width: 90vw;
     max-height: 90vh;
-    /* Smooth zoom-in animation */
+    border-radius: 0.5rem;
     transform: scale(0.9);
     transition: transform 0.4s ease;
   }
@@ -162,33 +153,37 @@
 
   .lightbox-close {
     position: absolute;
-    top: 20px;
-    right: 30px;
+    top: 1.5rem;
+    right: 2rem;
     font-size: 3rem;
     color: #fff;
     cursor: pointer;
     font-weight: 300;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, color 0.3s ease;
   }
   
   .lightbox-close:hover {
-      transform: scale(1.2) rotate(90deg);
+      color: var(--accent-color);
+      transform: rotate(90deg);
   }
-
 </style>
 
 <div class="page-container">
   <div class="content-wrapper">
 
-    <h2 class="item-name">{{ item.name }}</h2>
-
-    <p class="item-description">{{ description }}</p>
-
+    <div class="text-card">
+     
+      <h2 class="item-name">{{ item.name }}</h2>
+      <p class="item-description">{{ description }}</p>
+      
+    </div>
+     <a href="{{ url_for(endpoint) }}" class="back-button">← Go Back</a> <br>
+     <span>.</span>
     <div class="image-container" id="imageTrigger">
       <img src="{{ item.image_url }}" alt="{{ item.name }}" class="item-image">
     </div>
 
-    <a href="{{ url_for(endpoint) }}" class="back-link">← Go Back</a>
+    
 
   </div>
 </div>
@@ -205,10 +200,13 @@
   const lightbox = document.getElementById('lightbox');
   const lightboxClose = document.getElementById('lightboxClose');
   const lightboxImage = document.getElementById('lightboxImage');
-  const imageUrl = "{{ item.image_url }}"; // Get the image URL from Django/Jinja
-
-  // Function to open the lightbox
+  
+  // A more robust way to open the lightbox
   function openLightbox() {
+    // Find the image inside the container that was clicked and get its URL
+    const imageUrl = imageTrigger.querySelector('.item-image').src;
+    
+    // Set that URL to the lightbox image and show the lightbox
     lightboxImage.setAttribute('src', imageUrl);
     lightbox.classList.add('active');
   }
@@ -219,15 +217,19 @@
   }
 
   // --- Event Listeners ---
-
-  // 1. Click the main image to open the lightbox
-  imageTrigger.addEventListener('click', openLightbox);
-
+  
+  // Make sure the imageTrigger element exists before adding a listener
+  if (imageTrigger) {
+    // 1. Click the main image to open the lightbox
+    imageTrigger.addEventListener('click', openLightbox);
+  }
+  
   // 2. Click the 'X' button to close
   lightboxClose.addEventListener('click', closeLightbox);
 
   // 3. Click the dark background area to close
   lightbox.addEventListener('click', function(event) {
+    // We check if the click was on the dark overlay itself, not the image
     if (event.target === lightbox) {
       closeLightbox();
     }
@@ -239,7 +241,6 @@
       closeLightbox();
     }
   });
-
 </script>
 
 {% endblock %}

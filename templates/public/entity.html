@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}{{ entity_name }} : Palashbaria Secondary School{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="page-header">
+    <h1 style="color: black;">Our {{ entity_name }}</h1>
+  </div>
+
+  <div class="filter-container">
+    <input type="text" id="filter-input" class="filter-input" placeholder=" Search by name...">
+  </div>
+
+  <div class="content-grid">
+    {% for item in entity_items %}
+      <a href="{{ url_for(detail_endpoint, id=item.id) }}" class="content-card person-card">
+        <div class="person-image-wrapper">
+          <img src="{{ item.image_url }}" alt="{{ item.name }}">
+        </div>
+        <div class="person-info">
+          <h3>{{ item.name }}</h3>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+
+  <p id="no-results-message">No {{ entity_name|lower() }} found with that name.</p>
+</div>
+{% endblock %}

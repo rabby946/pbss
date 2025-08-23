@@ -8,7 +8,7 @@ from functools import wraps
 from models import db, News, Gallery, Teacher, Student, Committee, MPO, Result, Routine
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from werkzeug.utils import secure_filename
-from models import db, Teacher, Student, MPO, Committee, Result, Routine, News, Gallery
+from models import db, Teacher, Student, MPO, Committee, Result, Routine, News, Gallery, Report
 import os
 from utils import admin_required, upload_to_imgbb
 
@@ -54,7 +54,31 @@ def dashboard():
 UPLOAD_FOLDER_IMAGES = "static/images"
 UPLOAD_FOLDER_PDFS = "static/pdfs"
 
+@admin_bp.route("/reports")
+@admin_required
+def reports():
+    items = Report.query.order_by(Report.id).all()
+    return render_template("admin/reports.html", items=items)
+
+@admin_bp.route('/delete-report/<int:id>', methods=['POST']) 
+@admin_required 
+def delete_reports(id):
+    if request.method == 'POST':
+        report_to_delete = Report.query.get_or_404(id)
+        db.session.delete(report_to_delete)
+        db.session.commit()
+        flash('Report has been deleted successfully.', 'success')
+        return redirect(url_for('admin.reports')) 
+    return redirect(url_for('admin.reports'))
+
+@admin_bp.route("/admin/more_about/<int:id>")
+@admin_required
+def more_about(id):
+    item = Report.query.get_or_404(id)
+    return render_template("admin/more_about.html", item=item)
+
 # ------------------ TEACHERS ------------------ #
+
 @admin_bp.route("/teachers")
 @admin_required
 def teachers():
@@ -496,3 +520,13 @@ def delete_gallery(id):
     db.session.commit()
     flash("Gallery item deleted successfully!", "success")
     return redirect(url_for("admin.gallery"))
+
+
+
+@admin_bp.route("/teacher/upload")
+@admin_required
+def teacher_upload():
+    item = load(teachers.json)
+    for t in item:
+        file = upload_to_imgbb(t.image_url)
+        teacher = Teacher(name=t.title, position=t.description, img_url=file)

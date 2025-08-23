@@ -1,15 +1,34 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    // --- 1. NEW: Navigation Menu Toggle ---
-    const hamburgerMenu = document.getElementById('hamburger-menu');
-    const mainNav = document.getElementById('main-nav');
-    if (hamburgerMenu && mainNav) {
-        hamburgerMenu.addEventListener('click', function() {
-            this.classList.toggle('active');
-            mainNav.classList.toggle('open');
-            const isExpanded = this.getAttribute('aria-expanded') === 'true';
-            this.setAttribute('aria-expanded', !isExpanded);
-        });
+    // --- 1. UNIFIED NAVIGATION DRAWER SCRIPT ---
+    const hamburgerButton = document.getElementById('pss-unique-hamburger');
+    const closeButton = document.getElementById('pss-unique-close-button');
+    const navMenu = document.getElementById('pss-unique-nav-menu');
+    const body = document.body;
+
+    let overlay = document.querySelector('.pss-nav-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'pss-nav-overlay';
+        body.appendChild(overlay);
+    }
+
+    const openMenu = () => {
+        navMenu.classList.add('is-open');
+        overlay.classList.add('is-visible');
+        body.classList.add('pss-drawer-open');
+    };
+
+    const closeMenu = () => {
+        navMenu.classList.remove('is-open');
+        overlay.classList.remove('is-visible');
+        body.classList.remove('pss-drawer-open');
+    };
+
+    if (hamburgerButton && navMenu && closeButton) {
+        hamburgerButton.addEventListener('click', openMenu);
+        closeButton.addEventListener('click', closeMenu);
+        overlay.addEventListener('click', closeMenu);
     }
 
     // --- 2. AI Chatbot Functionality ---

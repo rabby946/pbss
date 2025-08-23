@@ -67,7 +67,7 @@
     font-weight: 500;
     color: var(--primary-text);
     text-align: center;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all 0.9s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 
   .admin-link:hover {
@@ -84,6 +84,7 @@
   .admin-link.logout:hover {
     background: var(--logout-hover-bg);
     border-color: var(--logout-hover-border-color);
+ 
   }
 </style>
 
@@ -103,9 +104,14 @@
       <a href="{{ url_for('admin.mpos') }}" class="admin-link"><i class="fas fa-award"></i> Manage Accreditations</a>
       <a href="{{ url_for('admin.routines') }}" class="admin-link"><i class="fas fa-calendar-alt"></i> Manage Routine</a>
       <a href="{{ url_for('admin.results') }}" class="admin-link"><i class="fas fa-poll"></i> Manage Results</a>
-      <a href="{{ url_for('admin.logout') }}" class="admin-link logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      <a href="{{ url_for('admin.reports') }}" class="admin-link"><i class="fas fa-envelope"></i> See reports</a>
+      
     </div>
+    <!-- <P>~</P> -->
+     <br>
+  <a href="{{ url_for('admin.logout') }}" class="admin-link logout"><i class="fas fa-sign-out-alt"></i>  Logout</a>  
   </div>
+    
 </div>
 
 <script>

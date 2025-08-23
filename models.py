@@ -45,10 +45,11 @@ class Committee(db.Model):
 # MPOs
 class MPO(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), nullable=False)
-    designation = db.Column(db.String(200))
-    image_url = db.Column(db.String(500))
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    name = db.Column(db.String(255))  # can stay short
+    designation = db.Column(db.Text)  # long descriptions
+    image_url = db.Column(db.String(500))  # imgbb urls can be long
+    timestamp = db.Column(db.DateTime)
+
 
 # Results
 class Result(db.Model):
@@ -62,4 +63,12 @@ class Routine(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200))
     file_url = db.Column(db.String(500))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+# Reports
+class Report(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))   
+    email = db.Column(db.String(100))  
+    purpose = db.Column(db.String(100))
+    message = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)

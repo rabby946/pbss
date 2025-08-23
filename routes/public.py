@@ -1,12 +1,13 @@
-from flask import Blueprint, render_template, redirect, url_for
-from models import News, Gallery, Teacher, Student, Committee, MPO, Result, Routine
-
+from flask import Blueprint, render_template, redirect, url_for, request, flash
+from models import News, Gallery, Teacher, Student, Committee, MPO, Result, Routine, Report
+from flask_mail import Message
+from extensions import mail, db
 public_bp = Blueprint("public", __name__)
 
 # ---------- Home ----------
 @public_bp.route("/")
 def home():
-    headline_item = News.query.first()
+    headline_item = News.query.order_by(News.id.desc()).first()
     headline = headline_item.title if headline_item else "No news yet"
     headline2 = headline_item.description if headline_item else ""
     return render_template("public/home.html", text=headline, text2=headline2)
@@ -96,6 +97,22 @@ def routine():
     return render_template("public/routine.html",items=items)
 
 # ---------- Contact ----------
-@public_bp.route("/contact")
+@public_bp.route("/contact", methods=["GET", "POST"])
 def contact():
-    return render_template("contact.html")
+    if request.method == "POST":
+        name = request.form.get("name")
+        email = request.form.get("email")
+        purpose = request.form.get("subject")
+        message = request.form.get("message")
+        report = Report(name=name, email=email, purpose=purpose, message=message)
+        db.session.add(report)
+        db.session.commit()
+
+        if request.is_json or request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return {"success": True}
+
+        flash("posted your issue")
+        return redirect(url_for("public.contact"))
+
+    return render_template("public/contact.html")
+

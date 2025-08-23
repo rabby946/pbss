@@ -461,7 +461,7 @@ def delete_news(id):
 @admin_bp.route("/gallery")
 @admin_required
 def gallery():
-    items = Gallery.query.order_by(Gallery.id.desc()).all()
+    items = Gallery.query.all()
     return render_template("admin/gallery.html", items=items)
 
 @admin_bp.route("/gallery/add", methods=["GET", "POST"])
@@ -523,10 +523,3 @@ def delete_gallery(id):
 
 
 
-@admin_bp.route("/teacher/upload")
-@admin_required
-def teacher_upload():
-    item = load(teachers.json)
-    for t in item:
-        file = upload_to_imgbb(t.image_url)
-        teacher = Teacher(name=t.title, position=t.description, img_url=file)

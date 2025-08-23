@@ -9,7 +9,7 @@ from routes.public import public_bp
 from routes.admin import admin_bp
 from routes.ai_chat import ai_bp
 from utils import upload_to_imgbb
-from models import  MPO
+from models import  Gallery
 
 # Load environment variables
 load_dotenv()
@@ -33,30 +33,7 @@ with app.app_context():
 app.register_blueprint(public_bp)
 app.register_blueprint(admin_bp, url_prefix="/admin")
 app.register_blueprint(ai_bp)
-@app.route("/upload")
-def teacher_upload():
-    # Load teachers.json file
-    json_path = os.path.join(current_app.root_path, "mpos.json")
-    with open(json_path, "r", encoding="utf-8") as f:
-        items = json.load(f)
 
-    count = 0
-    for t in items:
-        # Upload image and get hosted URL
-        image_path = os.path.join(current_app.root_path, "static/images/mpos", t["filename"])
-        if image_path:
-            file_url = upload_to_imgbb(image_path)
-
-
-            # Create teacher entry
-            teacher = MPO(name=t["title"], designation=t["description"], image_url=file_url)
-
-            db.session.add(teacher)
-            count += 1
-
-    db.session.commit()
-
-    return f"✅ Uploaded {count} teachers to the database!"
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)

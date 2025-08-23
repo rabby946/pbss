@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}reports{% endblock %}
+{% block content %}
+
+<div class="ts-container">
+
+    <header class="ts-header">
+        <h2 class="ts-header__title">All Reports</h2>
+        <div class="ts-header__controls">
+            <div class="ts-search-wrapper">
+                <i class="fas fa-search ts-search-icon"></i>
+                <input type="text" id="reportsSearch" placeholder="Search by name or position..." class="ts-search-input">
+            </div>
+            <!-- <a href="{{ url_for('admin.dashboard') }}" class="ts-add-btn">
+                <i class="fas fa-plus mr-2"></i> back
+            </a> -->
+        </div>
+    </header>
+
+    <main>
+        <div id="teacherGrid" class="ts-grid">
+            {% for t in items %}
+            <div class="ts-card" data-name="{{ t.name }}" data-position="{{ t.position }}">
+                
+                <div class="ts-card__content">
+                    <h3 class="ts-card__name">{{ t.name}}</h3>
+                    <p class="ts-card__position">{{ t.email}}</p>
+                    <p class="ts-card__position">{{ t.purpose}}</p>
+                    <p class="ts-card__position">{{ t.message}}</p>
+                    <div class="ts-card__actions">
+                        <a href="{{ url_for('admin.more_about', id=t.id) }}" class="ts-action-btn ts-action-btn--edit" title="More">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div id="noResultsMessage" class="ts-no-results">
+            <p>No reports found matching your search.</p>
+        </div>
+    </main>
+</div>
+
+{% endblock %}

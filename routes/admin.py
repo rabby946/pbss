@@ -90,7 +90,7 @@ def teachers():
 def add_teacher():
     if request.method == "POST":
         name = request.form.get("name")
-        description = request.form.get("description")
+        description = request.form.get("position")
         file = request.files.get("filename")
 
         image_url = None
@@ -167,7 +167,7 @@ def students():
 def add_student():
     if request.method == "POST":
         name = request.form.get("name")
-        description = request.form.get("description")
+        description = request.form.get("roll")
         file = request.files.get("photo")
         image_url = None
         if "photo" in request.files:
@@ -322,7 +322,7 @@ def committees():
 def add_committee():
     if request.method == "POST":
         name = request.form.get("name")
-        description = request.form.get("description")
+        description = request.form.get("position")
         image_url = None
         if "filename" in request.files:
             file = request.files["filename"]
@@ -540,7 +540,7 @@ def news():
 @admin_required
 def add_news():
     if request.method == "POST":
-        title = request.form.get("name")
+        title = request.form.get("title")
         description = request.form.get("description")
         news = News(title=title, description=description)
         db.session.add(news)

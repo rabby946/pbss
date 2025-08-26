@@ -1,38 +1,42 @@
 {% extends "base.html" %}
-{% block title %}Manage Routines{% endblock %}
+{% block title %}Manage routine{% endblock %}
 
 {% block content %}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
-    /* A completely new, scoped style set for this page */
+    /* Scoped and corrected styles for the Manage routine page */
     :root {
         --admin-bg: #f8f9fa;
         --admin-card-bg: #ffffff;
         --admin-primary: #0d6efd;
         --admin-danger: #dc3545;
-        --admin-edit: #17a2b8; /* A different color for edit */
+        --admin-edit: #17a2b8; /* A professional teal for edit actions */
         --admin-border: #e9ecef;
-        --admin-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+        --admin-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         --admin-text-dark: #212529;
         --admin-text-light: #6c757d;
         --admin-font: 'Poppins', sans-serif;
     }
 
-    .admin-container-new {
+    .admin-container {
         font-family: var(--admin-font);
         max-width: 1000px;
         margin: 2rem auto;
-        padding: 1rem;
+        padding: 2rem;
     }
 
     .admin-header {
+        margin-bottom: 2.5rem;
+    }
+    .admin-header__top {
         display: flex;
-        flex-wrap: wrap;
         justify-content: space-between;
         align-items: center;
-        gap: 1.5rem;
-        margin-bottom: 2.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--admin-border);
     }
     .admin-header__title {
         font-size: 2.2rem;
@@ -40,9 +44,32 @@
         color: var(--admin-text-dark);
         margin: 0;
     }
-    .admin-header__actions {
+    .admin-btn--back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        color: var(--admin-text-dark);
+        background-color: #e9ecef;
+        transition: all 0.3s ease;
+        border: 1px solid var(--admin-border);
+    }
+    .admin-btn--back:hover {
+        background-color: #dee2e6;
+        transform: translateY(-2px);
+    }
+    
+    .admin-header__controls {
         display: flex;
-        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: flex-end; /* Align buttons to the right */
+        align-items: center;
+        gap: 1.5rem;
+        padding-top: 1.5rem;
     }
     .admin-btn {
         display: inline-flex;
@@ -64,13 +91,13 @@
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
 
-    .routines-grid-new {
+    .routine-grid {
         display: grid;
         grid-template-columns: 1fr;
         gap: 1.5rem;
     }
 
-    .routine-card-new {
+    .result-card {
         display: flex;
         align-items: center;
         gap: 1.5rem;
@@ -81,12 +108,12 @@
         box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         transition: all 0.3s ease;
     }
-    .routine-card-new:hover {
+    .result-card:hover {
         transform: translateY(-5px);
         box-shadow: var(--admin-shadow);
     }
 
-    .routine-card-new__icon {
+    .result-card__icon {
         font-size: 1.8rem;
         color: var(--admin-danger);
         background-color: #f8d7da;
@@ -99,16 +126,17 @@
         flex-shrink: 0;
     }
     
-    .routine-card-new__info {
+    .result-card__info {
         flex-grow: 1;
     }
-    .routine-card-new__title {
+    .result-card__title {
         font-size: 1.3rem;
         font-weight: 500;
-        color: var(--admin-text-dark);
+        color: var(--admin-text-dark) !important; /* Force color to prevent override */
         margin: 0 0 0.5rem 0;
+        position: static !important; /* CRITICAL FIX: Ensures title stays in place */
     }
-    .routine-card-new__file-link {
+    .result-card__file-link {
         font-size: 1rem;
         color: var(--admin-primary);
         text-decoration: none;
@@ -116,18 +144,18 @@
         align-items: center;
         gap: 0.5rem;
     }
-    .routine-card-new__file-link:hover { text-decoration: underline; }
-    .routine-card-new__no-file {
+    .result-card__file-link:hover { text-decoration: underline; }
+    .result-card__no-file {
         font-size: 1rem;
         color: var(--admin-text-light);
         font-style: italic;
     }
 
-    .routine-card-new__actions {
+    .result-card__actions {
         display: flex;
         gap: 0.75rem;
     }
-    .action-btn-new {
+    .action-btn {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -142,106 +170,92 @@
         transition: all 0.3s ease;
         text-decoration: none;
     }
-    .action-btn-new--edit:hover {
+    .action-btn--edit:hover {
         background-color: var(--admin-edit);
         color: #fff;
     }
-    .action-btn-new--delete:hover {
+    .action-btn--delete:hover {
         background-color: var(--admin-danger);
         color: #fff;
     }
 </style>
 
-<div class="admin-container-new">
-    <div class="admin-header">
-        <h2 class="admin-header__title">Manage routines</h2>
-        <div class="admin-header__actions">
-            <a href="{{ url_for('admin.routine_swap') }}" class="admin-btn admin-btn--secondary">
-                <i class="fas fa-exchange-alt"></i> Swap Items
-            </a>
-            <a href="{{ url_for('admin.add_routine') }}" class="admin-btn admin-btn--primary">
-                <i class="fas fa-plus"></i> Add New routine
+<div class="admin-container">
+
+    <header class="admin-header">
+        <div class="admin-header__top">
+            <h2 class="admin-header__title">Manage routine</h2>
+            <a href="{{ url_for('admin.dashboard') }}" class="admin-btn--back">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
             </a>
         </div>
-    </div>
-
-    {% if items %}
-    <div class="routines-grid-new">
-        {% for r in items %}
-        <div class="routine-card-new">
-            <div class="routine-card-new__icon">
-                <i class="fas fa-file-pdf"></i>
-            </div>
-            <div class="routine-card-new__info">
-                <h3 class="routine-card-new__title">{{ r.title }}</h3>
-                {% if r.file_url %}
-                <a href="{{ r.file_url }}" target="_blank" class="routine-card-new__file-link">
-                    <i class="fas fa-link"></i> View Attached File
-                </a>
-                {% else %}
-                <p class="routine-card-new__no-file">No file uploaded</p>
-                {% endif %}
-            </div>
-
-            <div class="routine-card-new__actions">
-                <a href="{{ url_for('admin.edit_routine', id=r.id) }}" class="action-btn-new action-btn-new--edit" title="Edit">
-                    <i class="fas fa-pencil-alt"></i>
-                </a>
-                <button class="action-btn-new action-btn-new--delete" title="Delete"
-                        data-title="{{ r.title }}"
-                        data-url="{{ url_for('admin.delete_routine', id=r.id) }}">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            </div>
+        <div class="admin-header__controls">
+            <a href="{{ url_for('admin.result_swap') }}" class="admin-btn admin-btn--secondary">
+                <i class="fas fa-exchange-alt"></i> Reorder routine
+            </a>
+            <a href="{{ url_for('admin.add_result') }}" class="admin-btn admin-btn--primary">
+                <i class="fas fa-plus"></i> Add New Result
+            </a>
         </div>
-        {% endfor %}
-    </div>
-    {% else %}
-        <div class="alert alert-warning">No routine items found! Click "Add New routine" to get started.</div>
-    {% endif %}
+    </header>
+
+    <main>
+        {% if items %}
+        <div class="routine-grid">
+            {% for r in items %}
+            <div class="result-card">
+                <div class="result-card__icon">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <div class="result-card__info">
+                    <h3 class="result-card__title">{{ r.title }}</h3>
+                    {% if r.file_url %}
+                    <a href="{{ r.file_url }}" target="_blank" class="result-card__file-link">
+                        <i class="fas fa-link"></i> View Attached File
+                    </a>
+                    {% else %}
+                    <p class="result-card__no-file">No file uploaded</p>
+                    {% endif %}
+                </div>
+
+                <div class="result-card__actions">
+                    <a href="{{ url_for('admin.edit_result', id=r.id) }}" class="action-btn action-btn--edit" title="Edit">
+                        <i class="fas fa-pencil-alt"></i>
+                    </a>
+                    <button class="action-btn action-btn--delete" title="Delete"
+                            data-title="{{ r.title }}"
+                            data-url="{{ url_for('admin.delete_result', id=r.id) }}">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+            <div class="alert alert-warning">No result items found! Click "Add New Result" to get started.</div>
+        {% endif %}
+    </main>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const deleteButtons = document.querySelectorAll('.action-btn-new--delete');
+    const deleteButtons = document.querySelectorAll('.action-btn--delete');
 
     deleteButtons.forEach(button => {
         button.addEventListener('click', function() {
-            const routineTitle = this.dataset.title;
+            const resultTitle = this.dataset.title;
             const deleteUrl = this.dataset.url;
 
             Swal.fire({
                 title: 'Are you sure?',
-                html: `You are about to delete the routine: <br><strong>${routineTitle}</strong>`,
+                html: `You are about to delete the result: <br><strong>${resultTitle}</strong>`,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#dc3545', // Red color for confirm
-                cancelButtonColor: '#6c757d',  // Gray color for cancel
-                confirmButtonText: 'Yes, delete it!',
-                // Custom classes for a more modern look
-                customClass: {
-                    popup: 'your-custom-popup-class', // Optional: for further styling
-                    header: 'your-custom-header-class',
-                    title: 'your-custom-title-class',
-                    closeButton: 'your-custom-close-button-class',
-                    icon: 'your-custom-icon-class',
-                    image: 'your-custom-image-class',
-                    content: 'your-custom-content-class',
-                    htmlContainer: 'your-custom-html-container-class',
-                    input: 'your-custom-input-class',
-                    inputLabel: 'your-custom-input-label-class',
-                    validationMessage: 'your-custom-validation-message-class',
-                    actions: 'your-custom-actions-class',
-                    confirmButton: 'your-custom-confirm-button-class',
-                    denyButton: 'your-custom-deny-button-class',
-                    cancelButton: 'your-custom-cancel-button-class',
-                    loader: 'your-custom-loader-class',
-                    footer: 'your-custom-footer-class',
-                    timerProgressBar:'your-custom-timer-progress-bar-class',
-                }
-            }).then((routine) => {
-                if (routine.isConfirmed) {
-                    // If the user confirms, redirect to the delete URL
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete !'
+            }).then((result) => {
+                if (result.isConfirmed) {
                     window.location.href = deleteUrl;
                 }
             });

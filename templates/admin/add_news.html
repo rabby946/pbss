@@ -2,121 +2,142 @@
 {% block title %}Add News{% endblock %}
 
 {% block content %}
-
 <style>
-    /* Import a clean, modern font from Google Fonts */
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-
-    /* Apply the user-specified background and base styles */
-    body {
-        /* This is the exact gradient you requested */
-        background: linear-gradient(90deg, rgba(203, 235, 160, 0.524) 0%, rgba(146, 210, 232, 0.53) 50%);
-        font-family: 'Poppins', sans-serif;
-        color: #1a1a1a; /* Black text as requested */
-        line-height: 1.6;
+    /* Scoped styles for the Add News page */
+    :root {
+        --admin-bg: #f8f9fa;
+        --admin-card-bg: #ffffff;
+        --admin-primary: #0d6efd;
+        --admin-border: #dee2e6;
+        --admin-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        --admin-text-dark: #212529;
+        --admin-text-light: #6c757d;
+        --admin-font: 'Poppins', sans-serif;
     }
 
-    /* A container to center the form card on the page */
-    .page-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
+    .add-form-container {
+        font-family: var(--admin-font);
+        max-width: 800px;
+        margin: 2rem auto;
         padding: 2rem;
-        padding-bottom: 60%;
     }
 
-    /* The stylish "frosted glass" card that holds the form */
-    .form-card {
-        width: 100%;
-        max-width: 600px;
-        background: rgba(255, 255, 255, 0.6); /* Semi-transparent white */
-        backdrop-filter: blur(12px); /* The frosted glass effect */
-        -webkit-backdrop-filter: blur(12px);
+    .add-form-card {
+        background-color: var(--admin-card-bg);
         padding: 2.5rem;
-        border-radius: 1rem;
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+        border-radius: 16px;
+        box-shadow: var(--admin-shadow);
+        border: 1px solid var(--admin-border);
     }
 
-    /* Styling for the main heading */
-    .form-heading {
-        text-align: center;
-        margin-bottom: 2rem;
-        font-size: 2.25rem;
+    .add-form-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--admin-border);
+    }
+    .add-form-header__title {
+        font-size: 2.2rem;
         font-weight: 600;
-        color: #111;
+        color: var(--admin-text-dark);
+        margin: 0;
     }
-
-    /* Targeting the form elements for styling */
-    .admin-form-news-add label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: #333;
-    }
-
-    .admin-form-news-add input[type="text"],
-    .admin-form-news-add textarea {
-        width: 100%;
-        padding: 0.8rem 1rem;
-        margin-bottom: 1.5rem;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        background: rgba(249, 249, 249, 0.8);
+    .admin-btn--back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
         font-size: 1rem;
-        font-family: 'Poppins', sans-serif;
-        color: #1a1a1a;
-        box-sizing: border-box; /* Ensures padding doesn't affect width */
+        font-weight: 500;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        color: var(--admin-text-dark);
+        background-color: #e9ecef;
+        transition: all 0.3s ease;
+        border: 1px solid var(--admin-border);
+    }
+    .admin-btn--back:hover {
+        background-color: #dee2e6;
+        transform: translateY(-2px);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-group label {
+        display: block;
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--admin-text-dark);
+        margin-bottom: 0.5rem;
+    }
+    .form-input, .form-textarea {
+        width: 100%;
+        padding: 12px 15px;
+        font-size: 1rem;
+        border: 1px solid var(--admin-border);
+        border-radius: 8px;
+        background-color: #fff;
         transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
-
-    /* Style for when a user clicks into a field */
-    .admin-form-news-add input[type="text"]:focus,
-    .admin-form-news-add textarea:focus {
+    .form-input:focus, .form-textarea:focus {
         outline: none;
-        border-color: #5aa9c4; /* A nice blue sampled from the gradient */
-        box-shadow: 0 0 0 3px rgba(146, 210, 232, 0.4);
+        border-color: var(--admin-primary);
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
     }
-    
-    .admin-form-news-add textarea {
+    .form-textarea {
         min-height: 150px;
-        resize: vertical; /* Allows user to resize height only */
+        resize: vertical;
     }
 
-    .admin-form-news-add button[type="submit"] {
-        width: 100%;
-        padding: 0.9rem;
-        border: none;
-        border-radius: 8px;
-        background-color: #5aa9c4; /* Matching blue for the button */
-        color: white;
+    .form-actions {
+        margin-top: 2rem;
+        text-align: right;
+    }
+    .btn-submit {
         font-size: 1.1rem;
         font-weight: 600;
+        padding: 12px 25px;
+        border-radius: 8px;
+        border: none;
+        background-color: var(--admin-primary);
+        color: #fff;
         cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease;
+        transition: all 0.3s ease;
     }
-
-    /* Hover effect for the button */
-    .admin-form-news-add button[type="submit"]:hover {
-        background-color: #4c98b3;
+    .btn-submit:hover {
+        background-color: #0b5ed7;
         transform: translateY(-2px);
     }
 </style>
 
-<div class="page-container">
-    <div class="form-card">
-        <h2 class="form-heading">Add News</h2>
+<div class="add-form-container">
+    <div class="add-form-card">
+        <header class="add-form-header">
+            <h2 class="add-form-header__title">Add New News </h2>
+            <a href="{{ url_for('admin.news') }}" class="admin-btn--back">
+                <i class="fas fa-times"></i>
+                <span>Cancel</span>
+            </a>
+        </header>
 
-        <form method="POST" enctype="multipart/form-data" class="admin-form-news-add">
-            <label for="name-input">Title:</label>
-            <input type="text" id="name-input" name="name" required>
+        <form method="POST">
+            
+            <div class="form-group">
+                <label for="title-input">News Title:</label>
+                <input type="text" id="title-input" name="title" class="form-input" required>
+            </div>
 
-            <label for="description-input">Description:</label>
-            <textarea id="description-input" name="description" required></textarea>
-
-            <button type="submit">Add News</button>
+            <div class="form-group">
+                <label for="description-input">Description:</label>
+                <textarea id="description-input" name="description" class="form-textarea" required></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Add News</button>
+            </div>
         </form>
     </div>
 </div>

@@ -1,9 +1,9 @@
-from flask import Blueprint, request, render_template, redirect, url_for, flash, current_app
+from flask import Blueprint, request, render_template, redirect, url_for, flash, current_app, send_from_directory
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import os
-import base64
-import requests
+import cloudinary.uploader
+import json
 from functools import wraps
 from models import db, News, Gallery, Teacher, Student, Committee, MPO, Result, Routine
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
@@ -57,7 +57,7 @@ UPLOAD_FOLDER_PDFS = "static/pdfs"
 @admin_bp.route("/reports")
 @admin_required
 def reports():
-    items = Report.query.order_by(Report.id).all()
+    items = Report.query.order_by(Report.id.desc()).all()
     return render_template("admin/reports.html", items=items)
 
 @admin_bp.route('/delete-report/<int:id>', methods=['POST']) 
@@ -82,7 +82,7 @@ def more_about(id):
 @admin_bp.route("/teachers")
 @admin_required
 def teachers():
-    items = Teacher.query.order_by(Teacher.id).all()
+    items = Teacher.query.order_by(Teacher.id.desc()).all()
     return render_template("admin/teachers.html", items=items)
 
 @admin_bp.route("/teachers/add", methods=["GET", "POST"])
@@ -134,13 +134,32 @@ def delete_teacher(id):
     db.session.commit()
     flash("Teacher deleted successfully!", "success")
     return redirect(url_for("admin.teachers"))
+@admin_bp.route("/teachers/swap/<int:id1>/<int:id2>")
+@admin_required
+def teacher_swap_between(id1, id2):
+    item1 = Teacher.query.get_or_404(id1)
+    item2 = Teacher.query.get_or_404(id2)
+
+    item1.name, item2.name = item2.name, item1.name
+    item1.position, item2.position = item2.position, item1.position
+    item1.image_url, item2.image_url = item2.image_url, item1.image_url
+    item1.timestamp, item2.timestamp = item2.timestamp, item1.timestamp
+    db.session.commit()
+    flash("swapped successfully", "success")
+    return redirect(url_for("admin.teacher_swap"))
+
+@admin_bp.route("/teachers/swap")
+@admin_required
+def teacher_swap():
+    items = Teacher.query.order_by(Teacher.id.desc()).all()
+    return render_template("admin/teachers_swap.html", items=items)
 
 
 # ------------------ STUDENTS ------------------ #
 @admin_bp.route("/students")
 @admin_required
 def students():
-    items = Student.query.order_by(Student.id).all()
+    items = Student.query.order_by(Student.id.desc()).all()
     return render_template("admin/students.html", items=items)
 
 @admin_bp.route("/students/add", methods=["GET", "POST"])
@@ -193,12 +212,32 @@ def delete_student(id):
     flash("Student deleted successfully!", "success")
     return redirect(url_for("admin.students"))
 
+@admin_bp.route("/students/swap/<int:id1>/<int:id2>")
+@admin_required
+def student_swap_between(id1, id2):
+    item1 = Student.query.get_or_404(id1)
+    item2 = Student.query.get_or_404(id2)
+
+    item1.name, item2.name = item2.name, item1.name
+    item1.roll, item2.roll = item2.roll, item1.roll
+    item1.image_url, item2.image_url = item2.image_url, item1.image_url
+    item1.timestamp, item2.timestamp = item2.timestamp, item1.timestamp
+    db.session.commit()
+    flash("swapped successfully", "success")
+    return redirect(url_for("admin.student_swap"))
+
+@admin_bp.route("/students/swap")
+@admin_required
+def student_swap():
+    items = Student.query.order_by(Student.id.desc()).all()
+    return render_template("admin/students_swap.html", items=items)
+
 
 # ------------------ MPOs ------------------ #
 @admin_bp.route("/mpos")
 @admin_required
 def mpos():
-    items = MPO.query.order_by(MPO.id).all()
+    items = MPO.query.order_by(MPO.id.desc()).all()
     return render_template("admin/mpos.html", items=items)
 
 @admin_bp.route("/mpos/add", methods=["GET", "POST"])
@@ -250,13 +289,32 @@ def delete_mpo(id):
     db.session.commit()
     flash("MPO deleted successfully!", "success")
     return redirect(url_for("admin.mpos"))
+@admin_bp.route("/mpos/swap/<int:id1>/<int:id2>")
+@admin_required
+def mpo_swap_between(id1, id2):
+    item1 = MPO.query.get_or_404(id1)
+    item2 = MPO.query.get_or_404(id2)
+
+    item1.name, item2.name = item2.name, item1.name
+    item1.designation, item2.designation = item2.designation, item1.designation
+    item1.image_url, item2.image_url = item2.image_url, item1.image_url
+    item1.timestamp, item2.timestamp = item2.timestamp, item1.timestamp
+    db.session.commit()
+    flash("swapped successfully", "success")
+    return redirect(url_for("admin.mpo_swap"))
+
+@admin_bp.route("/mpos/swap")
+@admin_required
+def mpo_swap():
+    items = MPO.query.order_by(MPO.id.desc()).all()
+    return render_template("admin/mpos_swap.html", items=items)
 
 
 # ------------------ COMMITTEES ------------------ #
 @admin_bp.route("/committees")
 @admin_required
 def committees():
-    items = Committee.query.order_by(Committee.id).all()
+    items = Committee.query.order_by(Committee.id.desc()).all()
     return render_template("admin/committees.html", items=items)
 
 @admin_bp.route("/committees/add", methods=["GET", "POST"])
@@ -308,14 +366,35 @@ def delete_committee(id):
     flash("Committee deleted successfully!", "success")
     return redirect(url_for("admin.committees"))
 
+@admin_bp.route("/committees/swap/<int:id1>/<int:id2>")
+@admin_required
+def committee_swap_between(id1, id2):
+    item1 = Committee.query.get_or_404(id1)
+    item2 = Committee.query.get_or_404(id2)
+
+    item1.name, item2.name = item2.name, item1.name
+    item1.designation, item2.designation = item2.designation, item1.designation
+    item1.image_url, item2.image_url = item2.image_url, item1.image_url
+    item1.timestamp, item2.timestamp = item2.timestamp, item1.timestamp
+    db.session.commit()
+    flash("swapped successfully", "success")
+    return redirect(url_for("admin.committee_swap"))
+
+@admin_bp.route("/committees/swap")
+@admin_required
+def committee_swap():
+    items = Committee.query.order_by(Committee.id.desc()).all()
+    return render_template("admin/committees_swap.html", items=items)
+
 
 # ------------------ RESULTS ------------------ #
+
 @admin_bp.route("/results")
 @admin_required
-def results():
+def results():   
     items = Result.query.order_by(Result.id.desc()).all()
-
     return render_template("admin/results.html", items=items)
+
 
 @admin_bp.route("/results/add", methods=["GET", "POST"])
 @admin_required
@@ -323,12 +402,12 @@ def add_result():
     if request.method == "POST":
         title = request.form.get("title")
         file = request.files.get("file")
-        filename = None
-        if file:
-            filename = secure_filename(file.filename)
-            os.makedirs(UPLOAD_FOLDER_PDFS, exist_ok=True)
-            file.save(os.path.join(UPLOAD_FOLDER_PDFS, filename))
-        result = Result(title=title, file_url=filename)
+        if not file:
+            flash("No file uploaded!", "danger")
+            return redirect(url_for("admin.add_result"))
+        upload_result = cloudinary.uploader.upload(file,resource_type="raw")
+        pdf_url = upload_result["secure_url"]
+        result = Result(title=title, file_url=pdf_url)
         db.session.add(result)
         db.session.commit()
         flash("Result added successfully!", "success")
@@ -342,11 +421,11 @@ def edit_result(id):
     if request.method == "POST":
         result.title = request.form.get("title")
         file = request.files.get("file")
-        if file:
-            filename = secure_filename(file.filename)
-            os.makedirs(UPLOAD_FOLDER_PDFS, exist_ok=True)
-            file.save(os.path.join(UPLOAD_FOLDER_PDFS, filename))
-            result.file_url = filename
+        if not file:
+            flash("File remains same !", "danger")
+        else:
+            upload_result = cloudinary.uploader.upload(file,resource_type="raw")
+            result.file_url = upload_result["secure_url"]
         db.session.commit()
         flash("Result updated successfully!", "success")
         return redirect(url_for("admin.results"))
@@ -361,6 +440,26 @@ def delete_result(id):
     flash("Result deleted successfully!", "success")
     return redirect(url_for("admin.results"))
 
+@admin_bp.route("/result/swap/<int:id1>/<int:id2>")
+@admin_required
+def result_swap_between(id1, id2):
+    item1 = Result.query.get_or_404(id1)
+    item2 = Result.query.get_or_404(id2)
+
+    item1.title, item2.title = item2.title, item1.title
+    item1.file_url, item2.file_url = item2.file_url, item1.file_url
+    item1.timestamp, item2.timestamp = item2.timestamp, item1.timestamp
+    db.session.commit()
+    flash("swapped successfully", "success")
+    return redirect(url_for("admin.result_swap"))
+
+@admin_bp.route("/result/swap")
+@admin_required
+def result_swap():
+    items = Result.query.order_by(Result.id.desc()).all()
+    return render_template("admin/result_swap.html", items=items)
+
+
 
 # ------------------ ROUTINES ------------------ #
 @admin_bp.route("/routines")
@@ -368,18 +467,19 @@ def delete_result(id):
 def routines():
     items = Routine.query.order_by(Routine.id.desc()).all()
     return render_template("admin/routines.html", items=items)
+
 @admin_bp.route("/routines/add", methods=["GET", "POST"])
 @admin_required
 def add_routine():
     if request.method == "POST":
         title = request.form.get("title")
         file = request.files.get("file")
-        filename = None
-        if file:
-            filename = secure_filename(file.filename)
-            os.makedirs(UPLOAD_FOLDER_PDFS, exist_ok=True)
-            file.save(os.path.join(UPLOAD_FOLDER_PDFS, filename))
-        routine = Routine(title=title, file_url=filename)
+        if not file:
+            flash("No file uploaded!", "danger")
+            return redirect(url_for("admin.add_routine"))
+        upload_result = cloudinary.uploader.upload(file, resource_type="raw")
+        pdf_url = upload_result["secure_url"]
+        routine = Routine(title=title, file_url=pdf_url)
         db.session.add(routine)
         db.session.commit()
         flash("Routine added successfully!", "success")
@@ -394,10 +494,8 @@ def edit_routine(id):
         routine.title = request.form.get("title")
         file = request.files.get("file")
         if file:
-            filename = secure_filename(file.filename)
-            os.makedirs(UPLOAD_FOLDER_PDFS, exist_ok=True)
-            file.save(os.path.join(UPLOAD_FOLDER_PDFS, filename))
-            routine.file_url = filename
+            upload_result = cloudinary.uploader.upload(file, resource_type="raw")
+            routine.file_url = upload_result["secure_url"]
         db.session.commit()
         flash("Routine updated successfully!", "success")
         return redirect(url_for("admin.routines"))
@@ -412,13 +510,31 @@ def delete_routine(id):
     db.session.commit()
     flash("Routine deleted successfully!", "success")
     return redirect(url_for("admin.routines"))
+@admin_bp.route("/routine/swap/<int:id1>/<int:id2>")
+@admin_required
+def routine_swap_between(id1, id2):
+    item1 = Routine.query.get_or_404(id1)
+    item2 = Routine.query.get_or_404(id2)
+
+    item1.title, item2.title = item2.title, item1.title
+    item1.file_url, item2.file_url = item2.file_url, item1.file_url
+    item1.timestamp, item2.timestamp = item2.timestamp, item1.timestamp
+    db.session.commit()
+    flash("swapped successfully", "success")
+    return redirect(url_for("admin.routine_swap"))
+
+@admin_bp.route("/routine/swap")
+@admin_required
+def routine_swap():
+    items = Routine.query.order_by(Routine.id.desc()).all()
+    return render_template("admin/routine_swap.html", items=items)
 
 # ------------------ NEWS ------------------ #
 @admin_bp.route("/news")
 @admin_required
 def news():
-    items = News.query.order_by(News.id).all()
-    items.reverse()
+    items = News.query.order_by(News.id.desc()).all()
+    # items.reverse()
     return render_template("admin/news.html", items=items)
 @admin_bp.route("/news/add", methods=["GET", "POST"])
 @admin_required
@@ -442,7 +558,7 @@ def edit_news(id):
         news.title = request.form.get("name")
         news.description = request.form.get("description")
         db.session.commit()
-        flash("News updated successfully!", "success")
+        flash("News updated successfully!", "successfull")
         return redirect(url_for("admin.news"))
 
     return render_template("admin/edit_news.html", item=news)
@@ -456,12 +572,33 @@ def delete_news(id):
     flash("News deleted successfully!", "success")
     return redirect(url_for("admin.news"))
 
+@admin_bp.route("/news/swap/<int:id1>/<int:id2>")
+@admin_required
+def news_swap_between(id1, id2):
+    item1 = News.query.get_or_404(id1)
+    item2 = News.query.get_or_404(id2)
+
+    item1.title, item2.title = item2.title, item1.title
+    item1.description, item2.description = item2.description, item1.description
+    item1.timestamp, item2.timestamp = item2.timestamp, item1.timestamp
+    db.session.commit()
+    flash("swapped successfully", "success")
+    return redirect(url_for("admin.news_swap"))
+
+@admin_bp.route("/news/swap")
+@admin_required
+def news_swap():
+    items = News.query.order_by(News.id.desc()).all()
+    return render_template("admin/news_swap.html", items=items)
+
+
+
 
 # ------------------ GALLERY ------------------ #
 @admin_bp.route("/gallery")
 @admin_required
 def gallery():
-    items = Gallery.query.all()
+    items = Gallery.query.order_by(Gallery.id.desc()).all()
     return render_template("admin/gallery.html", items=items)
 
 @admin_bp.route("/gallery/add", methods=["GET", "POST"])
@@ -484,7 +621,6 @@ def add_gallery():
         return redirect(url_for("admin.gallery"))
     return render_template("admin/add_gallery.html")
 
-from flask import request, flash, redirect, url_for, render_template
 
 @admin_bp.route("/gallery/edit/<int:id>", methods=["GET", "POST"])
 @admin_required
@@ -497,7 +633,7 @@ def edit_gallery(id):
         gallery.description = request.form.get("description")
         # 2. Get the list of newly uploaded files
         files = request.files.getlist("filename")
-        if files and files[0].filename:
+        if files and any(f.filename for f in files):
             new_filenames = []
             for file in files:
                 if file:
@@ -521,5 +657,24 @@ def delete_gallery(id):
     flash("Gallery item deleted successfully!", "success")
     return redirect(url_for("admin.gallery"))
 
+@admin_bp.route("/gallery/swap/<int:id1>/<int:id2>")
+@admin_required
+def gallery_swap_between(id1, id2):
+    item1 = Gallery.query.get_or_404(id1)
+    item2 = Gallery.query.get_or_404(id2)
+
+    item1.title, item2.title = item2.title, item1.title
+    item1.description, item2.description = item2.description, item1.description
+    item1.images, item2.images = item2.images, item1.images
+    item1.timestamp, item2.timestamp = item2.timestamp, item1.timestamp
+    db.session.commit()
+    flash("swapped successfully", "success")
+    return redirect(url_for("admin.gallery_swap"))
+
+@admin_bp.route("/gallery/swap")
+@admin_required
+def gallery_swap():
+    items = Gallery.query.order_by(Gallery.id.desc()).all()
+    return render_template("admin/gallery_swap.html", items=items)
 
 

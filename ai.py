@@ -34,3 +34,6 @@ def handle_ai_chat():
         reply = "Sorry, I couldn't understand your question. You may ask about teachers, students, news, results, etc."
 
     return jsonify({"reply": reply})
+
+
+

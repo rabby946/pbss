@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Swap Results{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Swap Result Items</h2>
+
+    {% if items %}
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Title</th>
+                <th>File</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in range(items|length) %}
+            <tr>
+                <td>{{ i + 1 }}</td>
+                <td>{{ items[i].title }}</td>
+                <td>
+                    {% if items[i].file_url %}
+                    <a href="{{ items[i].file_url }}" target="_blank">View File</a>
+                    {% else %}
+                    No file
+                    {% endif %}
+                </td>
+                <td>{{ items[i].timestamp.strftime('%Y-%m-%d') }}</td>
+                <td>
+                    {% if i > 0 %}
+                    <a href="{{ url_for('admin.result_swap_between', id1=items[i].id, id2=items[i-1].id) }}" class="btn btn-sm btn-warning">
+                        &#8593; Up
+                    </a>
+                    {% endif %}
+                    {% if i < items|length - 1 %}
+                    <a href="{{ url_for('admin.result_swap_between', id1=items[i].id, id2=items[i+1].id) }}" class="btn btn-sm btn-info">
+                        &#8595; Down
+                    </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-warning">No result items found!</div>
+    {% endif %}
+</div>
+{% endblock %}

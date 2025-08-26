@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block title %}Reorder Teacher Positions{% endblock %}
+
+{% block content %}
+<style>
+    /* Scoped styles for the Reorder Teachers page */
+    :root {
+        --reorder-bg: #f8f9fa;
+        --reorder-card-bg: #ffffff;
+        --reorder-primary: #007bff;
+        --reorder-border: #e9ecef;
+        --reorder-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        --reorder-text-dark: #212529;
+        --reorder-text-light: #6c757d;
+        --reorder-font: 'Poppins', sans-serif;
+    }
+
+    .reorder-container {
+        font-family: var(--reorder-font);
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+
+    .reorder-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--reorder-border);
+    }
+    .reorder-header__title {
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: var(--reorder-text-dark);
+        margin: 0;
+    }
+    .reorder-btn--back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        color: var(--reorder-text-dark);
+        background-color: #e9ecef;
+        transition: all 0.3s ease;
+        border: 1px solid var(--reorder-border);
+    }
+    .reorder-btn--back:hover {
+        background-color: #dee2e6;
+        transform: translateY(-2px);
+    }
+
+    .reorder-list {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .reorder-card {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 1rem;
+        background-color: var(--reorder-card-bg);
+        border: 1px solid var(--reorder-border);
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        /* For animation */
+        opacity: 0;
+        transform: translateY(20px);
+        animation: card-fade-in 0.5s ease-out forwards;
+    }
+    .reorder-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--reorder-shadow);
+    }
+    
+    .reorder-card__image {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        flex-shrink: 0;
+        border: 3px solid var(--reorder-card-bg);
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .reorder-card__content {
+        flex-grow: 1;
+    }
+    .reorder-card__name {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--reorder-text-dark);
+        margin: 0 0 0.25rem 0;
+    }
+    .reorder-card__position {
+        font-size: 1rem;
+        color: var(--reorder-text-light);
+        margin: 0;
+    }
+
+    .reorder-card__controls {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    .reorder-control-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: 1px solid var(--reorder-border);
+        background-color: transparent;
+        color: var(--reorder-text-light);
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    .reorder-control-btn:hover {
+        background-color: var(--reorder-primary);
+        color: #fff;
+        border-color: var(--reorder-primary);
+    }
+    .reorder-control-btn.disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+        background-color: transparent;
+        color: var(--reorder-text-light);
+    }
+    .reorder-control-btn.disabled:hover {
+        background-color: transparent;
+        border-color: var(--reorder-border);
+    }
+
+    @keyframes card-fade-in {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="reorder-container">
+    <header class="reorder-header">
+        <h2 class="reorder-header__title">Reorder Teachers</h2>
+        <a href="{{ url_for('admin.teachers') }}" class="reorder-btn--back">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back to Teachers</span>
+        </a>
+    </header>
+
+    {% if items %}
+    <div class="reorder-list">
+        {% for teacher in items %}
+        <div class="reorder-card">
+            <img src="{{ teacher.image_url or url_for('static', filename='images/default-avatar.png') }}" alt="{{ teacher.name }}" class="reorder-card__image">
+            <div class="reorder-card__content">
+                <h3 class="reorder-card__name">{{ teacher.name }}</h3>
+                <p class="reorder-card__position">{{ teacher.position }}</p>
+            </div>
+            <div class="reorder-card__controls">
+                {# The loop variable from Jinja2 gives us access to the index #}
+                {% if not loop.first %}
+                    <a href="{{ url_for('admin.teacher_swap_between', id1=teacher.id, id2=items[loop.index0 - 1].id) }}" class="reorder-control-btn" title="Move Up">
+                        <i class="fas fa-chevron-up"></i>
+                    </a>
+                {% else %}
+                    <span class="reorder-control-btn disabled"><i class="fas fa-chevron-up"></i></span>
+                {% endif %}
+
+                {% if not loop.last %}
+                    <a href="{{ url_for('admin.teacher_swap_between', id1=teacher.id, id2=items[loop.index0 + 1].id) }}" class="reorder-control-btn" title="Move Down">
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                {% else %}
+                     <span class="reorder-control-btn disabled"><i class="fas fa-chevron-down"></i></span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-warning">No teachers to reorder!</div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Staggered animation for list items
+    const cards = document.querySelectorAll('.reorder-card');
+    cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.07}s`;
+    });
+});
+</script>
+{% endblock %}

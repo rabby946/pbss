@@ -31,7 +31,7 @@
 :root {
     --pss-header-height: 80px;
     --pss-primary-accent: #007BFF;
-    --pss-text-dark: #212529;
+    --pss-text-dark: #23292e;
     --pss-text-light: #ffffff;
     --pss-font-bengali: 'Noto Sans Bengali', sans-serif;
     --pss-font-english: 'Poppins', sans-serif;
@@ -45,7 +45,7 @@ body.pss-drawer-open { overflow: hidden; }
     position: sticky;
     top: 0;
     z-index: 1050; /* Needs to be higher than most elements */
-    background-color: rgba(255, 255, 255, 0.85);
+    background: linear-gradient(90deg,  rgba(238, 245, 189, 0.869)  0%, rgba(180, 228, 234, 0.742) 50%);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
@@ -62,16 +62,16 @@ body.pss-drawer-open { overflow: hidden; }
     height: 100%;
 }
 
-.pss-nav-logo { display: flex; align-items: center; gap: 15px; text-decoration: none; }
+.pss-nav-logo { display: flex; align-items: center; gap: 0px; text-decoration: none; }
 .pss-nav-logo:hover { text-decoration: none; }
 .pss-nav-logo__img { height: 50px; }
-.pss-nav-logo__text { font-family: var(--pss-font-bengali); font-size: 1.4rem; font-weight: 600; color: var(--pss-text-dark); }
+.pss-nav-logo__text { font-family: var(--pss-font-bengali); font-size: 2.0rem; font-weight: 600; color: var(--pss-text-dark); }
 
 .pss-nav-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background-color: rgba(0, 0, 0, 0.5); z-index: 1999;
     opacity: 0; visibility: hidden;
-    transition: opacity 0.4s ease, visibility 0.4s ease;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
 }
 .pss-nav-overlay.is-visible { opacity: 1; visibility: visible; }
 
@@ -79,8 +79,8 @@ body.pss-drawer-open { overflow: hidden; }
     position: fixed; top: 0; right: -320px;
     width: 320px; max-width: 90%;
     height: 100%;
-    background-color: #ffffff;
-    box-shadow: -5px 0 25px rgba(0,0,0,0.15);
+    background: linear-gradient(90deg,rgb(232, 231, 220)  0%, rgb(210, 237, 237) 50%);
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.424);
     transition: right 0.4s cubic-bezier(0.23, 1, 0.32, 1);
     z-index: 2000;
     overflow-y: auto;
@@ -93,7 +93,7 @@ body.pss-drawer-open { overflow: hidden; }
     right: 15px;
     font-size: 2.5rem;
     font-weight: 300;
-    color: #888;
+    color: #220404;
     background: none;
     border: none;
     cursor: pointer;
@@ -158,18 +158,174 @@ body.pss-drawer-open { overflow: hidden; }
             <li><a href="{{ url_for('public.gallery') }}" class="pss-nav-menu__link {% if request.endpoint=='public.gallery' %}active{% endif %}">Gallery</a></li>
             <li><a href="{{ url_for('public.mpos') }}" class="pss-nav-menu__link {% if request.endpoint=='public.mpos' %}active{% endif %}">Accreditations</a></li>
             <li><a href="{{ url_for('public.contact') }}" class="pss-nav-menu__link {% if request.endpoint=='public.contact' %}active{% endif %}">Contact</a></li>
-            <li><a href="{{ url_for('admin.login') }}" class="pss-nav-menu__link {% if request.endpoint=='admin.login' %}active{% endif %}">Dashboard</a></li>
+            <li><a href="{{ url_for('admin.dashboard') }}" class="pss-nav-menu__link {% if request.endpoint=='admin.dashboard' %}active{% endif %}">Dashboard</a></li>
         </ul>
     </nav>
 
-<main class="container" style="padding-top: 40px;">
-  {% with messages = get_flashed_messages(with_categories=true) %}
+{% with messages = get_flashed_messages(with_categories=true) %}
     {% for category, msg in messages %}
-      <div class="glass-card message-card" style="color: {% if category == 'error' %}red{% else %}green{% endif %};">{{ msg }}</div>
+        {% set is_error = category == 'error' %}
+        <div class="toast-notification" data-is-error="{{ is_error|lower }}">
+            <div class="toast-notification__icon">
+                <i class="fas {{ 'fa-times-circle' if is_error else 'fa-check-circle' }}"></i>
+            </div>
+            <div class="toast-notification__content">
+                <p class="toast-notification__title">{{ 'Error' if is_error else 'Success' }}</p>
+                <p class="toast-notification__message">{{ msg }}</p>
+            </div>
+            <button class="toast-notification__close">&times;</button>
+            <div class="toast-notification__progress"></div>
+        </div>
     {% endfor %}
-  {% endwith %}
-  {% block content %}{% endblock %}
+{% endwith %}
+
+<style>
+    /* New styles for the Toast Notification */
+    .toast-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        max-width: 350px;
+        width: 90%;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: flex-start;
+        padding: 1rem;
+        z-index: 9999;
+        font-family: 'Poppins', sans-serif;
+        border-left: 5px solid;
+        animation: toast-slide-in 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        overflow: hidden;
+    }
+
+    .toast-notification[data-is-error="true"] {
+        border-left-color: #dc3545; /* Red for error */
+    }
+
+    .toast-notification[data-is-error="false"] {
+        border-left-color: #28a745; /* Green for success */
+    }
+
+    .toast-notification__icon {
+        font-size: 1.5rem;
+        margin-right: 1rem;
+        line-height: 1;
+    }
+    
+    .toast-notification[data-is-error="true"] .toast-notification__icon {
+        color: #dc3545;
+    }
+
+    .toast-notification[data-is-error="false"] .toast-notification__icon {
+        color: #28a745;
+    }
+
+    .toast-notification__content {
+        flex-grow: 1;
+    }
+    .toast-notification__title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0 0 0.25rem 0;
+        color: #212529;
+    }
+    .toast-notification__message {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin: 0;
+    }
+
+    .toast-notification__close {
+        background: none;
+        border: none;
+        color: #adb5bd;
+        font-size: 1.5rem;
+        font-weight: 300;
+        cursor: pointer;
+        padding: 0 0 0 1rem;
+        line-height: 1;
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+    }
+    .toast-notification__close:hover {
+        opacity: 1;
+    }
+
+    .toast-notification__progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 4px;
+        width: 100%;
+        animation: toast-progress 5s linear forwards;
+    }
+
+    .toast-notification[data-is-error="true"] .toast-notification__progress {
+        background-color: #dc3545;
+    }
+
+    .toast-notification[data-is-error="false"] .toast-notification__progress {
+        background-color: #28a745;
+    }
+    
+    @keyframes toast-slide-in {
+        from { transform: translateX(110%); }
+        to { transform: translateX(0); }
+    }
+    
+    @keyframes toast-slide-out {
+        from { transform: translateX(0); }
+        to { transform: translateX(110%); }
+    }
+    
+    @keyframes toast-progress {
+        from { width: 100%; }
+        to { width: 0%; }
+    }
+</style>
+
+
+<style>
+    @keyframes flash-fade-in {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes flash-fade-out {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(-20px); }
+    }
+</style>
+
+
+    {% block content %}{% endblock %}
 </main>
+
+<style>
+    @keyframes flash-fade-in {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes flash-fade-out {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(-20px); }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const flashMessages = document.querySelectorAll('.flash-message-container');
+        
+        flashMessages.forEach(message => {
+            setTimeout(() => {
+                if (message) {
+                    message.remove();
+                }
+            }, 5000);
+        });
+    });
+</script>
 
 
 <script>
@@ -573,5 +729,32 @@ document.addEventListener('DOMContentLoaded', () => {
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.toast-notification').forEach(toast => {
+        
+        // Function to dismiss the toast
+        const dismissToast = () => {
+            toast.style.animation = 'toast-slide-out 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards';
+            // Remove the element from the page after the animation completes
+            setTimeout(() => {
+                toast.remove();
+            }, 500);
+        };
+
+        // Automatically dismiss after 5 seconds
+        const autoDismissTimer = setTimeout(dismissToast, 5000);
+
+        // Allow user to dismiss by clicking the close button
+        const closeButton = toast.querySelector('.toast-notification__close');
+        if (closeButton) {
+            closeButton.addEventListener('click', () => {
+                clearTimeout(autoDismissTimer); // Stop the automatic dismissal
+                dismissToast();
+            });
+        }
+    });
+});
+    </script>
 </body>
 </html>

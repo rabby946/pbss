@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from models import News, Gallery, Teacher, Student, Committee, MPO, Result, Routine, Report
 from flask_mail import Message
-from extensions import mail, db
+from extensions import  db
 public_bp = Blueprint("public", __name__)
 
 # ---------- Home ----------
@@ -37,10 +37,9 @@ def gallery_detail(id):
     return render_template("public/gallery_detail.html", item=item)
 
 # ---------- Teachers ----------
-# ---------- Teachers ----------
 @public_bp.route("/teachers")
 def teachers():
-    items = Teacher.query.all()
+    items = Teacher.query.order_by(Teacher.id.desc()).all()
     return render_template("public/entity.html",entity_items=items,entity_name="Teachers",detail_endpoint="public.teacher_detail")
 
 @public_bp.route("/teacher/<int:id>")
@@ -52,7 +51,7 @@ def teacher_detail(id):
 # ---------- Students ----------
 @public_bp.route("/students")
 def students():
-    items = Student.query.all()
+    items = Student.query.order_by(Student.id.desc()).all()
     return render_template("public/entity.html",entity_items=items,entity_name="Students",detail_endpoint="public.student_detail")
 
 @public_bp.route("/student/<int:id>")
@@ -64,7 +63,7 @@ def student_detail(id):
 # ---------- Committee ----------
 @public_bp.route("/committees")
 def committees():
-    items = Committee.query.all()
+    items = Committee.query.order_by(Committee.id.desc()).all()
     return render_template("public/entity.html",entity_items=items,entity_name="Committee",detail_endpoint="public.committee_detail")
 
 @public_bp.route("/committee/<int:id>")
@@ -75,7 +74,7 @@ def committee_detail(id):
 # ---------- MPO ----------
 @public_bp.route("/mpos")
 def mpos():
-    items = MPO.query.all()
+    items = MPO.query.order_by(MPO.id.desc()).all()
     return render_template("public/entity.html",entity_items=items,entity_name="Accreditations",detail_endpoint="public.mpo_detail")
 
 @public_bp.route("/mpo/<int:id>")
@@ -87,13 +86,13 @@ def mpo_detail(id):
 # ---------- Results ----------
 @public_bp.route("/results")
 def results():
-    items = Result.query.all()
+    items = Result.query.order_by(Result.id.desc()).all()
     return render_template("public/results.html", items=items)
 
 # ---------- Routine ----------
 @public_bp.route("/routine")
 def routine():
-    items = Routine.query.all()
+    items = Routine.query.order_by(Routine.id.desc()).all()
     return render_template("public/routine.html",items=items)
 
 # ---------- Contact ----------

@@ -1,165 +1,270 @@
 {% extends 'base.html' %}
-{% block title %}Add Teacher{% endblock %}
+{% block title %}Add New Teacher{% endblock %}
 
 {% block content %}
-
 <style>
-    /* Import a clean, modern font from Google Fonts */
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-
-    /* Apply the standard background and base styles */
-    body {
-        background: linear-gradient(90deg, rgba(203, 235, 160, 0.524) 0%, rgba(146, 210, 232, 0.53) 50%);
-        font-family: 'Poppins', sans-serif;
-        color: #1a1a1a; /* Black text */
-        line-height: 1.6;
+    /* Scoped styles for the Add Teacher page */
+    :root {
+        --admin-bg: #f8f9fa;
+        --admin-card-bg: #ffffff;
+        --admin-primary: #0d6efd;
+        --admin-border: #dee2e6;
+        --admin-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        --admin-text-dark: #212529;
+        --admin-text-light: #6c757d;
+        --admin-font: 'Poppins', sans-serif;
     }
 
-    /* A container to center the form card on the page */
-    .page-container {
+    .add-form-container {
+        font-family: var(--admin-font);
+        max-width: 700px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+
+    .add-form-card {
+        background-color: var(--admin-card-bg);
+        padding: 2.5rem;
+        border-radius: 16px;
+        box-shadow: var(--admin-shadow);
+        border: 1px solid var(--admin-border);
+    }
+
+    .add-form-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--admin-border);
+    }
+    .add-form-header__title {
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: var(--admin-text-dark);
+        margin: 0;
+    }
+    .admin-btn--back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        color: var(--admin-text-dark);
+        background-color: #e9ecef;
+        transition: all 0.3s ease;
+        border: 1px solid var(--admin-border);
+    }
+    .admin-btn--back:hover {
+        background-color: #dee2e6;
+        transform: translateY(-2px);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-group label {
+        display: block;
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--admin-text-dark);
+        margin-bottom: 0.5rem;
+    }
+    .form-input, .form-textarea {
+        width: 100%;
+        padding: 12px 15px;
+        font-size: 1rem;
+        border: 1px solid var(--admin-border);
+        border-radius: 8px;
+        background-color: #fff;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .form-input:focus, .form-textarea:focus {
+        outline: none;
+        border-color: var(--admin-primary);
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+    }
+    .form-textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    /* --- New File Upload Styling --- */
+    .file-upload-wrapper .file-input-native {
+        display: none;
+    }
+    .file-input-custom {
+        border: 2px dashed var(--admin-border);
+        border-radius: 8px;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .file-input-custom.is-dragging {
+        background-color: #e9ecef;
+        border-color: var(--admin-primary);
+    }
+    .file-preview {
+        width: 120px;
+        height: 120px;
+        border-radius: 8px;
+        background-color: #e9ecef;
+        background-size: cover;
+        background-position: center;
+        flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        min-height: 100vh;
-        padding: 2rem;
-        padding-bottom: 70%;
+        color: var(--admin-text-light);
+        font-size: 2.5rem;
     }
-
-    /* The stylish "frosted glass" card that holds the form */
-    .form-card {
-        width: 100%;
-        max-width: 600px;
-        background: rgba(255, 255, 255, 0.6);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        padding: 2.5rem;
-        border-radius: 1rem;
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
-    }
-
-    /* Styling for the main heading */
-    .form-heading {
-        text-align: center;
-        margin-bottom: 2rem;
-        font-size: 2.25rem;
-        font-weight: 600;
-        color: #111;
-    }
-
-    /* Base styles for the form */
-    .admin-form-teacher-add label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: #333;
-    }
-
-    .admin-form-teacher-add input[type="text"],
-    .admin-form-teacher-add textarea {
-        width: 100%;
-        padding: 0.8rem 1rem;
-        margin-bottom: 1.5rem;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        background: rgba(249, 249, 249, 0.8);
-        font-size: 1rem;
-        font-family: 'Poppins', sans-serif;
-        color: #1a1a1a;
-        box-sizing: border-box;
-        transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .admin-form-teacher-add input[type="text"]:focus,
-    .admin-form-teacher-add textarea:focus {
-        outline: none;
-        border-color: #5aa9c4;
-        box-shadow: 0 0 0 3px rgba(146, 210, 232, 0.4);
-    }
-    
-    .admin-form-teacher-add textarea {
-        min-height: 100px;
-        resize: vertical;
-    }
-    
-    /* Hides the default ugly file input */
-    .admin-form-teacher-add input[type="file"] {
-        display: none;
-    }
-
-    /* This is the styled "button" that the user will click for file uploads */
-    .file-input-label {
-        display: block;
-        width: 100%;
-        padding: 0.8rem 1rem;
-        margin-bottom: 1.5rem;
-        border: 1px dashed #aaa;
-        border-radius: 8px;
-        background-color: #f0f0f0;
-        text-align: center;
+    .file-instructions {
         cursor: pointer;
-        transition: background-color 0.3s, border-color 0.3s;
+    }
+    .file-instructions .upload-text {
+        font-weight: 500;
+        color: var(--admin-text-dark);
+    }
+    .file-instructions .upload-hint, #file-name-display {
+        font-size: 0.9rem;
+        color: var(--admin-text-light);
+    }
+    #file-name-display {
+        font-weight: 500;
+        color: var(--admin-primary);
+        margin-top: 0.5rem;
+        display: block; /* Ensure it takes its own line */
     }
 
-    .file-input-label:hover {
-        background-color: #e0e0e0;
-        border-color: #5aa9c4;
+    .form-actions {
+        margin-top: 2rem;
+        text-align: right;
     }
-
-    .admin-form-teacher-add button[type="submit"] {
-        width: 100%;
-        padding: 0.9rem;
-        border: none;
-        border-radius: 8px;
-        background-color: #5aa9c4;
-        color: white;
+    .btn-submit {
         font-size: 1.1rem;
         font-weight: 600;
+        padding: 12px 25px;
+        border-radius: 8px;
+        border: none;
+        background-color: var(--admin-primary);
+        color: #fff;
         cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease;
+        transition: all 0.3s ease;
     }
-
-    .admin-form-teacher-add button[type="submit"]:hover {
-        background-color: #4c98b3;
+    .btn-submit:hover {
+        background-color: #0b5ed7;
         transform: translateY(-2px);
     }
 </style>
 
-<div class="page-container">
-    <div class="form-card">
-        <h2 class="form-heading">Add a New Teacher</h2>
+<div class="add-form-container">
+    <div class="add-form-card">
+        <header class="add-form-header">
+            <h2 class="add-form-header__title">Add New Teacher</h2>
+            <a href="{{ url_for('admin.teachers') }}" class="admin-btn--back">
+                <i class="fas fa-times"></i>
+                <span>Cancel</span>
+            </a>
+        </header>
 
-        <form method="POST" enctype="multipart/form-data" class="admin-form-teacher-add">
+        <form method="POST" enctype="multipart/form-data">
             
-            <label for="name-input">Name:</label>
-            <input type="text" id="name-input" name="name" required>
+            <div class="form-group">
+                <label for="name-input">Teacher's Name:</label>
+                <input type="text" id="name-input" name="name" class="form-input" required>
+            </div>
 
-            <label for="description-input">Position / Description:</label>
-            <textarea id="description-input" name="description" required></textarea>
+            <div class="form-group">
+                <label for="position-input">Position / Designation:</label>
+                <input type="text" id="position-input" name="position" class="form-input" required>
+            </div>
 
-            <label for="photo-input">Photo:</label>
-            <label for="photo-input" class="file-input-label" id="file-label">Click to upload photo...</label>
-            <input type="file" id="photo-input" name="photo" accept="image/*" required>
-
-            <button type="submit">Add Teacher</button>
+            <div class="form-group">
+                <label for="photo-input">Teacher's Photo:</label>
+                
+                <div class="file-upload-wrapper" id="file-upload-wrapper">
+                    <input type="file" name="photo" id="photo-input" class="file-input-native" accept="image/*" required>
+                    
+                    <div class="file-input-custom">
+                        <div id="file-preview" class="file-preview">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <label for="photo-input" class="file-instructions">
+                            <span class="upload-text">Drag & drop an image here</span>
+                            <span class="upload-hint">or click to select a file</span>
+                            <span id="file-name-display"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Add Teacher</button>
+            </div>
         </form>
     </div>
 </div>
 
 <script>
-    const photoInput = document.getElementById('photo-input');
-    const fileLabel = document.getElementById('file-label');
+document.addEventListener('DOMContentLoaded', () => {
+    const fileUploadWrapper = document.getElementById('file-upload-wrapper');
+    const fileInputNative = document.getElementById('photo-input');
+    const fileNameDisplay = document.getElementById('file-name-display');
+    const filePreview = document.getElementById('file-preview');
 
-    photoInput.addEventListener('change', () => {
-        if (photoInput.files.length > 0) {
-            // Display the name of the chosen file
-            fileLabel.textContent = photoInput.files[0].name;
-        } else {
-            // Reset text if no file is chosen
-            fileLabel.textContent = 'Click to upload photo...';
-        }
-    });
+    if (fileUploadWrapper && fileInputNative && fileNameDisplay && filePreview) {
+        
+        // Function to update the preview and file name
+        const updateDisplay = (file) => {
+            if (file) {
+                fileNameDisplay.textContent = `Selected: ${file.name}`;
+                // Create a URL for the selected image to show a preview
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    filePreview.style.backgroundImage = `url('${e.target.result}')`;
+                    filePreview.innerHTML = ''; // Remove the icon
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        // Update display when a file is chosen via click
+        fileInputNative.addEventListener('change', () => {
+            if (fileInputNative.files.length > 0) {
+                updateDisplay(fileInputNative.files[0]);
+            }
+        });
+
+        // Add visual feedback for drag-and-drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileUploadWrapper.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+        ['dragenter', 'dragover'].forEach(eventName => {
+            fileUploadWrapper.addEventListener(eventName, () => fileUploadWrapper.classList.add('is-dragging'));
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            fileUploadWrapper.addEventListener(eventName, () => fileUploadWrapper.classList.remove('is-dragging'));
+        });
+
+        // Handle the file drop
+        fileUploadWrapper.addEventListener('drop', (e) => {
+            const droppedFiles = e.dataTransfer.files;
+            if (droppedFiles.length > 0) {
+                // Assign the dropped files to our hidden input
+                fileInputNative.files = droppedFiles;
+                updateDisplay(droppedFiles[0]);
+            }
+        });
+    }
+});
 </script>
 
 {% endblock %}

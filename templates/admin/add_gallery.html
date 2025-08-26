@@ -1,135 +1,126 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% block title %}Add Gallery Item{% endblock %}
 
 {% block content %}
 <style>
-    /* --- SUPER STYLISH "CREATIVE CANVAS" DESIGN --- */
-
-    /* 1. Theme & Variables */
+    /* Scoped styles for the Add Gallery page */
     :root {
-        --font-sans: 'Inter', sans-serif;
-        --color-accent: #8B5CF6; /* Vibrant Purple */
-        --color-accent-light: #A78BFA;
-        --color-text-dark: #111827;
-        --color-text-light: #6B7280;
-        --color-bg-canvas: #F9FAFB;
-        --color-border: #D1D5DB;
+        --admin-bg: #f8f9fa;
+        --admin-card-bg: #ffffff;
+        --admin-primary: #6f42c1; /* Stylish Purple for Gallery */
+        --admin-border: #dee2e6;
+        --admin-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        --admin-text-dark: #212529;
+        --admin-text-light: #6c757d;
+        --admin-font: 'Poppins', sans-serif;
+    }
+
+    .add-form-container {
+        font-family: var(--admin-font);
+        max-width: 1100px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+
+    .add-form-card {
+        background-color: var(--admin-card-bg);
+        padding: 3rem;
+        border-radius: 16px;
+        box-shadow: var(--admin-shadow);
+        border: 1px solid var(--admin-border);
     }
     
-    /* 2. Main Layout & Canvas */
-    .canvas-wrapper {
-        max-width: 1200px;
-        margin: 2rem auto;
-        padding: 1rem;
-        font-family: var(--font-sans);
+    .add-form-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--admin-border);
     }
-    .canvas-grid {
+    .add-form-header__title {
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: var(--admin-text-dark);
+        margin: 0;
+    }
+    .admin-btn--back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        color: var(--admin-text-dark);
+        background-color: #e9ecef;
+        transition: all 0.3s ease;
+        border: 1px solid var(--admin-border);
+    }
+    .admin-btn--back:hover {
+        background-color: #dee2e6;
+        transform: translateY(-2px);
+    }
+
+    .add-form-grid {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 2rem;
-        background-color: var(--color-bg-canvas);
-        padding: 2rem;
-        border-radius: 1.5rem;
-        box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+        gap: 3rem;
     }
     @media (min-width: 1024px) {
-        .canvas-grid {
+        .add-form-grid {
             grid-template-columns: 1fr 1fr;
-            gap: 3rem;
-            padding: 3rem;
         }
     }
 
-    /* 3. Form Section (Left Side) */
-    .canvas-form__header {
-        font-size: 2.25rem;
-        font-weight: 700;
-        color: var(--color-text-dark);
+    .form-group {
         margin-bottom: 2rem;
     }
-
-    /* Floating Label Input Group */
-    .float-group {
-        position: relative;
-        margin-bottom: 2rem;
+    .form-group label {
+        display: block;
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--admin-text-dark);
+        margin-bottom: 0.75rem;
     }
-    .float-input, .float-textarea {
+    .form-input, .form-textarea {
         width: 100%;
-        padding: 0.75rem 0;
-        font-size: 1.1rem;
-        border: none;
-        border-bottom: 2px solid var(--color-border);
-        background-color: transparent;
-        color: var(--color-text-dark);
-        transition: border-color 0.3s ease;
+        padding: 12px 15px;
+        font-size: 1rem;
+        border: 1px solid var(--admin-border);
+        border-radius: 8px;
+        background-color: #fff;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
-    .float-input:focus, .float-textarea:focus {
+    .form-input:focus, .form-textarea:focus {
         outline: none;
-        border-color: var(--color-accent);
+        border-color: var(--admin-primary);
+        box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.15);
     }
-    .float-label {
-        position: absolute;
-        top: 0.75rem;
-        left: 0;
-        font-size: 1.1rem;
-        color: var(--color-text-light);
-        pointer-events: none;
-        transition: all 0.3s ease;
+    .form-textarea {
+        min-height: 150px;
+        resize: vertical;
     }
-    .float-input:focus ~ .float-label,
-    .float-input:not(:placeholder-shown) ~ .float-label,
-    .float-textarea:focus ~ .float-label,
-    .float-textarea:not(:placeholder-shown) ~ .float-label {
-        top: -1.25rem;
-        left: 0;
-        font-size: 0.875rem;
-        color: var(--color-accent);
-    }
-    .float-textarea { resize: vertical; min-height: 80px; }
 
-    /* Buttons */
-    .canvas-actions { display: flex; gap: 1rem; margin-top: 2rem; }
-    .canvas-btn {
-        padding: 0.8rem 2rem;
-        font-weight: 600;
-        border-radius: 0.75rem;
-        text-decoration: none;
-        border: none;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    .canvas-btn--primary {
-        background-image: linear-gradient(to right, var(--color-accent), var(--color-accent-light));
-        color: white;
-        box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
-    }
-    .canvas-btn--primary:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4); }
-    .canvas-btn--secondary { background-color: #E5E7EB; color: var(--color-text-dark); }
-    .canvas-btn--secondary:hover { background-color: #D1D5DB; }
-
-
-    /* 4. Preview Section (Right Side) */
-    .canvas-preview__header { font-size: 1.5rem; font-weight: 600; color: var(--color-text-dark); margin-bottom: 1.5rem; }
-
-    /* Drag & Drop File Uploader */
+    /* --- New Multi-Image Uploader --- */
     #drop-area {
-        border: 2px dashed var(--color-border);
-        border-radius: 1rem;
+        border: 2px dashed var(--admin-border);
+        border-radius: 12px;
         padding: 2rem;
         text-align: center;
-        color: var(--color-text-light);
+        color: var(--admin-text-light);
         transition: all 0.3s ease;
         cursor: pointer;
     }
     #drop-area.is-active {
-        border-color: var(--color-accent);
-        background-color: rgba(139, 92, 246, 0.05);
+        border-color: var(--admin-primary);
+        background-color: #f3effc;
     }
-    #drop-area-icon { font-size: 3rem; color: var(--color-accent); margin-bottom: 1rem; }
+    #drop-area-icon { font-size: 3rem; color: var(--admin-primary); margin-bottom: 1rem; }
     #drop-area p { margin: 0; font-weight: 500; }
-    #file-input { display: none; }
+    #file-input-native { display: none; }
 
-    /* Live Image Previews */
     #previews-container {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -138,11 +129,12 @@
     }
     .preview-thumbnail {
         position: relative;
-        border-radius: 0.5rem;
+        border-radius: 8px;
         overflow: hidden;
-        border: 1px solid var(--color-border);
+        border: 1px solid var(--admin-border);
+        height: 100px;
     }
-    .preview-thumbnail img { width: 100%; height: 100px; object-fit: cover; display: block; }
+    .preview-thumbnail img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .remove-btn {
         position: absolute;
         top: 0.25rem;
@@ -159,108 +151,93 @@
         justify-content: center;
         font-size: 0.8rem;
     }
-    
-    /* Live Text Preview Card */
-    .preview-card {
-        margin-top: 2rem;
-        background-color: white;
-        border-radius: 1rem;
-        padding: 1.5rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    }
-    #preview-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: var(--color-text-dark);
-        min-height: 1.5rem; /* Prevents layout shift */
-    }
-    #preview-description {
-        font-size: 1rem;
-        color: var(--color-text-light);
-        margin-top: 0.5rem;
-        min-height: 1rem;
-    }
 
+    .form-actions {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--admin-border);
+    }
+    .btn-submit {
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding: 12px 25px;
+        border-radius: 8px;
+        border: none;
+        background-color: var(--admin-primary);
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .btn-submit:hover {
+        background-color: #5b21b6;
+        transform: translateY(-2px);
+    }
 </style>
 
-<div class="canvas-wrapper">
-    <form id="gallery-form" method="POST" enctype="multipart/form-data">
-        <div class="canvas-grid">
+<div class="add-form-container">
+    <div class="add-form-card">
+        <header class="add-form-header">
+            <h2 class="add-form-header__title">Add New Gallery Item</h2>
+            <a href="{{ url_for('admin.gallery') }}" class="admin-btn--back">
+                <i class="fas fa-times"></i>
+                <span>Cancel</span>
+            </a>
+        </header>
 
-            <div class="canvas-form">
-                <h2 class="canvas-form__header">Create a New Gallery</h2>
+        <form id="gallery-form" method="POST" enctype="multipart/form-data">
+            <div class="add-form-grid">
 
-                <div class="float-group">
-                    <input type="text" id="title-input" name="title" class="float-input" placeholder=" " required>
-                    <label for="title-input" class="float-label">Title</label>
+                <div class="form-details">
+                    <div class="form-group">
+                        <label for="title-input">Gallery Title</label>
+                        <input type="text" id="title-input" name="title" class="form-input" placeholder="e.g., Annual Sports Day 2024" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description-input">Description</label>
+                        <textarea id="description-input" name="description" class="form-textarea" placeholder="A brief description of the gallery..." required></textarea>
+                    </div>
                 </div>
 
-                <div class="float-group">
-                    <textarea id="description-input" name="description" class="float-textarea" placeholder=" "></textarea>
-                    <label for="description-input" class="float-label">Description</label>
+                <div class="form-uploader">
+                    <div class="form-group">
+                        <label for="file-input-native">Gallery Images</label>
+                        <div id="drop-area">
+                            <input type="file" id="file-input-native" name="images" multiple required accept="image/*">
+                            <div id="drop-area-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                            <p><strong>Drag & drop images here</strong></p>
+                            <p class="text-sm">or click to select files</p>
+                        </div>
+                        <div id="previews-container"></div>
+                    </div>
                 </div>
 
-                <div class="canvas-actions">
-                    <button type="submit" class="canvas-btn canvas-btn--primary">Create Gallery</button>
-                    <a href="{{ url_for('admin.gallery') }}" class="canvas-btn canvas-btn--secondary">Cancel</a>
-                </div>
             </div>
 
-            <div class="canvas-preview">
-                <h3 class="canvas-preview__header">Live Preview</h3>
-                
-                <div id="drop-area">
-                    <input type="file" id="file-input" name="filename" multiple required>
-                    <div id="drop-area-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                    <p><strong>Drag & drop images here</strong></p>
-                    <p class="text-sm">or click to select files</p>
-                </div>
-
-                <div id="previews-container"></div>
-                
-                <div class="preview-card">
-                    <h4 id="preview-title">[Your Title Will Appear Here]</h4>
-                    <p id="preview-description">[Your description will appear here...]</p>
-                </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Create Gallery</button>
             </div>
-
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // --- 1. LIVE TEXT PREVIEW ---
-    const titleInput = document.getElementById('title-input');
-    const descriptionInput = document.getElementById('description-input');
-    const previewTitle = document.getElementById('preview-title');
-    const previewDescription = document.getElementById('preview-description');
-
-    titleInput.addEventListener('keyup', () => {
-        previewTitle.textContent = titleInput.value || '[Your Title Will Appear Here]';
-    });
-    descriptionInput.addEventListener('keyup', () => {
-        previewDescription.textContent = descriptionInput.value || '[Your description will appear here...]';
-    });
-
-    // --- 2. DRAG & DROP & LIVE IMAGE PREVIEW ---
     const dropArea = document.getElementById('drop-area');
-    const fileInput = document.getElementById('file-input');
+    const fileInput = document.getElementById('file-input-native');
     const previewsContainer = document.getElementById('previews-container');
-    const galleryForm = document.getElementById('gallery-form');
-    let selectedFiles = []; // Use an array to manage files
+    let selectedFiles = []; // Use an array to manage the files
 
     // Trigger file input click when drop area is clicked
     dropArea.addEventListener('click', () => fileInput.click());
 
     // Highlight drop area when file is dragged over
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropArea.addEventListener(eventName, preventDefaults, false);
+        dropArea.addEventListener(eventName, e => {
+            e.preventDefault();
+            e.stopPropagation();
+        }, false);
     });
-    function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
     ['dragenter', 'dragover'].forEach(eventName => {
         dropArea.addEventListener(eventName, () => dropArea.classList.add('is-active'), false);
     });
@@ -268,24 +245,24 @@ document.addEventListener('DOMContentLoaded', () => {
         dropArea.addEventListener(eventName, () => dropArea.classList.remove('is-active'), false);
     });
 
-    // Handle dropped files
-    dropArea.addEventListener('drop', handleFiles, false);
-    // Handle selected files
-    fileInput.addEventListener('change', function() {
-        handleFiles(this.files);
-    });
-
-    function handleFiles(files) {
-        files = [...files];
-        files.forEach(file => {
+    // Handle file selection (both drop and click)
+    const handleFiles = (files) => {
+        [...files].forEach(file => {
             if (file.type.startsWith('image/')) {
-                selectedFiles.push(file);
-                previewFile(file);
+                // To avoid duplicates, we check if a file with the same name and size is already there
+                if (!selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                    selectedFiles.push(file);
+                    previewFile(file);
+                }
             }
         });
         updateFileInput();
-    }
+    };
 
+    dropArea.addEventListener('drop', e => handleFiles(e.dataTransfer.files), false);
+    fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+    // Create a visual preview for a file
     function previewFile(file) {
         let reader = new FileReader();
         reader.readAsDataURL(file);
@@ -293,27 +270,31 @@ document.addEventListener('DOMContentLoaded', () => {
             const id = `file-${Math.random().toString(36).substr(2, 9)}`;
             let thumb = document.createElement('div');
             thumb.className = 'preview-thumbnail';
-            thumb.dataset.id = id;
+            thumb.dataset.fileId = id; // Custom ID for the file object
+            
             thumb.innerHTML = `
                 <img src="${reader.result}" alt="${file.name}">
-                <button type="button" class="remove-btn" data-id="${id}">&times;</button>
+                <button type="button" class="remove-btn" data-file-id="${id}">&times;</button>
             `;
             previewsContainer.appendChild(thumb);
-            file.id = id; // Assign an ID to the file object
+            file.id = id; // Assign the same ID to the file object for tracking
         }
     }
 
     // Handle removing a previewed image
     previewsContainer.addEventListener('click', function(e) {
         if (e.target.classList.contains('remove-btn')) {
-            const id = e.target.dataset.id;
-            document.querySelector(`.preview-thumbnail[data-id="${id}"]`).remove();
-            selectedFiles = selectedFiles.filter(file => file.id !== id);
+            const fileId = e.target.dataset.fileId;
+            // Remove the visual thumbnail
+            document.querySelector(`.preview-thumbnail[data-file-id="${fileId}"]`).remove();
+            // Remove the file from our array
+            selectedFiles = selectedFiles.filter(file => file.id !== fileId);
+            // Update the actual file input
             updateFileInput();
         }
     });
 
-    // Since FileList is immutable, we use a DataTransfer object to update it
+    // This crucial function syncs our 'selectedFiles' array with the actual <input>
     function updateFileInput() {
         const dataTransfer = new DataTransfer();
         selectedFiles.forEach(file => dataTransfer.items.add(file));

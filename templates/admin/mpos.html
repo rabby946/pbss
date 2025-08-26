@@ -1,31 +1,37 @@
 {% extends 'base.html' %}
-{% block title %}mpos{% endblock %}
+{% block title %}Accreditations{% endblock %}
 {% block content %}
 
 <div class="ts-container">
+
     <header class="ts-header">
-        <h2 class="ts-header__title">Our mpos</h2>
+        <h2 class="ts-header__title">Our Accreditations</h2>
         <div class="ts-header__controls">
-            <div class="ts-search-wrapper">
+            <a href="{{ url_for('admin.add_mpo') }}" class="ts-add-btn">
+                <i class="fas fa-plus mr-2"></i> Add 
+            </a>    
+            
+            <a href="{{ url_for('admin.mpo_swap') }}" class="ts-add-btn">
+                <i class="fas fa-exchange-alt mr-2"></i>  Swap
+            </a>
+        </div>
+        <br>
+            <div class="ts-search-wrapper" style="padding-left: 0%;">
                 <i class="fas fa-search ts-search-icon"></i>
                 <input type="text" id="mpoSearch" placeholder="Search by name or position..." class="ts-search-input">
             </div>
-            <a href="{{ url_for('admin.add_mpo') }}" class="ts-add-btn">
-                <i class="fas fa-plus mr-2"></i> Add mpo
-            </a>
-        </div>
     </header>
 
     <main>
         <div id="mpoGrid" class="ts-grid">
             {% for t in items %}
-            <div class="ts-card" data-name="{{ t.name }}" data-position="{{ t.designation }}">
+            <div class="ts-card" data-name="{{ t.name }}" data-designation="{{ t.designation }}">
                 <div class="ts-card__image-wrapper">
-                    <img class="ts-card__image" src="{{ t.image_url }}" alt="Photo of {{ t.title }}">
+                    <img class="ts-card__image" src="{{ t.image_url }}" alt="Photo of {{ t.name }}">
                 </div>
                 <div class="ts-card__content">
                     <h3 class="ts-card__name">{{ t.name }}</h3>
-                    <p class="ts-card__position">{{ t.designation }}</p>
+                    <p class="ts-card__designation">{{ t.designation }}</p>
                     <div class="ts-card__actions">
                         <a href="{{ url_for('admin.edit_mpo', id=t.id) }}" class="ts-action-btn ts-action-btn--edit" title="Edit">
                             <i class="fas fa-pencil-alt"></i>

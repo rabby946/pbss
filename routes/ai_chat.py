@@ -41,7 +41,7 @@ def ai_chat():
             )
 
         if teachers_data:
-            teacher_names = ", ".join([t.title for t in teachers_data])
+            teacher_names = ", ".join([t.name for t in teachers_data])
             context_parts.append(
                 f"### Teachers Information\n- Total Teachers: {len(teachers_data)}\n- Names: {teacher_names}"
             )
@@ -52,7 +52,7 @@ def ai_chat():
             )
 
         if committees_data:
-            committee_titles = ", ".join([c.title for c in committees_data])
+            committee_titles = ", ".join([c.name for c in committees_data])
             context_parts.append(
                 f"### Committees\n- Committees include: {committee_titles}"
             )
@@ -62,7 +62,7 @@ def ai_chat():
             context_parts.append(f"### Recent News\n{news_headlines}")
 
         if accreditations_data:
-            acc_titles = ", ".join([a.title for a in accreditations_data])
+            acc_titles = ", ".join([a.name for a in accreditations_data])
             context_parts.append(f"### Accreditations (MPO)\n- {acc_titles}")
 
         if gallery_data:

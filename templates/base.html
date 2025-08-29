@@ -79,7 +79,7 @@ body.pss-drawer-open { overflow: hidden; }
 
 .pss-nav-menu {
     position: fixed; top: 0; right: -320px;
-    width: 320px; max-width: 90%;
+    width: 320px; max-width: 30%;
     height: 100%;
     background: linear-gradient(90deg,rgb(232, 231, 220)  0%, rgb(210, 237, 237) 50%);
     box-shadow: -5px 0 25px rgba(0, 0, 0, 0.424);
@@ -129,6 +129,26 @@ body.pss-drawer-open { overflow: hidden; }
     margin: 6px 0; background-color: var(--pss-text-dark);
     border-radius: 3px;
 }
+/* Mobile only (adjust max-width as you like, e.g., 768px) */
+@media (max-width: 768px) {
+  .pss-nav-hamburger {
+    position: relative;
+    top: 600px;              /* pushes it 15% down from its container height */
+    background: #75a5fffc; /* your custom colour */
+    border-radius: 50%;    /* makes it circular */
+    padding: 2%;           /* adds breathing space inside */
+    box-shadow: 0 2% 4% rgba(0, 0, 0, 0.2); /* soft shadow */
+    transition: background 0.3s ease;
+    /* margin-left: 40%; */
+     margin-left: auto;   /* pushes it all the way right */
+    margin-right: 0.1px;
+  }
+
+  .pss-nav-hamburger:hover {
+    background: #5a8de6;   /* darker shade on hover */
+  }
+}
+
 </style>
 </head>
 <body class="main-body">
@@ -148,7 +168,7 @@ body.pss-drawer-open { overflow: hidden; }
         </div>
     </header>
 <nav class="pss-nav-menu" id="pss-unique-nav-menu">
-        <button class="pss-nav-menu__close" id="pss-unique-close-button" aria-label="Close navigation menu">&times;</button>
+        <!-- <button class="pss-nav-menu__close" id="pss-unique-close-button" aria-label="Close navigation menu">&times;</button> -->
         <ul class="pss-nav-menu__list">
             <li><a href="{{ url_for('public.home') }}" class="pss-nav-menu__link {% if request.endpoint=='public.home' %}active{% endif %}">Home</a></li>
             <li><a href="{{ url_for('public.news') }}" class="pss-nav-menu__link {% if request.endpoint=='public.news' %}active{% endif %}">News</a></li>
@@ -161,6 +181,7 @@ body.pss-drawer-open { overflow: hidden; }
             <li><a href="{{ url_for('public.mpos') }}" class="pss-nav-menu__link {% if request.endpoint=='public.mpos' %}active{% endif %}">Accreditations</a></li>
             <li><a href="{{ url_for('public.contact') }}" class="pss-nav-menu__link {% if request.endpoint=='public.contact' %}active{% endif %}">Contact</a></li>
             <li><a href="{{ url_for('admin.dashboard') }}" class="pss-nav-menu__link {% if request.endpoint=='admin.dashboard' %}active{% endif %}">Dashboard</a></li>
+            <!-- <button class="pss-nav-menu__close" id="pss-unique-close-button" aria-label="Close navigation menu">&times;</button> -->
         </ul>
     </nav>
 
@@ -185,7 +206,7 @@ body.pss-drawer-open { overflow: hidden; }
     /* New styles for the Toast Notification */
     .toast-notification {
         position: fixed;
-        top: 20px;
+        top: 60px;
         right: 20px;
         max-width: 350px;
         width: 90%;

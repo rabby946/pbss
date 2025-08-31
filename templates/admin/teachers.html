@@ -3,271 +3,108 @@
 
 {% block content %}
 <style>
-    /* Scoped styles for the redesigned Manage Teachers page */
+    /* New, conflict-proof styles for the Manage Teachers page */
     :root {
-        --admin-bg: #f8f9fa;
-        --admin-card-bg: #ffffff;
-        --admin-primary: #0d6efd;
-        --admin-secondary: #6c757d;
-        --admin-danger: #dc3545;
-        --admin-edit: #17a2b8;
-        --admin-border: #e9ecef;
-        --admin-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        --admin-text-dark: #212529;
-        --admin-text-light: #6c757d;
-        --admin-font: 'Poppins', sans-serif;
+        --tm-bg: #f8f9fa;
+        --tm-card-bg: #ffffff;
+        --tm-primary: #0d6efd;
+        --tm-secondary: #6c757d;
+        --tm-danger: #dc3545;
+        --tm-edit: #17a2b8;
+        --tm-border: #e9ecef;
+        --tm-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        --tm-text-dark: #212529;
+        --tm-text-light: #6c757d;
+        --tm-font: 'Poppins', sans-serif;
     }
 
-    .admin-container {
-        font-family: var(--admin-font);
+    .tm-container {
+        font-family: var(--tm-font);
         max-width: 1200px;
         margin: 2rem auto;
         padding: 2rem;
     }
 
-    /* 1. Clean Header Layout */
-    .admin-header {
-        margin-bottom: 2.5rem;
-    }
-    .admin-header__top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px solid var(--admin-border);
-    }
-    .admin-header__title {
-        font-size: 2.2rem;
-        font-weight: 600;
-        color: var(--admin-text-dark);
-        margin: 0;
-    }
-    .admin-btn--back {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 1rem;
-        font-weight: 500;
-        text-decoration: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        color: var(--admin-text-dark);
-        background-color: #e9ecef;
-        transition: all 0.3s ease;
-        border: 1px solid var(--admin-border);
-    }
-    .admin-btn--back:hover {
-        background-color: #dee2e6;
-        transform: translateY(-2px);
-    }
+    .tm-header { margin-bottom: 2.5rem; }
+    .tm-header__top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--tm-border); }
+    .tm-header__title { font-size: 2.2rem; font-weight: 600; color: var(--tm-text-dark); margin: 0; }
+    .tm-btn--back { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 1rem; font-weight: 500; text-decoration: none; padding: 10px 20px; border-radius: 8px; color: var(--tm-text-dark); background-color: #e9ecef; transition: all 0.3s ease; border: 1px solid var(--tm-border); }
+    .tm-btn--back:hover { background-color: #dee2e6; transform: translateY(-2px); }
+    .tm-header__controls { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem; padding-top: 1.5rem; }
+    .tm-controls__buttons { display: flex; gap: 1rem; }
+    .tm-btn { display: inline-flex; align-items: center; gap: 0.75rem; font-size: 1rem; font-weight: 500; text-decoration: none; padding: 12px 22px; border-radius: 8px; color: #fff; transition: all 0.3s ease; border: none; }
+    .tm-btn--primary { background-color: var(--tm-primary); }
+    .tm-btn--secondary { background-color: var(--tm-secondary); }
+    .tm-btn:hover { transform: translateY(-3px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+    .tm-search-wrapper { position: relative; min-width: 350px; }
+    .tm-search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #9CA3AF; }
+    .tm-search-input { width: 100%; padding: 12px 1rem 12px 2.75rem; border: 1px solid var(--tm-border); border-radius: 8px; font-size: 1rem; transition: all 0.3s ease; }
+    .tm-search-input:focus { outline: none; border-color: var(--tm-primary); box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15); }
+
+    .tm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
     
-    .admin-header__controls {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        align-items: center;
-        gap: 1.5rem;
-        padding-top: 1.5rem;
-    }
-    .admin-controls__buttons {
-        display: flex;
-        gap: 1rem;
-    }
-    .admin-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.75rem;
-        font-size: 1rem;
-        font-weight: 500;
-        text-decoration: none;
-        padding: 12px 22px;
-        border-radius: 8px;
-        color: #fff;
-        transition: all 0.3s ease;
-        border: none;
-    }
-    .admin-btn--primary { background-color: var(--admin-primary); }
-    .admin-btn--secondary { background-color: var(--admin-secondary); }
-    .admin-btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .admin-search-wrapper {
-        position: relative;
-        min-width: 350px;
-    }
-    .admin-search-icon {
-        position: absolute;
-        left: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #9CA3AF;
-    }
-    .admin-search-input {
-        width: 100%;
-        padding: 12px 1rem 12px 2.75rem;
-        border: 1px solid var(--admin-border);
-        border-radius: 8px;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-    }
-    .admin-search-input:focus {
-        outline: none;
-        border-color: var(--admin-primary);
-        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
-    }
-
-    /* 2. Professional Card Grid */
-    .ts-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 2rem;
-    }
-
-    /* 3. Stylish Teacher Card */
-    .ts-card {
-        background: var(--admin-card-bg);
-        border-radius: 16px;
-        border: 1px solid var(--admin-border);
+    .tm-card {
+        background: var(--tm-card-bg);
+        border-radius: 16px; border: 1px solid var(--tm-border);
         box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        overflow: hidden;
-        position: relative;
+        overflow: hidden; position: relative;
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    .ts-card:hover {
-        transform: translateY(-10px);
-        box-shadow: var(--admin-shadow);
-    }
-
-    /* 4. Large, Clear Image */
-    .ts-card__image-wrapper {
-        height: 300px;
-        position: relative;
-    }
-    .ts-card__image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center top; /* Focus on the face */
-    }
-
-    /* 5. Bigger, Readable Text */
-    .ts-card__content {
-        padding: 1.5rem;
-        text-align: center;
-    }
-    .ts-card__name {
-        font-size: 1.3rem;
-        font-weight: 600;
-        color: var(--admin-text-dark);
-        margin: 0 0 0.5rem 0;
-    }
-    .ts-card__position {
-        font-size: 1rem;
-        color: var(--admin-text-light);
-        margin: 0;
-    }
-    
-    /* 6. Hover-Reveal Action Buttons */
-    .ts-card__actions {
-        position: absolute;
-        bottom: 1.5rem;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        gap: 1rem;
-        opacity: 0;
-        transition: all 0.3s ease-in-out;
-        pointer-events: none;
-    }
-    .ts-card:hover .ts-card__actions {
-        opacity: 1;
-        transform: translateX(-50%) translateY(-10px);
-        pointer-events: auto;
-    }
-    
-    .ts-action-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 3rem;
-        height: 3rem;
-        border-radius: 50%;
-        color: white;
-        text-decoration: none;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        font-size: 1rem;
-        transition: all 0.3s ease;
-    }
-    .ts-action-btn:hover {
-        transform: scale(1.1);
-        filter: brightness(1.1);
-    }
-    .ts-action-btn--edit { background-color: var(--admin-edit); }
-    .ts-action-btn--delete { background-color: var(--admin-danger); }
-
-    .ts-no-results {
-        display: none;
-        text-align: center;
-        padding: 4rem 0;
-        grid-column: 1 / -1;
-        font-size: 1.25rem;
-        color: var(--admin-text-light);
-    }
+    .tm-card.is-hidden { display: none; }
+    .tm-card:hover { transform: translateY(-10px); box-shadow: var(--tm-shadow); }
+    .tm-card__image-wrapper { height: 300px; position: relative; }
+    .tm-card__image { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+    .tm-card__content { padding: 1.5rem; text-align: center; }
+    .tm-card__name { font-size: 1.3rem; font-weight: 600; color: var(--tm-text-dark); margin: 0 0 0.5rem 0; }
+    .tm-card__position { font-size: 1rem; color: var(--tm-text-light); margin: 0; }
+    .tm-card__actions { position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%); display: flex; gap: 1rem; opacity: 0; transition: all 0.3s ease-in-out; pointer-events: none; }
+    .tm-card:hover .tm-card__actions { opacity: 1; transform: translateX(-50%) translateY(-10px); pointer-events: auto; }
+    .tm-action-btn { display: flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; border-radius: 50%; color: white; text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.2); font-size: 1rem; transition: all 0.3s ease; }
+    .tm-action-btn:hover { transform: scale(1.1); filter: brightness(1.1); }
+    .tm-action-btn--edit { background-color: var(--tm-edit); }
+    .tm-action-btn--delete { background-color: var(--tm-danger); }
+    .tm-no-results { display: none; text-align: center; padding: 4rem 0; grid-column: 1 / -1; font-size: 1.25rem; color: var(--tm-text-light); }
 </style>
 
-<div class="admin-container">
-
-    <header class="admin-header">
-        <div class="admin-header__top">
-            <h2 class="admin-header__title">Manage Teachers</h2>
-            <a href="{{ url_for('admin.dashboard') }}" class="admin-btn--back">
+<div class="tm-container">
+    <header class="tm-header">
+        <div class="tm-header__top">
+            <h2 class="tm-header__title">Manage Teachers</h2>
+            <a href="{{ url_for('admin.dashboard') }}" class="tm-btn--back">
                 <i class="fas fa-arrow-left"></i> Back to Dashboard
             </a>
         </div>
-        <div class="admin-header__controls">
-            <div class="admin-controls__buttons">
-                <a href="{{ url_for('admin.add_teacher') }}" class="admin-btn admin-btn--primary">
-                    <i class="fas fa-plus"></i> Add Teacher
-                </a>
-                <a href="{{ url_for('admin.teacher_swap') }}" class="admin-btn admin-btn--secondary">
-                    <i class="fas fa-exchange-alt"></i> Reorder Teachers
-                </a>
+        <div class="tm-header__controls">
+            <div class="tm-controls__buttons">
+                <a href="{{ url_for('admin.add_teacher') }}" class="tm-btn tm-btn--primary"><i class="fas fa-plus"></i> Add Teacher</a>
+                <a href="{{ url_for('admin.teacher_swap') }}" class="tm-btn tm-btn--secondary"><i class="fas fa-exchange-alt"></i> Reorder Teachers</a>
             </div>
-            <div class="admin-search-wrapper">
-                <i class="fas fa-search admin-search-icon"></i>
-                <input type="text" id="teacherSearch" placeholder="Search by name or position..." class="admin-search-input">
+            <div class="tm-search-wrapper">
+                <i class="fas fa-search tm-search-icon"></i>
+                <input type="text" id="teacherSearch" placeholder="Search by name or position..." class="tm-search-input">
             </div>
         </div>
     </header>
 
     <main>
-        <div id="teacherGrid" class="ts-grid">
+        <div id="teacherGrid" class="tm-grid">
             {% for t in items %}
-            <div class="ts-card" data-name="{{ t.name }}" data-position="{{ t.position }}">
-                <div class="ts-card__image-wrapper">
-                    <img class="ts-card__image" src="{{ t.image_url or url_for('static', filename='images/default-avatar.png') }}" alt="Photo of {{ t.name }}">
+            <div class="tm-card" data-name="{{ t.name }}" data-position="{{ t.position }}">
+                <div class="tm-card__image-wrapper">
+                    <img class="tm-card__image" src="{{ t.image_url or url_for('static', filename='images/default-avatar.png') }}" alt="Photo of {{ t.name }}">
                 </div>
-                <div class="ts-card__content">
-                    <h3 class="ts-card__name">{{ t.name }}</h3>
-                    <p class="ts-card__position">{{ t.position }}</p>
-                    <div class="ts-card__actions">
-                        <a href="{{ url_for('admin.edit_teacher', id=t.id) }}" class="ts-action-btn ts-action-btn--edit" title="Edit">
-                            <i class="fas fa-pencil-alt"></i>
-                        </a>
-                        <a href="{{ url_for('admin.delete_teacher', id=t.id) }}" class="ts-action-btn ts-action-btn--delete" title="Delete" onclick="return confirm('Are you sure you want to delete {{ t.name }}?');">
-                            <i class="fas fa-trash-alt"></i>
-                        </a>
+                <div class="tm-card__content">
+                    <h3 class="tm-card__name">{{ t.name }}</h3>
+                    <p class="tm-card__position">{{ t.position }}</p>
+                    <div class="tm-card__actions">
+                        <a href="{{ url_for('admin.edit_teacher', id=t.id) }}" class="tm-action-btn tm-action-btn--edit" title="Edit"><i class="fas fa-pencil-alt"></i></a>
+                        <a href="{{ url_for('admin.delete_teacher', id=t.id) }}" class="tm-action-btn tm-action-btn--delete" title="Delete" onclick="return confirm('Are you sure you want to delete {{ t.name }}?');"><i class="fas fa-trash-alt"></i></a>
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
-        
-        <div id="noResultsMessage" class="ts-no-results">
+        <div id="noResultsMessage" class="tm-no-results">
             <p>No teachers found matching your search.</p>
         </div>
     </main>
@@ -276,13 +113,12 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('teacherSearch');
-    const teacherGrid = document.getElementById('teacherGrid');
     const noResultsMessage = document.getElementById('noResultsMessage');
-    const teacherCards = teacherGrid.querySelectorAll('.ts-card');
+    const teacherCards = document.querySelectorAll('.tm-card'); // Using new .tm-card class
 
     if (searchInput) {
-        searchInput.addEventListener('keyup', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
+        const filterTeachers = () => {
+            const searchTerm = searchInput.value.toLowerCase();
             let visibleCount = 0;
 
             teacherCards.forEach(card => {
@@ -290,17 +126,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const position = card.dataset.position.toLowerCase();
 
                 if (name.includes(searchTerm) || position.includes(searchTerm)) {
-                    card.style.display = 'block';
+                    card.classList.remove('is-hidden');
                     visibleCount++;
                 } else {
-                    card.style.display = 'none';
+                    card.classList.add('is-hidden');
                 }
             });
 
             if (noResultsMessage) {
                 noResultsMessage.style.display = visibleCount === 0 ? 'block' : 'none';
             }
-        });
+        };
+        searchInput.addEventListener('keyup', filterTeachers);
+        filterTeachers(); // Run once on page load
     }
 });
 </script>

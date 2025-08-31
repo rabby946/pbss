@@ -199,7 +199,7 @@
             {% for t in items %}
             <div class="news-card" data-title="{{ t.title }}" data-description="{{ t.description }}">
                 <div class="news-card__content">
-                    <h3 class="news-card__title">{{ t.title }}</h3>
+                    <p class="news-card__description" style="font-size: larger; font-weight: bold;">{{ t.title }}</p>
                     <p class="news-card__description">{{ t.description[:150] }}{% if t.description|length > 150 %}...{% endif %}</p>
                 </div>
                 <div class="news-card__actions">

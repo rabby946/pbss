@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-# 🏫 High School Website
+ High School Website
 
 A complete high school website built using Flask, designed for managing students, galleries, announcements, and more.
 
@@ -12,7 +11,7 @@ A complete high school website built using Flask, designed for managing students
 
 ## 🚀 Live Demo
 
-Will be available soon…
+palashbariasecondaryschool.org
 
 ## ⚙️ Technologies Used
 

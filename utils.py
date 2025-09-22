@@ -1,8 +1,12 @@
+import cloudinary.uploader
 from functools import wraps
 from flask import session, redirect, url_for, flash
-import requests, base64
 from config import Config
 
+
+# ---------------------------
+# Admin Login Protection
+# ---------------------------
 def admin_required(view):
     @wraps(view)
     def wrapped(*args, **kwargs):
@@ -10,24 +14,28 @@ def admin_required(view):
             flash("Login required", "error")
             return redirect(url_for('admin.login'))
         return view(*args, **kwargs)
-    return wrapped 
-   
+    return wrapped
 
-import requests
 
-def upload_to_imgbb(file, expiration=None):
-    """Upload file to ImgBB and return the image URL."""
-    data = {"key": Config.IMGBB_API_KEY}
-    if expiration:
-        data["expiration"] = expiration
+# ---------------------------
+# Upload to Cloudinary
+# ---------------------------
+def upload_to_imgbb(file, folder="uploads"):
+    """
+    Upload file to Cloudinary and return its viewable URL.
+    
+    Args:
+        file: FileStorage object from Flask (request.files['image'])
+        folder: Cloudinary folder name (default: 'uploads')
+    
+    Returns:
+        str: Secure URL of the uploaded image
+    """
+    if not file:
+        raise ValueError("No file provided for upload")
 
-    response = requests.post(
-        "https://api.imgbb.com/1/upload",
-        data=data,
-        files={"image": file}
-    )
-
-    if response.status_code == 200:
-        return response.json()["data"]["url"]
-    else:
-        raise ValueError(f"Image upload failed: {response.text}")
+    try:
+        result = cloudinary.uploader.upload(file, folder=folder)
+        return result["secure_url"]   # Always returns HTTPS link
+    except Exception as e:
+        raise ValueError(f"Cloudinary upload failed: {e}")

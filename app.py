@@ -7,7 +7,6 @@ from extensions import db
 from config import Config
 from routes.public import public_bp
 from routes.admin import admin_bp
-from routes.ai_chat import ai_bp
 
 
 # Load environment variables
@@ -29,7 +28,7 @@ with app.app_context():
 # Register blueprints
 app.register_blueprint(public_bp)
 app.register_blueprint(admin_bp, url_prefix="/admin")
-app.register_blueprint(ai_bp)
+
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))

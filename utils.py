@@ -20,7 +20,7 @@ def admin_required(view):
 # ---------------------------
 # Upload to Cloudinary
 # ---------------------------
-def upload_to_imgbb(file, folder="uploads"):
+def upload_image(file, folder="uploads"):
     """
     Upload file to Cloudinary and return its viewable URL.
     

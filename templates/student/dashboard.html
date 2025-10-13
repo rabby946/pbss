@@ -1,0 +1,100 @@
+{% extends "student/base.html" %}
+{% block title %}Student Dashboard{% endblock %}
+
+{% block student_content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-semibold text-primary">Welcome, {{ session['student_name'] }} 👋</h3>
+    <p class="text-muted mb-0">Have a productive study day!</p>
+  </div>
+
+  <!-- Student Info Card -->
+  <div class="card shadow-sm mb-4 border-0">
+    <div class="card-body">
+      <h5 class="card-title text-primary mb-3">🎓 Your Profile Overview</h5>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <p><strong>Name:</strong> {{ student.name }}</p>
+        </div>
+        <div class="col-md-4">
+          <p><strong>Class:</strong> {{ student.class_.name }}</p>
+        </div>
+        <div class="col-md-4">
+          <p><strong>Section:</strong> {{ student.class_.section }}</p>
+        </div>
+        <div class="col-md-4">
+          <p><strong>Class Teacher:</strong> {{ student.class_.teacher.name }}</p>
+        </div>
+        <div class="col-md-4">
+          <p><strong>Roll:</strong> {{ student.roll }}</p>
+        </div>
+        <div class="col-md-4">
+          <p><strong>Due Amount:</strong> {{ student.due_amount }}</p>
+        </div>
+        <div class="col-md-4">
+          <p><strong>Joined:</strong> {{ student.created_at.strftime('%d %B %Y') }}</p>
+        </div>
+        <div class="col-md-4">
+          <p><strong>Status:</strong> <span class="badge bg-success">Active</span></p>
+        </div>
+        <div class="col-md-4">
+          <p><strong>Email:</strong> {{ student.user.email }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Access Cards -->
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-body text-center">
+          <h5 class="text-primary">📊 Results</h5>
+          <p class="text-muted">View your exam performance and progress.</p>
+          <a href="{{ url_for('student_bp.results') }}" class="btn btn-outline-primary btn-sm">View Results</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-body text-center">
+          <h5 class="text-success">📅 Attendance</h5>
+          <p class="text-muted">Check your attendance record.</p>
+          <a href="{{ url_for('student_bp.attendance') }}" class="btn btn-outline-success btn-sm">View Attendance</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-body text-center">
+          <h5 class="text-warning">📰 Notices</h5>
+          <p class="text-muted">Stay updated with school announcements.</p>
+          <a href="{{ url_for('student_bp.notices') }}" class="btn btn-outline-warning btn-sm">View Notices</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Notices Section -->
+  <div class="card shadow-sm mt-4 border-0">
+    <div class="card-header bg-light fw-semibold">Recent Notices</div>
+    <div class="card-body">
+      {% if notices %}
+        <ul class="list-group list-group-flush">
+          {% for n in notices %}
+            <li class="list-group-item">
+              <strong>{{ n.title }}</strong> — {{ n.description }}
+              <span class="text-muted small d-block">{{ n.timestamp.strftime('%d %B %Y') }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted mb-0">No recent notices available.</p>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

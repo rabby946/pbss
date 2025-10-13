@@ -1,82 +1,149 @@
 {% extends 'base.html' %}
 {% block title %}Contact Us : Palashbaria Secondary School{% endblock %}
+
+{% block head_extra %}
+<style>
+    /* Custom animation styles that complement Tailwind */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .animate-in {
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="page-container">
-    <div class="page-header">
-        <h1>Get in Touch</h1>
+<div class="contact-page-container">
+    <div class="text-center mb-12 lg:mb-16 animate-on-scroll">
+        <!-- <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">We're here to help and answer any question you might have. We look forward to hearing from you!</p> -->
     </div>
 
-    <div class="contact-wrapper">
-        <div class="contact-form-section">
-            <h2>Send Us a Message</h2>
-            <form id="contact-form" novalidate method="POST">
-                <div class="form-group">
-                    <label for="name">Full Name</label>
-                    <input type="text" id="name" name="name" class="form-input" required>
-                    <p class="error-message" id="name-error">Please enter your name.</p>
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-12">
+        
+        <div class="md:col-span-2 space-y-8">
+            <div class="animate-on-scroll" style="animation-delay: 0.1s;">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Direct Contact</h2>
+                <div class="space-y-4">
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0 h-12 w-12 flex items-center justify-center bg-blue-100 text-blue-600 rounded-lg">
+                            <i class="fas fa-phone-alt text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Phone</h3>
+                            <a href="tel:01714850660" class="text-gray-600 hover:text-blue-600 transition">01714850660</a>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0 h-12 w-12 flex items-center justify-center bg-blue-100 text-blue-600 rounded-lg">
+                            <i class="fas fa-envelope text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Email</h3>
+                            <a href="mailto:s118044@gmail.com" class="text-gray-600 hover:text-blue-600 transition">s118044@gmail.com</a>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0 h-12 w-12 flex items-center justify-center bg-blue-100 text-blue-600 rounded-lg">
+                            <i class="fas fa-map-marker-alt text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Address</h3>
+                            <p class="text-gray-600">Palashbaria, Mohammadpur, Magura, Bangladesh</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" class="form-input" required>
-                    <p class="error-message" id="email-error">Please enter your email.</p>
+            </div>
+
+            <div class="animate-on-scroll" style="animation-delay: 0.2s;">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Our Location</h2>
+                <div class="rounded-lg overflow-hidden shadow-lg border border-gray-200">
+                    <iframe src="http://googleusercontent.com/maps.google.com/6" width="100%" height="350" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
-                <div class="form-group">
-                    <label for="subject">Purpose of Contact</label>
-                    <select id="subject" name="subject" class="form-select" required>
-                        <option value="">-- Please select a reason --</option>
+            </div>
+        </div>
+
+        <div class="md:col-span-3 bg-white p-8 rounded-lg shadow-lg border border-gray-200 animate-on-scroll" style="animation-delay: 0.3s;">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-6">Send Us a Message</h2>
+            <form id="contact-form" novalidate method="POST" class="space-y-6">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                    <input type="text" id="name" name="name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                    <input type="email" id="email" name="email" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="subject" class="block text-sm font-medium text-gray-700">Purpose of Contact</label>
+                    <select id="subject" name="subject" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                        <option value="" disabled selected>Please select a reason</option>
                         <option value="General Inquiry">General Inquiry</option>
                         <option value="Information Request">Information Request</option>
                         <option value="Report an Issue">Report an Issue</option>
                     </select>
-                    <p class="error-message" id="subject-error">Please select a purpose.</p>
                 </div>
-                <div class="form-group">
-                    <label for="message">Your Message</label>
-                    <textarea id="message" name="message" class="form-textarea" required></textarea>
-                    <p class="error-message" id="message-error">Please enter your message.</p>
+                <div>
+                    <label for="message" class="block text-sm font-medium text-gray-700">Your Message</label>
+                    <textarea id="message" name="message" rows="4" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
                 </div>
-                <button type="submit" class="btn-submit" id="submit-btn">Submit Message</button>
+                <div>
+                    <button type="submit" id="submit-btn" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition disabled:bg-gray-400">
+                        <span class="btn-text">Submit Message</span>
+                    </button>
+                </div>
             </form>
-            <div id="form-result"></div>
-        </div>
-
-        <div class="contact-details-section">
-            <h2>Direct Contact</h2>
-            <ul class="contact-info-list">
-                <li>
-                    <i class="fas fa-phone-alt icon"></i>
-                    <div class="info-text">
-                        <strong>Phone</strong>
-                        <span>01714850660</span>
-                    </div>
-                    <button class="copy-btn" data-copy="01714850660" title="Copy phone number">
-                        <i class="far fa-copy"></i>
-                    </button>
-                </li>
-                <li>
-                    <i class="fas fa-envelope icon"></i>
-                    <div class="info-text">
-                        <strong>Email</strong>
-                        <span>s118044@gmail.com</span>
-                    </div>
-                    <button class="copy-btn" data-copy="s118044@gmail.com" title="Copy email address">
-                        <i class="far fa-copy"></i>
-                    </button>
-                </li>
-                <li>
-                    <i class="fas fa-map-marker-alt icon"></i>
-                    <div class="info-text">
-                        <strong>Address</strong>
-                        <span>Palashbaria, Mohammadpur, Magura, Bangladesh</span>
-                    </div>
-                </li>
-            </ul>
-            <h2>Our Location</h2>
-            <div class="map-wrapper">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1791851.860868028!2d87.66714924554131!3d24.27508610792029!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39ffb3a259b97091%3A0xdaf7ebe1757643b1!2sPalashbaria%20School%20%26%20College!5e1!3m2!1sen!2sbd!4v1755248051643!5m2!1sen!2sbd" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-            </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Scroll Animations ---
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-in');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.animate-on-scroll').forEach(element => {
+        // Hide element initially to prepare for animation
+        element.style.opacity = '0';
+        observer.observe(element);
+    });
+
+    // --- Prevent Duplicate Form Submissions ---
+    const contactForm = document.getElementById('contact-form');
+    const submitBtn = document.getElementById('submit-btn');
+
+    if (contactForm && submitBtn) {
+        contactForm.addEventListener('submit', function(e) {
+            if (!contactForm.checkValidity()) {
+                return;
+            }
+            // This happens after browser validation passes
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Submitting...
+            `;
+        });
+    }
+});
+</script>
 {% endblock %}

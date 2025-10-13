@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 {% block title %}Edit Gallery Item{% endblock %}
 
 {% block content %}
@@ -63,7 +63,7 @@
                 <input type="hidden" id="images-to-keep" name="images_to_keep" value="{{ item.images }}">
                 <div class="canvas-actions">
                     <button type="submit" class="canvas-btn canvas-btn--primary">Update Gallery</button>
-                    <a href="{{ url_for('admin.gallery') }}" class="canvas-btn canvas-btn--secondary">Cancel</a>
+                    <a href="{{ url_for('admin_bp.gallery') }}" class="canvas-btn canvas-btn--secondary">Cancel</a>
                 </div>
                 <br>
                 

@@ -1,0 +1,57 @@
+{% extends "teacher/base.html" %}
+{% block title %}Upload Results{% endblock %}
+
+{% block teacher_content %}
+<div class="container mt-4">
+  <h3 class="text-center mb-4">Upload Results for {{ subject.name }}</h3>
+
+  {% if registrations %}
+  <form method="POST" action="{{ url_for('teacher_bp.submit_results', subject_id=subject.id) }}">
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label class="form-label">Exam Type</label>
+        <select name="exam_type" class="form-select" required>
+          <option value="">-- Select Exam Type --</option>
+          <option value="midterm">Midterm</option>
+          <option value="final">Final</option>
+          <option value="quiz">Quiz</option>
+          <option value="class_test">Class Test</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Exam Date</label>
+        <input type="date" name="exam_date" class="form-control" required>
+      </div>
+    </div>
+
+    <table class="table table-bordered shadow-sm align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>class Roll</th>
+          <th>Student Name</th>
+          <th>Student ID</th>
+          <th>Marks</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for reg in registrations %}
+        <tr>
+          <td>{{ reg.student.roll}}</td>
+          <td>{{ reg.student.name }}</td>
+          <td>{{ reg.student.studentID }}</td>
+          <td><input type="number" step="0.01" name="marks_{{ reg.student.id }}" class="form-control" min="0" max="100"></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="text-end mt-3">
+      <button type="submit" class="btn btn-success px-4">Save Results</button>
+    </div>
+  </form>
+  {% else %}
+    <p class="text-center text-muted">No registered students found for this subject.</p>
+  {% endif %}
+</div>
+{% endblock %}
+

@@ -1,265 +1,253 @@
-{% extends "base.html" %}
-{% block title %}Manage routine{% endblock %}
+{% extends "admin/base.html" %}
 
-{% block content %}
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% block title %}Manage Routine{% endblock %}
 
+{% block head_extra %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
 <style>
-    /* Scoped and corrected styles for the Manage routine page */
-    :root {
-        --admin-bg: #f8f9fa;
-        --admin-card-bg: #ffffff;
-        --admin-primary: #0d6efd;
-        --admin-danger: #dc3545;
-        --admin-edit: #17a2b8; /* A professional teal for edit actions */
-        --admin-border: #e9ecef;
-        --admin-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        --admin-text-dark: #212529;
-        --admin-text-light: #6c757d;
-        --admin-font: 'Poppins', sans-serif;
-    }
-
-    .admin-container {
-        font-family: var(--admin-font);
-        max-width: 1000px;
-        margin: 2rem auto;
-        padding: 2rem;
-    }
-
-    .admin-header {
-        margin-bottom: 2.5rem;
-    }
-    .admin-header__top {
+    /* These styles perfectly match your admin/base.html design system */
+    .page-header {
         display: flex;
+        flex-wrap: wrap;
         justify-content: space-between;
         align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px solid var(--admin-border);
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
     }
-    .admin-header__title {
-        font-size: 2.2rem;
+    .page-title {
+        font-size: 2rem;
         font-weight: 600;
-        color: var(--admin-text-dark);
-        margin: 0;
+        color: var(--admin-text);
     }
-    .admin-btn--back {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 1rem;
-        font-weight: 500;
-        text-decoration: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        color: var(--admin-text-dark);
-        background-color: #e9ecef;
-        transition: all 0.3s ease;
-        border: 1px solid var(--admin-border);
-    }
-    .admin-btn--back:hover {
-        background-color: #dee2e6;
-        transform: translateY(-2px);
-    }
-    
-    .admin-header__controls {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-end; /* Align buttons to the right */
-        align-items: center;
-        gap: 1.5rem;
-        padding-top: 1.5rem;
-    }
-    .admin-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.75rem;
-        font-size: 1rem;
-        font-weight: 500;
-        text-decoration: none;
-        padding: 12px 22px;
-        border-radius: 8px;
-        color: #fff;
-        transition: all 0.3s ease;
-        border: none;
-    }
-    .admin-btn--primary { background-color: var(--admin-primary); }
-    .admin-btn--secondary { background-color: #6c757d; }
-    .admin-btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .routine-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
-
-    .result-card {
-        display: flex;
-        align-items: center;
-        gap: 1.5rem;
-        padding: 1.5rem;
+    .table-card {
         background-color: var(--admin-card-bg);
         border: 1px solid var(--admin-border);
-        border-radius: 16px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        transition: all 0.3s ease;
-    }
-    .result-card:hover {
-        transform: translateY(-5px);
+        border-radius: var(--admin-radius, 0.75rem);
         box-shadow: var(--admin-shadow);
+        overflow: hidden;
     }
+    .routine-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .routine-table thead th {
+        text-align: left; padding: 1rem 1.5rem; font-weight: 500;
+        color: var(--admin-text-muted); background-color: var(--admin-bg);
+        text-transform: uppercase; font-size: 0.8rem;
+    }
+    .routine-table tbody td {
+        padding: 1rem 1.5rem; vertical-align: middle;
+        border-top: 1px solid var(--admin-border);
+    }
+    .routine-table tbody tr:hover { background-color: #f8fafc; }
 
-    .result-card__icon {
-        font-size: 1.8rem;
-        color: var(--admin-danger);
-        background-color: #f8d7da;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
+    /* Custom styles to make Choices.js match your theme */
+    .choices__inner {
+        background-color: var(--admin-bg) !important;
+        border: 1px solid var(--admin-border) !important;
+        border-radius: 0.375rem !important;
+        padding: 0.375rem 0.75rem !important;
+        min-height: 38px;
     }
-    
-    .result-card__info {
-        flex-grow: 1;
+    .choices[data-type*="select-one"]::after {
+        border-color: var(--admin-text-muted) transparent transparent !important;
     }
-    .result-card__title {
-        font-size: 1.3rem;
-        font-weight: 500;
-        color: var(--admin-text-dark) !important; /* Force color to prevent override */
-        margin: 0 0 0.5rem 0;
-        position: static !important; /* CRITICAL FIX: Ensures title stays in place */
-    }
-    .result-card__file-link {
-        font-size: 1rem;
-        color: var(--admin-primary);
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    .result-card__file-link:hover { text-decoration: underline; }
-    .result-card__no-file {
-        font-size: 1rem;
-        color: var(--admin-text-light);
-        font-style: italic;
-    }
-
-    .result-card__actions {
-        display: flex;
-        gap: 0.75rem;
-    }
-    .action-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        border: none;
-        background-color: #f8f9fa;
-        color: var(--admin-text-light);
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
-    }
-    .action-btn--edit:hover {
-        background-color: var(--admin-edit);
-        color: #fff;
-    }
-    .action-btn--delete:hover {
-        background-color: var(--admin-danger);
-        color: #fff;
+    .is-focused .choices__inner {
+        border-color: var(--admin-brand) !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, .25) !important;
     }
 </style>
+{% endblock %}
 
-<div class="admin-container">
-
-    <header class="admin-header">
-        <div class="admin-header__top">
-            <h2 class="admin-header__title">Manage routine</h2>
-            <a href="{{ url_for('admin.dashboard') }}" class="admin-btn--back">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
-            </a>
-        </div>
-        <div class="admin-header__controls">
-            <a href="{{ url_for('admin.result_swap') }}" class="admin-btn admin-btn--secondary">
-                <i class="fas fa-exchange-alt"></i> Reorder routine
-            </a>
-            <a href="{{ url_for('admin.add_result') }}" class="admin-btn admin-btn--primary">
-                <i class="fas fa-plus"></i> Add New Result
-            </a>
-        </div>
-    </header>
-
-    <main>
-        {% if items %}
-        <div class="routine-grid">
-            {% for r in items %}
-            <div class="result-card">
-                <div class="result-card__icon">
-                    <i class="fas fa-file-pdf"></i>
-                </div>
-                <div class="result-card__info">
-                    <h3 class="result-card__title">{{ r.title }}</h3>
-                    {% if r.file_url %}
-                    <a href="{{ r.file_url }}" target="_blank" class="result-card__file-link">
-                        <i class="fas fa-link"></i> View Attached File
-                    </a>
-                    {% else %}
-                    <p class="result-card__no-file">No file uploaded</p>
-                    {% endif %}
-                </div>
-
-                <div class="result-card__actions">
-                    <a href="{{ url_for('admin.edit_result', id=r.id) }}" class="action-btn action-btn--edit" title="Edit">
-                        <i class="fas fa-pencil-alt"></i>
-                    </a>
-                    <button class="action-btn action-btn--delete" title="Delete"
-                            data-title="{{ r.title }}"
-                            data-url="{{ url_for('admin.delete_result', id=r.id) }}">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-            <div class="alert alert-warning">No result items found! Click "Add New Result" to get started.</div>
-        {% endif %}
-    </main>
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Manage Routine</h1>
 </div>
 
+<ul class="nav nav-tabs" id="routineTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="view-tab" data-bs-toggle="tab" data-bs-target="#view-pane" type="button">
+            <i class="fas fa-list me-2"></i> View Routine
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="form-tab" data-bs-toggle="tab" data-bs-target="#form-pane" type="button">
+            <i class="fas fa-plus me-2"></i> <span id="form-tab-title">Add Entry</span>
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="routineTabsContent">
+    <div class="tab-pane fade show active" id="view-pane" role="tabpanel">
+        <div class="table-card p-4">
+            <form method="get" class="row g-3 mb-4">
+                <div class="col-md-4"><label class="form-label">Day</label><select name="day" class="form-select"><option value="all">All Days</option>{% for d in days %}<option value="{{ d }}" {% if selected_day == d %}selected{% endif %}>{{ d }}</option>{% endfor %}</select></div>
+                <div class="col-md-4"><label class="form-label">Class</label><select name="class_id" class="form-select"><option value="all">All Classes</option>{% for c in classes %}<option value="{{ c.id }}" {% if selected_class|int == c.id %}selected{% endif %}>{{ c.name }} ({{ c.section }})</option>{% endfor %}</select></div>
+                <div class="col-md-4 d-flex align-items-end"><button type="submit" class="btn btn-primary w-100">Apply Filter</button></div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table routine-table">
+                    <thead>
+                        <tr><th>Day</th><th>Class</th><th>Subject</th><th>Teacher</th><th>Time</th><th>Room</th><th class="text-end">Actions</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for r in routines %}
+                        <tr class="routine-row">
+                            <td data-label="Day"><strong>{{ r.day }}</strong></td>
+                            <td data-label="Class">{{ r.subject.class_.name }} - {{ r.subject.class_.section }}</td>
+
+                            <td data-label="Subject">{{ r.subject.name }}</td>
+                            <td data-label="Teacher">{{ r.teacher.name }}</td>
+                            <td data-label="Time">{{ r.start_time.strftime("%I:%M %p") }} - {{ r.end_time.strftime("%I:%M %p") }}</td>
+                            <td data-label="Room">{{ r.room or "N/A" }}</td>
+                            <td data-label="Actions" class="text-end">
+                                <div class="action-buttons d-inline-flex gap-3">
+                                    <button class="btn btn-link p-0 edit-routine-btn" title="Edit Routine"
+                                            data-routine-id="{{ r.id }}"
+                                            data-subject-id="{{ r.subject_id }}"
+                                            data-teacher-id="{{ r.teacher_id }}"
+                                            data-day="{{ r.day }}"
+                                            data-start-time="{{ r.start_time.strftime('%H:%M') }}"
+                                            data-end-time="{{ r.end_time.strftime('%H:%M') }}"
+                                            data-room="{{ r.room }}">
+                                        <i class="fa fa-edit fs-5"></i>
+                                    </button>
+                                    <a href="{{ url_for('admin_bp.delete_routine', id=r.id) }}" class="btn btn-link p-0 action-btn--delete" title="Delete Routine"
+                                    onclick="return confirm('Are you sure you want to delete this routine entry?')">
+                                        <i class="fa fa-trash fs-5"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="7" class="text-center text-muted p-5">No routine entries found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tab-pane fade" id="form-pane" role="tabpanel">
+        <div class="table-card p-4">
+            <h3 id="form-title" class="mb-4 fs-5 fw-semibold">Add New Routine Entry</h3>
+            <form  id="routine-form" action="{{ url_for('admin_bp.add_routine') }}" method="POST">
+                <input type="hidden" name="action" id="form-action">
+                <input type="hidden" name="routine_id" id="form-routine-id">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Subject</label>
+                        <select name="subject_id" id="subject-select" required>
+                            <option value="">Search for a subject...</option>
+                            {% for s in subjects %}<option value="{{ s.id }}">{{ s.name }} ({{s.code}})</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Day</label>
+                        <select name="day" class="form-select" required>
+                            {% for d in days %}<option value="{{ d }}">{{ d }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Start Time</label>
+                        <input type="time" name="start_time" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">End Time</label>
+                        <input type="time" name="end_time" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Room</label>
+                        <input type="text" name="room" class="form-control">
+                    </div>
+                </div>
+                <div class="mt-4 text-end">
+                    <button type="submit" class="btn" id="form-submit-btn">Add Entry</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const deleteButtons = document.querySelectorAll('.action-btn--delete');
+    // --- Initialize Searchable Dropdown ---
+    const subjectSelect = document.getElementById('subject-select');
+    const subjectChoices = new Choices(subjectSelect, {
+        searchEnabled: true,
+        itemSelectText: '',
+    });
 
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const resultTitle = this.dataset.title;
-            const deleteUrl = this.dataset.url;
+    // --- Tab and Form Logic ---
+    const formTab = document.getElementById('form-tab');
+    const formTabTitle = document.getElementById('form-tab-title');
+    const viewTab = new bootstrap.Tab(document.getElementById('view-tab'));
+    const bsFormTab = new bootstrap.Tab(formTab);
 
-            Swal.fire({
-                title: 'Are you sure?',
-                html: `You are about to delete the result: <br><strong>${resultTitle}</strong>`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, delete !'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = deleteUrl;
-                }
-            });
+    const formEl = document.getElementById('routine-form');
+    const formTitle = document.getElementById('form-title');
+    const formSubmitBtn = document.getElementById('form-submit-btn');
+    const formActionInput = document.getElementById('form-action');
+    const formRoutineIdInput = document.getElementById('form-routine-id');
+
+    // Function to switch to the "Add" mode
+    function setupAddForm() {
+        formEl.reset();
+        subjectChoices.setChoiceByValue(''); // Clear searchable dropdown
+        formTitle.textContent = 'Add New Routine Entry';
+        formTabTitle.textContent = 'Add Entry';
+        formActionInput.value = 'add';
+        formRoutineIdInput.value = '';
+        formSubmitBtn.textContent = 'Add Entry';
+        formSubmitBtn.className = 'btn btn-success';
+        bsFormTab.show();
+    }
+    
+    // Switch to Add form when tab is clicked directly
+    formTab.addEventListener('show.bs.tab', function(event) {
+        // If we're not already in edit mode, set up the add form
+        if (formActionInput.value !== 'edit') {
+            setupAddForm();
+        }
+    });
+
+    // Configure for EDITING
+    document.querySelectorAll('.edit-routine-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            formEl.reset();
+            formTitle.textContent = 'Edit Routine Entry';
+            formTabTitle.textContent = 'Edit Entry';
+            formActionInput.value = 'edit';
+            formRoutineIdInput.value = button.dataset.routineId;
+            formSubmitBtn.textContent = 'Save Changes';
+            formSubmitBtn.className = 'btn btn-primary';
+
+            // Populate form fields, including the searchable dropdown
+            subjectChoices.setChoiceByValue(button.dataset.subjectId);
+            formEl.querySelector('[name="teacher_id"]').value = button.dataset.teacherId;
+            formEl.querySelector('[name="day"]').value = button.dataset.day;
+            formEl.querySelector('[name="start_time"]').value = button.dataset.startTime;
+            formEl.querySelector('[name="end_time"]').value = button.dataset.endTime;
+            formEl.querySelector('[name="room"]').value = button.dataset.room;
+
+            bsFormTab.show();
         });
+    });
+
+    // Reset form state when switching back to the view tab
+    document.getElementById('view-tab').addEventListener('show.bs.tab', function() {
+        formTabTitle.textContent = 'Add Entry';
+        formActionInput.value = 'add'; // Reset for next time
+    });
+
+    // Prevent Duplicate Submission
+    formEl.addEventListener('submit', function() {
+        formSubmitBtn.disabled = true;
+        formSubmitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...`;
     });
 });
 </script>

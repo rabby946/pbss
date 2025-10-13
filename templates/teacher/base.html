@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Teacher Dashboard{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --teacher-primary: #0d6efd;
+            --teacher-bg: #f8fafc;
+            --teacher-sidebar-bg: #ffffff;
+            --teacher-text-dark: #212529;
+            --teacher-text-light: #6c757d;
+            --teacher-border: #e9ecef;
+            --teacher-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            --teacher-font: 'Poppins', sans-serif;
+        }
+
+        body {
+            font-family: var(--teacher-font);
+            background-color: var(--teacher-bg);
+            color: var(--teacher-text-dark);
+        }
+
+        .dashboard-wrapper {
+            display: flex;
+        }
+
+        /* --- Modern Collapsible Sidebar --- */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: var(--teacher-sidebar-bg);
+            border-right: 1px solid var(--teacher-border);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            z-index: 1030;
+        }
+        .sidebar-header {
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--teacher-primary);
+        }
+        .sidebar-nav {
+            padding: 1rem;
+        }
+        .sidebar .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            color: var(--teacher-text-light);
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .sidebar .nav-link:hover {
+            background-color: #eef5ff;
+            color: var(--teacher-primary);
+        }
+        .sidebar .nav-link.active {
+            background-color: var(--teacher-primary);
+            color: #fff;
+            font-weight: 600;
+        }
+        .sidebar .nav-link .icon {
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content Area */
+        .main-content {
+            flex-grow: 1;
+            padding-left: 260px; /* Space for the sidebar */
+            transition: padding-left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* Top Header Bar */
+        .top-header {
+            height: 70px;
+            background-color: var(--teacher-sidebar-bg);
+            box-shadow: var(--teacher-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+        }
+        .sidebar-toggle { font-size: 1.5rem; color: var(--teacher-text-light); }
+        .user-dropdown .dropdown-toggle { text-decoration: none; }
+        .user-dropdown img { width: 40px; height: 40px; object-fit: cover; }
+        
+        .content-body {
+            padding: 2.5rem;
+        }
+
+        /* --- Collapsed State for Sidebar --- */
+        .sidebar.collapsed {
+            width: 80px;
+        }
+        .sidebar.collapsed .sidebar-header .brand-text,
+        .sidebar.collapsed .nav-link .link-text {
+            opacity: 0;
+            visibility: hidden;
+            width: 0;
+        }
+        .main-content.sidebar-collapsed {
+            padding-left: 80px;
+        }
+
+        /* --- Mobile Responsiveness --- */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.is-open {
+                transform: translateX(0);
+            }
+            .main-content, .main-content.sidebar-collapsed {
+                padding-left: 0;
+            }
+            .sidebar-toggle.desktop { display: none; } /* Hide desktop toggle */
+            .sidebar-overlay {
+                position: fixed; inset: 0; background-color: rgba(0,0,0,0.4);
+                z-index: 1025; opacity: 0; visibility: hidden;
+                transition: opacity 0.3s ease;
+            }
+            .sidebar-overlay.is-visible { opacity: 1; visibility: visible; }
+        }
+        @media (min-width: 992.1px) {
+            .sidebar-toggle.mobile { display: none; } /* Hide mobile toggle */
+        }
+        
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <aside class="sidebar" id="dashboard-sidebar">
+        <div class="sidebar-header">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span class="brand-text">Teacher Panel</span>
+        </div>
+        <nav class="sidebar-nav">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a href="{{ url_for('teacher_bp.dashboard') }}" class="nav-link {% if request.endpoint == 'teacher_bp.dashboard' %}active{% endif %}">
+                        <i class="icon fa-solid fa-gauge-high"></i> <span class="link-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('teacher_bp.routine') }}" class="nav-link {% if request.endpoint == 'teacher_bp.routine' %}active{% endif %}">
+                        <i class="icon fa-solid fa-calendar-week"></i> <span class="link-text">Routine</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('teacher_bp.attendance', class_id=1) }}" class="nav-link {% if request.endpoint == 'teacher_bp.attendance' %}active{% endif %}">
+                        <i class="icon fa-solid fa-user-check"></i> <span class="link-text">Attendance</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('teacher_bp.assigned_subjects', class_id=1) }}" class="nav-link {% if request.endpoint == 'teacher_bp.assigned_subjects' %}active{% endif %}">
+                        <i class="icon fa-solid fa-book-open-reader"></i> <span class="link-text">Assigned Subjects</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('teacher_bp.students_list') }}" class="nav-link {% if request.endpoint == 'teacher_bp.students_list' %}active{% endif %}">
+                        <i class="icon fa-solid fa-users"></i> <span class="link-text">Your Students</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('teacher_bp.view_news') }}" class="nav-link {% if request.endpoint == 'teacher_bp.view_news' %}active{% endif %}">
+                        <i class="icon fa-solid fa-bullhorn"></i> <span class="link-text">Announcement</span>
+                    </a>
+                </li>
+                 <li class="nav-item">
+                    <a href="{{ url_for('teacher_bp.profile') }}" class="nav-link {% if request.endpoint == 'teacher_bp.profile' %}active{% endif %}">
+                        <i class="icon fa-solid fa-user-circle"></i> <span class="link-text">Profile</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <div class="main-content" id="main-content">
+        <header class="top-header">
+            <button class="btn btn-link sidebar-toggle desktop" id="sidebar-toggle-desktop"><i class="fa-solid fa-bars"></i></button>
+            <button class="btn btn-link sidebar-toggle mobile" id="sidebar-toggle-mobile"><i class="fa-solid fa-bars"></i></button>
+
+            <div class="dropdown user-dropdown">
+                <a href="#" class="dropdown-toggle d-flex align-items-center gap-2" data-bs-toggle="dropdown">
+                    <img src="https://ui-avatars.com/api/?name={{ session['teacher_name'] }}&background=0d6efd&color=fff" class="rounded-circle" alt="User">
+                    <span class="d-none d-md-inline">{{ session['teacher_name'] }}</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="{{ url_for('teacher_bp.profile') }}"><i class="fa-solid fa-user-gear me-2"></i> My Profile</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="{{ url_for('teacher_bp.teacher_logout') }}"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</a></li>
+                </ul>
+            </div>
+        </header>
+
+        <main class="content-body">
+            <h2 class="mb-4">{% block page_title %}Teacher Dashboard{% endblock %}</h2>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            {% block teacher_content %}{% endblock %}
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const sidebar = document.getElementById('dashboard-sidebar');
+    const mainContent = document.getElementById('main-content');
+    const toggleDesktop = document.getElementById('sidebar-toggle-desktop');
+    const toggleMobile = document.getElementById('sidebar-toggle-mobile');
+    const overlay = document.getElementById('sidebar-overlay');
+
+    // Desktop: Collapse/Expand Sidebar
+    if (toggleDesktop) {
+        toggleDesktop.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('sidebar-collapsed');
+        });
+    }
+
+    // Mobile: Open/Close Drawer
+    if (toggleMobile) {
+        toggleMobile.addEventListener('click', () => {
+            sidebar.classList.add('is-open');
+            overlay.classList.add('is-visible');
+        });
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('is-open');
+            overlay.classList.remove('is-visible');
+        });
+    }
+});
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

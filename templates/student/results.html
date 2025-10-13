@@ -1,0 +1,31 @@
+{% extends "student/base.html" %}
+{% block title %}Results{% endblock %}
+{% block student_content %}
+<div class="container mt-4">
+  <h4 class="mb-3 text-primary">Exam Results</h4>
+  <table class="table table-striped">
+    <thead class="table-light">
+      <tr>
+        <th>Subject</th>
+        <th>Exam Type</th>
+        <th>Marks</th>
+        <th>Grade</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in results %}
+      <tr>
+        <td>{{ r.subject.name }}</td>
+        <td>{{ r.exam_type }}</td>
+        <td>{{ r.marks }}</td>
+        <td>{{ r.grade }}</td>
+        <td>{{ r.exam_date.strftime('%d %b %Y') if r.exam_date else 'N/A' }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="text-muted text-center">No results found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

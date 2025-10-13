@@ -1,0 +1,129 @@
+{% extends "teacher/base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <div class="card shadow-lg border-0 rounded-4">
+    <div class="card-header bg-primary text-white text-center py-3 rounded-top-4">
+      <h4 class="mb-0">Registered Students – Class {{ class_id }}</h4>
+    </div>
+    <div class="card-body p-4">
+
+      <!-- Search Bar -->
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <input
+          type="text"
+          id="searchInput"
+          class="form-control w-100 w-md-50"
+          placeholder="🔍 Search student name or ID..."
+          onkeyup="filterStudents()"
+        >
+        <a href="{{ url_for('teacher_dashboard') }}" class="btn btn-outline-secondary">
+          ← Back to Dashboard
+        </a>
+      </div>
+
+      <!-- Table -->
+      <div class="table-responsive">
+        <table class="table table-hover align-middle" id="studentsTable">
+          <thead class="table-primary">
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Student ID</th>
+              <th scope="col">Name</th>
+              <th scope="col">Email</th>
+              <th scope="col">Status</th>
+              <th scope="col">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for student in students %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ student.id }}</td>
+              <td>{{ student.name }}</td>
+              <td>{{ student.email or 'N/A' }}</td>
+              <td>
+                <span class="badge bg-success rounded-pill shadow-sm">Registered</span>
+              </td>
+              <td>
+                <a href="{{ url_for('teacher_bp.upload_marks', student_id=student.id) }}"
+                   class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                  Upload Marks
+                </a>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="6" class="text-center text-muted py-4">
+                <i class="bi bi-person-x fs-3"></i><br>
+                No registered students found for this class.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Simple JS search filter -->
+<script>
+  function filterStudents() {
+    const input = document.getElementById("searchInput");
+    const filter = input.value.toLowerCase();
+    const rows = document.querySelectorAll("#studentsTable tbody tr");
+
+    rows.forEach(row => {
+      const text = row.innerText.toLowerCase();
+      row.style.display = text.includes(filter) ? "" : "none";
+    });
+  }
+</script>
+
+<!-- Hover & Animation -->
+<style>
+  body {
+    background-color: #f8f9fc;
+  }
+  .card {
+    transition: all 0.3s ease;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  }
+  table th {
+    white-space: nowrap;
+  }
+  @media (max-width: 768px) {
+    .table thead {
+      display: none;
+    }
+    .table, .table tbody, .table tr, .table td {
+      display: block;
+      width: 100%;
+    }
+    .table tr {
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #dee2e6;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .table td {
+      text-align: right;
+      padding-left: 50%;
+      position: relative;
+    }
+    .table td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: 1rem;
+      width: 45%;
+      padding-right: 1rem;
+      font-weight: 600;
+      text-align: left;
+      color: #6c757d;
+    }
+  }
+</style>
+{% endblock %}

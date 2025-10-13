@@ -1,0 +1,71 @@
+{% extends "teacher/base.html" %}
+
+{% block title %}My Profile{% endblock %}
+{% block page_title %}Teacher Profile{% endblock %}
+
+{% block teacher_content %}
+<div class="container mt-4">
+    <div class="card shadow-lg border-0 rounded-4 p-4">
+        <div class="row align-items-center">
+            <div class="col-md-3 text-center">
+                <img src="{{ teacher.image_url or url_for('static', filename='images/default-avatar.png') }}" 
+                     class="rounded-circle shadow" width="150" height="150" alt="Teacher Avatar">
+            </div>
+            <div class="col-md-9">
+                <h3 class="text-primary">{{ teacher.name }}</h3>
+                <p><strong>Email:</strong> {{ teacher.user.email }}</p>
+                <p><strong>Designation:</strong> {{ teacher.designation or "N/A" }}</p>
+                <p><strong>Position:</strong> {{ teacher.position or "N/A" }}</p>
+                <p><strong>Qualification:</strong> {{ teacher.qualification or "N/A" }}</p>
+                <p><strong>Phone:</strong> {{ teacher.phone or "N/A" }}</p>
+                <p><strong>Address:</strong> {{ teacher.address or "N/A" }}</p>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- Profile Update Form -->
+        <h5 class="mb-3">Update Profile</h5>
+        <form method="POST" enctype="multipart/form-data" class="row g-3">
+            <div class="col-md-6">
+                <label for="name" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{ teacher.name }}" required>
+            </div>
+            <div class="col-md-6">
+                <label for="designation" class="form-label">Designation</label>
+                <input type="text" class="form-control" id="designation" name="designation" value="{{ teacher.designation }}">
+            </div>
+            <div class="col-md-6">
+                <label for="position" class="form-label">Position</label>
+                <input type="text" class="form-control" id="position" name="position" value="{{ teacher.position }}">
+            </div>
+            <div class="col-md-6">
+                <label for="qualification" class="form-label">Qualification</label>
+                <input type="text" class="form-control" id="qualification" name="qualification" value="{{ teacher.qualification }}">
+            </div>
+            <div class="col-md-6">
+                <label for="phone" class="form-label">Phone</label>
+                <input type="text" class="form-control" id="phone" name="phone" value="{{ teacher.phone }}">
+            </div>
+            <div class="col-md-6">
+                <label for="address" class="form-label">Address</label>
+                <input type="text" class="form-control" id="address" name="address" value="{{ teacher.address }}">
+            </div>
+            <div class="col-md-6">
+                <label for="image" class="form-label">Profile Picture</label>
+                <input class="form-control" type="file" id="image" name="image">
+            </div>
+
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Update Profile</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .form-control:focus {
+        box-shadow: 0 0 5px rgba(0,123,255,.5);
+    }
+</style>
+{% endblock %}

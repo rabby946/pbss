@@ -2,80 +2,191 @@
 {% block title %}Home : Palashbaria Secondary School{% endblock %}
 {% block content %}
 
-<!-- <div class="myMarquee" position="absolute" style="top: 2; left: 0; width: 100%; height: 50px; overflow: hidden;">
-  <div class="scroller">
-
-<div id="newsTicker"><p></p></div> -->
-<div class="onoffswitch3">
-    <input type="checkbox" name="onoffswitch3" class="onoffswitch3-checkbox" id="myonoffswitch3" checked>
-    <label class="onoffswitch3-label" for="myonoffswitch3">
-        <span class="onoffswitch3-inner">
-            <span class="onoffswitch3-active">
-                <marquee class="scroll-text" style="color: black;">{{text}}   <span class="glyphicon glyphicon-forward"></span>  {{text2}}</marquee>
-                <span class="onoffswitch3-switch">LATEST NEWS <span class="glyphicon glyphicon-remove"></span></span>
-            </span>
-            <span class="onoffswitch3-inactive"><span class="onoffswitch3-switch">SHOW LATEST NEWS</span></span>
-        </span>
-    </label>
-</div>
-<div class="container">
-    <div class="image-slider">
-        <div class="slider-container" id="sliderContainer">
-            <!-- Slide 1 -->
-             <div class="slide">
-                <img src="https://i.ibb.co/bgb4yL0Z/509fa54d7fc0.jpg" alt="School Building">
-                <div class="slide-caption">
-                    <h3>আমাদের বিদ্যালয় ভবন</h3>
-                    <p>পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়ের সুন্দর ও আধুনিক ভবন</p>
-                </div>
-            </div>
-            <div class="slide">
-                <img src="https://i.ibb.co/YTBNrzk6/8db5e2ff57d4.jpg" alt="School Building">
-                <div class="slide-caption">
-                    <h3>সমাবেশ</h3>
-                    <p>পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়ের সমাবেশ</p>
-                </div>
-            </div>
-            
-            <div class="slide">
-                <img src="https://i.ibb.co.com/mC0bF1tR/Screenshot-2025-08-26-00-21-32-906-com-google-android-apps-maps-2.jpg" alt="Screenshot-2025-08-26-00-21-32-906-com-google-android-apps-maps-2" border="0">
-                <div class="slide-caption">
-                    <h3>আমাদের বিদ্যালয় ভবন</h3>
-                    <p>পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়ের সুন্দর ও আধুনিক ভবন</p>
-                </div>
-            </div>
-            <div class="slide">
-                <img src="https://palashbaria-secondaryschool.web.app/assets/school3-c239234e.jpg" alt="School Building">
-                <div class="slide-caption">
-                    <h3>আমাদের সমাবেশ</h3>
-                    <p>পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়ের সমাবেশ</p>
-                </div>
-            </div>
-            <!-- Add 3 more slides with your school images -->
-        </div>
-        
-        <!-- Navigation arrows -->
-        <button class="slider-nav prev" onclick="changeSlide(-1)">❮</button>
-        <button class="slider-nav next" onclick="changeSlide(1)">❯</button>
-        
-        <!-- Progress bar -->
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
-        
-        <!-- Navigation dots -->
-        <div class="slider-dots">
-            <span class="dot active" onclick="currentSlide(1)"></span>
-            <span class="dot" onclick="currentSlide(2)"></span>
-            <span class="dot" onclick="currentSlide(3)"></span>
-            <span class="dot" onclick="currentSlide(4)"></span>
-        </div>
-    </div>
-</div> 
-<!-- <div id="box"> </div>  -->
-<!-- About Section -->
 <style>
-    /* এই স্টাইলগুলো শুধুমাত্র "আমাদের সম্পর্কে" bölüm এর জন্য কাজ করবে */
+    /* ------------------------------------------------------------------- */
+    /* 1. GLOBAL HOMEPAGE STYLES & LAYOUT */
+    /* ------------------------------------------------------------------- */
+
+    /* Ensure the main container is centered and has padding */
+    .homepage-container {
+        max-width: 1280px; /* Wider container for a modern look */
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+    
+    /* ------------------------------------------------------------------- */
+    /* 2. TOP ALERT MARQUEE (REPLACING onoffswitch3) */
+    /* ------------------------------------------------------------------- */
+    .alert-marquee-bar {
+        background-color: #f8f9fa; /* Light background to stand out */
+        border-bottom: 3px solid var(--primary-color);
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+        padding: 0.5rem 0;
+        margin-bottom: 2rem;
+    }
+    .alert-marquee-text {
+        font-weight: 500;
+        color: var(--text-dark);
+        display: flex;
+        align-items: center;
+    }
+    .alert-marquee-label {
+        background-color: var(--primary-color);
+        color: white;
+        font-weight: 600;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        margin-right: 1rem;
+        flex-shrink: 0;
+        animation: pulse-label 1.5s infinite alternate;
+    }
+    @keyframes pulse-label {
+        from { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.4); }
+        to { box-shadow: 0 0 0 8px rgba(0, 123, 255, 0); }
+    }
+    .alert-marquee-content {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* ------------------------------------------------------------------- */
+    /* 3. IMAGE SLIDER STYLES */
+    /* ------------------------------------------------------------------- */
+    .image-slider {
+        position: relative;
+        overflow: hidden;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        max-height: 500px; /* Control max height */
+        margin-bottom: 3rem;
+    }
+    .slider-container {
+        display: flex;
+        transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth easing */
+        width: 100%;
+    }
+    .slide {
+        min-width: 100%;
+        position: relative;
+    }
+    .slide img {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: cover;
+        max-height: 500px;
+        filter: brightness(0.7); /* Darken image for better caption readability */
+        transition: filter 0.5s ease;
+    }
+    .slide:hover img {
+        filter: brightness(0.8);
+    }
+    .slide-caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 1.5rem 2rem;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0));
+        color: white;
+        transition: opacity 0.3s ease;
+    }
+    .slide-caption h3 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        transform: translateY(10px);
+        opacity: 0;
+        animation: caption-in 0.8s ease-out forwards;
+        animation-delay: 0.2s;
+        font-family: var(--font-bengali);
+    }
+    .slide-caption p {
+        font-size: 1.1rem;
+        margin-top: 0.5rem;
+        transform: translateY(10px);
+        opacity: 0;
+        animation: caption-in 0.8s ease-out forwards;
+        animation-delay: 0.4s;
+        font-family: var(--font-bengali);
+    }
+    @keyframes caption-in {
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Slider Navigation */
+    .slider-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        padding: 1rem;
+        cursor: pointer;
+        z-index: 10;
+        font-size: 1.5rem;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    .slider-nav:hover {
+        background: rgba(0, 0, 0, 0.8);
+    }
+    .slider-nav.prev {
+        left: 0;
+        border-radius: 0 8px 8px 0;
+    }
+    .slider-nav.next {
+        right: 0;
+        border-radius: 8px 0 0 8px;
+    }
+    .slider-dots {
+        position: absolute;
+        bottom: 1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 0.5rem;
+        z-index: 10;
+    }
+    .dot {
+        height: 10px;
+        width: 10px;
+        background-color: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        display: inline-block;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        cursor: pointer;
+        border: 2px solid transparent;
+    }
+    .dot.active {
+        background-color: var(--primary-color);
+        transform: scale(1.2);
+        border: 2px solid white;
+    }
+
+    /* Progress Bar */
+    .progress-bar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background-color: rgba(255, 255, 255, 0.3);
+        z-index: 9;
+    }
+    .progress-fill {
+        height: 100%;
+        background-color: var(--primary-color);
+        width: 0%;
+        transition: none; /* Handled by JS */
+    }
+
+    /* ------------------------------------------------------------------- */
+    /* 4. ABOUT SECTION STYLES (Kept & Enhanced) */
+    /* ------------------------------------------------------------------- */
+
+    /* [Existing styles for 'about-school-section' remain here but are moved inside <style> tags in the main document for simplicity] */
     .about-school-section {
         font-family: 'Poppins', 'Noto Sans Bengali', sans-serif;
         background-color: #ffffff;
@@ -84,21 +195,23 @@
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
         border: 1px solid #e9ecef;
         margin: 2rem auto;
+        animation: fadeIn 1s ease-out;
     }
 
     .about-school-section .page-heading {
         font-size: 2.2rem;
-        font-weight: 600;
-        color: #1a202c;
+        font-weight: 700;
+        color: var(--primary-dark);
         text-align: center;
         margin-top: 0;
         margin-bottom: 2rem;
-        border-bottom: 2px solid #007bff;
+        border-bottom: 3px solid var(--primary-color);
         padding-bottom: 1rem;
         display: inline-block;
         left: 50%;
         position: relative;
         transform: translateX(-50%);
+        letter-spacing: 1px;
     }
 
     .about-school-content {
@@ -107,13 +220,11 @@
         font-size: 1.1rem;
         line-height: 1.8;
         text-align: justify;
-        /* প্রাথমিকভাবে লেখাটি ছোট করে দেখানোর জন্য */
-        max-height: 220px; /* এখানে লেখার প্রাথমিক উচ্চতা নির্ধারণ করা হয়েছে */
+        max-height: 220px; 
         overflow: hidden;
         transition: max-height 0.7s cubic-bezier(0.23, 1, 0.32, 1);
     }
 
-    /* লেখাটি যখন ছোট থাকবে, তখন শেষে একটি fade effect দেখানোর জন্য */
     .about-school-content::after {
         content: '';
         position: absolute;
@@ -125,12 +236,10 @@
         transition: opacity 0.5s ease;
     }
 
-    /* লেখাটি সম্পূর্ণ দেখা গেলে fade effect টি সরিয়ে ফেলার জন্য */
     .about-school-content.is-expanded::after {
         opacity: 0;
     }
 
-    /* "সম্পূর্ণ পড়ুন" বাটনটির ডিজাইন */
     .see-more-container {
         text-align: center;
         margin-top: 1.5rem;
@@ -141,7 +250,7 @@
         font-size: 1rem;
         font-weight: 500;
         color: #fff;
-        background-color: #007bff;
+        background-color: var(--primary-color);
         border: none;
         border-radius: 50px;
         padding: 12px 30px;
@@ -151,168 +260,412 @@
     }
 
     .see-more-btn:hover {
-        background-color: #0056b3;
-        transform: translateY(-3px);
-        box-shadow: 0 7px 20px rgba(0, 123, 255, 0.3);
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 7px 20px rgba(0, 123, 255, 0.4);
     }
+
+    /* ------------------------------------------------------------------- */
+    /* 5. FEATURE CARDS & QUICK LINKS */
+    /* ------------------------------------------------------------------- */
+
+    /* Section Heading Style */
+    .section-title {
+        text-align: center;
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-dark);
+        margin-bottom: 2.5rem;
+        position: relative;
+    }
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 4px;
+        background-color: var(--primary-color);
+        border-radius: 2px;
+    }
+
+    /* Feature Card Styles */
+    .feature-card {
+        background-color: #fff;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        border-top: 4px solid var(--primary-color);
+        transition: all 0.4s ease-in-out;
+        transform: translateY(0);
+    }
+    .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        border-top-color: var(--primary-dark);
+    }
+    .feature-card i {
+        font-size: 3rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        transition: color 0.3s ease;
+    }
+    .feature-card:hover i {
+        color: var(--primary-dark);
+    }
+    .feature-card h3 {
+        font-size: 1.35rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-family: var(--font-bengali);
+    }
+    .feature-card p {
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+
+    /* Quick Link Button Styles */
+    .quick-link-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        background-color: #f0f7ff;
+        color: var(--primary-dark);
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    .quick-link-btn:hover {
+        background-color: var(--primary-color);
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+    }
+    .quick-link-btn i {
+        margin-right: 0.75rem;
+        font-size: 1.25rem;
+    }
+
+    /* Utility for animations */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-delay-1 { animation-delay: 0.2s; }
+    .animate-delay-2 { animation-delay: 0.4s; }
+    .animate-delay-3 { animation-delay: 0.6s; }
+    .animate-delay-4 { animation-delay: 0.8s; }
+
 </style>
 
-<div class="container">
-    <div class="about-school-section">
-        <h1 class="page-heading">আমাদের সম্পর্কে</h1>
+<div class="homepage-container">
 
-        <div class="about-school-content" id="about-content">
+    <div class="alert-marquee-bar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center alert-marquee-text">
+            <span class="alert-marquee-label"><i class="fas fa-bullhorn ml-1"></i></span>
+            <div class="alert-marquee-content flex-grow">
+                <marquee scrollamount="5" direction="left" behavior="scroll" style="padding-left: 10px;">
+                    <span class="font-bengali mr-10">{{ text | default("সকল পরীক্ষার ফলাফল প্রকাশিত হয়েছে। ফলাফল দেখতে 'Resources > Results' অপশনটি অনুসরণ করুন।") }}</span>
+                    <span class="text-blue-600 font-bold mx-4">|||</span>
+                    <span class="font-bengali">{{ text2 | default("আগামীকাল সকল ক্লাস যথাসময়ে শুরু হবে। শিক্ষার্থীদের উপস্থিতি নিশ্চিত করুন।") }}</span>
+                </marquee>
+            </div>
+        </div>
+    </div>
+    
+    <div class="image-slider">
+        <div class="slider-container" id="sliderContainer">
+            <div class="slide">
+                <img src="https://i.ibb.co/bgb4yL0Z/509fa54d7fc0.jpg" alt="School Building 1">
+                <div class="slide-caption">
+                    <h3 style="animation-delay: 0.2s;">আমাদের আধুনিক বিদ্যালয় ভবন</h3>
+                    <p style="animation-delay: 0.4s;">পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়ের মনোরম পরিবেশ</p>
+                </div>
+            </div>
+            <div class="slide">
+                <img src="https://i.ibb.co/YTBNrzk6/8db5e2ff57d4.jpg" alt="School Assembly">
+                <div class="slide-caption">
+                    <h3 style="animation-delay: 0.2s;">দৈনিক সমাবেশ ও নৈতিক শিক্ষা</h3>
+                    <p style="animation-delay: 0.4s;">শৃঙ্খলা ও মূল্যবোধের পরিচায়ক আমাদের শিক্ষার্থীরা</p>
+                </div>
+            </div>
+            <div class="slide">
+                <img src="https://palashbaria-secondaryschool.web.app/assets/school3-c239234e.jpg" alt="Classroom Activity">
+                <div class="slide-caption">
+                    <h3 style="animation-delay: 0.2s;">শ্রেণীকক্ষের দৃশ্য</h3>
+                    <p style="animation-delay: 0.4s;">গুণগত মানসম্পন্ন পাঠদানের নিশ্চয়তা</p>
+                </div>
+            </div>
+            <div class="slide">
+                 <img src="https://i.ibb.co.com/mC0bF1tR/Screenshot-2025-08-26-00-21-32-906-com-google-android-apps-maps-2.jpg" alt="School Gate">
+                <div class="slide-caption">
+                    <h3 style="animation-delay: 0.2s;">শিক্ষা প্রাঙ্গণে স্বাগতম</h3>
+                    <p style="animation-delay: 0.4s;">জ্ঞানার্জনের পথে আমাদের যাত্রা শুরু</p>
+                </div>
+            </div>
+        </div>
+        
+        <button class="slider-nav prev" onclick="changeSlide(-1)">❮</button>
+        <button class="slider-nav next" onclick="changeSlide(1)">❯</button>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div class="slider-dots">
+            <span class="dot active" onclick="currentSlide(1)"></span>
+            <span class="dot" onclick="currentSlide(2)"></span>
+            <span class="dot" onclick="currentSlide(3)"></span>
+            <span class="dot" onclick="currentSlide(4)"></span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+
+        <div class="lg:col-span-2 space-y-8">
+            <h2 class="section-title">কেন আমাদের নির্বাচন করবেন?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <div class="feature-card animate-delay-1" style="animation: fadeIn 1s ease-out forwards;">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h3 class="font-bengali">শ্রেষ্ঠত্বের ঐতিহ্য</h3>
+                    <p class="font-bengali">২০১৬ সাল থেকে জাতীয় শিক্ষা সপ্তাহে মাগুরা জেলা পর্যায়ে শ্রেষ্ঠ শিক্ষাপ্রতিষ্ঠান হিসেবে নির্বাচিত। আমরা মানসম্মত শিক্ষায় প্রতিশ্রুতিবদ্ধ।</p>
+                </div>
+
+                <div class="feature-card animate-delay-2" style="animation: fadeIn 1s ease-out forwards;">
+                    <i class="fas fa-medal"></i>
+                    <h3 class="font-bengali">সফলতার ধারাবাহিকতা</h3>
+                    <p class="font-bengali">টানা পাঁচ বছর পাবলিক পরীক্ষায় পাশের হারে উপজেলায় শীর্ষস্থানে। আমাদের শিক্ষক ও শিক্ষার্থীদের সম্মিলিত প্রচেষ্টা এর মূল কারণ।</p>
+                </div>
+                
+                <div class="feature-card animate-delay-3" style="animation: fadeIn 1s ease-out forwards;">
+                    <i class="fas fa-book-open"></i>
+                    <h3 class="font-bengali">আধুনিক শিক্ষা শাখা</h3>
+                    <p class="font-bengali">ভোকেশনাল, ব্যবসা, কৃষি এবং কম্পিউটার শাখা সহ বহুমুখী শিক্ষার সুযোগ, যা শিক্ষার্থীদের ভবিষ্যতের জন্য প্রস্তুত করে।</p>
+                </div>
+
+                <div class="feature-card animate-delay-4" style="animation: fadeIn 1s ease-out forwards;">
+                    <i class="fas fa-users"></i>
+                    <h3 class="font-bengali">শিক্ষক ও নেতৃত্ব</h3>
+                    <p class="font-bengali">একাধিকবার শ্রেষ্ঠ প্রতিষ্ঠান প্রধান ও শিক্ষক হিসেবে পুরস্কৃত নেতৃত্ব দ্বারা পরিচালিত, যেখানে প্রতিটি শিক্ষকই প্রতিভাবান।</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-1 space-y-6">
+             <h2 class="section-title">জরুরী তথ্য ও লিঙ্ক</h2>
+
+            <div class="space-y-4">
+                <a href="{{ url_for('public.results') }}" class="quick-link-btn font-bengali">
+                    <i class="fas fa-check-circle"></i> পরীক্ষার ফলাফল দেখুন
+                </a>
+                <a href="{{ url_for('public.routine') }}" class="quick-link-btn font-bengali">
+                    <i class="fas fa-calendar-alt"></i> ক্লাসের রুটিন ডাউনলোড করুন
+                </a>
+                <a href="{{ url_for('public.teachers') }}" class="quick-link-btn font-bengali">
+                    <i class="fas fa-chalkboard-teacher"></i> সকল শিক্ষক পরিচিতি
+                </a>
+                <a href="{{ url_for('public.contact') }}" class="quick-link-btn font-bengali">
+                    <i class="fas fa-phone-alt"></i> যোগাযোগ করুন
+                </a>
+            </div>
+
+            <div class="p-6 bg-white rounded-xl shadow-lg border-l-4 border-red-500">
+                <h3 class="text-xl font-bold text-red-600 mb-3"><i class="fas fa-exclamation-triangle mr-2"></i> নোটিশ বোর্ড</h3>
+                <ul class="space-y-2 text-gray-700 text-sm">
+                    
+                    {%for item in notice %}
+                    
+                    <li class="font-bengali">{{item.index }} {{ item.title | default("সকল পরীক্ষার ফলাফল প্রকাশিত হয়েছে।") }}</li>
+                    {%endfor%}
+                </ul>
+                <a href="{{ url_for('public.news') }}" class="text-blue-600 hover:text-blue-800 text-sm mt-3 inline-block font-semibold">আরো দেখুন <i class="fas fa-arrow-right ml-1"></i></a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="about-school-section">
+        <h1 class="page-heading font-bengali">আমাদের সম্পর্কে</h1>
+
+        <div class="about-school-content font-bengali" id="about-content">
             <p>
-                মহম্মদপুর উপজেলার প্রত্যন্ত অঞ্চল পলাশবাড়ীয়া। এই পলাশ বাড়িয়া ইউনিয়নেই পাকিস্তান আমলের মিনিস্টার এম এ খালেক এবং মাগুরা-২ আসনে পরপর পাঁচবার নির্বাচিত সংসদ সদস্য বীর মুক্তিযোদ্ধা এ্যাড. আছাদুজ্জামানসহ অনেক খ্যাতিমান মানুষের জন্ম। তেমনি একজন খ্যাতিমান ব্যক্তি বীর মুক্তিযোদ্ধা আব্দুল কাইয়ুম মিয়া।তিনি জেলা আওয়ামী লীগের ভারপ্রাপ্ত সভাপতি হিসেবে দায়িত্ব পালনকালে ১৯৬৬ সালে পলাশ বাড়িয়া মাধ্যমিক বিদ্যালয়টি প্রতিষ্ঠিত করেন।সরেজমিনে বিদ্যালয়ে গিয়ে দেখা যায়, বিদ্যালয়ে রয়েছে প্রায় ৭শ শিক্ষার্থী। শিক্ষার্থীদের উদ্দেশ্যে এবং লেখাপড়ার মান উন্নয়নের লক্ষ্যে ভোকেশনাল শাখা, ব্যবসা শাখা, কৃষি বিষয়ক শিক্ষা ও কম্পিউটার শাখা খোলা হয়েছে। এছাড়াও রয়েছে- বঙ্গবন্ধু কর্ণার, সততা স্টোর, শহিদ মিনার, স্কাউট ও গার্লস গাইড। এর সবই সম্ভব হয়েছে প্রধান শিক্ষক ফরিদ আহম্মদ এর কারণে। জানা যায়- স্কুলটিতে সকল ধরণের জাতীয় দিবস পালনসহ জাতীয় প্রোগ্রামে অংশগ্রহন করে থাকে বিদ্যালয়টি। প্রতিষ্ঠান সুত্রে জানা যায়, বীর মুক্তিযোদ্ধা আব্দুল কাইয়ুম মিয়া এলাকার সাধারণ মানুষের কথা ভেবে এবং এলাকায় শিক্ষা বিস্তারের লক্ষ্য নিয়ে পলাশবাড়ীয়া বাজারের পাশে ১৯৬৬ সালে গড়ে তোলেন একটি শিক্ষাপ্রতিষ্ঠান। যার নাম দেয়া হয় পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়। এবং তিনিই প্রতিষ্ঠাতা প্রধান শিক্ষক হিসেবে বিদ্যালয়ের হাল ধরেন। দীর্ঘদিন তিনি এই দায়িত্ব পালন করেন। ১৯৬৬ সাল থেকে এ পর্যন্ত বিদ্যালয়টি এলাকায় শিক্ষা ক্ষেত্রে গুরত্বপূর্ন ভূমিকা পালন করে আসছে। এই বিদ্যালয়ের অনেক শিক্ষার্থী দেশের বিভিন্ন পর্যায়ের কর্মক্ষেত্রে নেতৃত্ব দিয়ে আসছেন। এই প্রতিষ্ঠান হতে সৃষ্টি হয়েছে অনেক প্রতিযশা- চিকিৎসক, প্রকৌশলী, প্রশাসক, রাজনীতিবীদ, আইনজীবি, ব্যবসায়ী- যারা দেশ-বিদেশে স্ব-মহিমায় সমুজ্জ্বল ছিলেন এবং বর্তমানে আছেন। পরপর পাঁচ থেকে সাত বছর ধরে পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়টি সকল পাবলিক পরীক্ষায় অংশগ্রহন করে পাশের শতকরা হারে উপজেলায় শীর্ষস্থানে রয়েছে। শিক্ষার মান উন্নয়নে শীর্ষস্থানে আশার মূলে রয়েছে বর্তমান প্রধান শিক্ষক মোঃ ফরিদ আহম্মদ। প্রধান শিক্ষক হিসেবে পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়ে ফরিদ আহম্মদ যোগদান করেন ২০১২ সালে। এরপর থেকে স্কুলটির লেখাপড়ার মান উন্নয়ন শুরু হয়। ২০১৬ সালে স্কুলটি জাতীয় শিক্ষা সপ্তাহে মাগুরা জেলা পর্যায়ে শ্রেষ্ঠ শিক্ষাপ্রতিষ্ঠান হিসেবে নির্বাচিত হয়। পরে মহম্মদপুর উপজেলা পর্যায়ে পরপর তিন বছর শ্রেষ্ঠ শিক্ষাপ্রতিষ্ঠান হিসেবে নির্বাচিত হয়েছে। প্রধান শিক্ষক ফরিদ আহম্মদ নিজেও একাধিকবার জেলা ও উপজেলা পর্যায়ে শ্রেষ্ঠ প্রতিষ্ঠান প্রধান হিসেবে নির্বাচিত হয়েছেন এবং শিক্ষা ক্ষেত্রে বিশেষ অবদান রাখায় দেশের বিভিন্ন সংগঠন থেকে সম্মাননা স্মারক ও সনদপত্র পেয়েছেন। এরপর ২০১৯ সালে সহকারী প্রধান শিক্ষক হিসেবে যোগদান করেন আরেক প্রতিভাবান শিক্ষককবি মোঃ শহিদুজ্জামান। কবি শহিদুজ্জামান শিক্ষা সপ্তাহ ২০২১ ও ২০২২শে শ্রেষ্ঠ শ্রেনি শিক্ষক নির্বাচিত হয়েছেন। প্রধান ও সহকারী প্রধান শিক্ষকসহ সকল শিক্ষকমন্ডলির প্রচেষ্টায় পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়টি শীর্ষস্থানে রয়েছে। প্রধান শিক্ষক মোঃ ফরিদ আহম্মদ জানান, সকল শিক্ষক, কর্মচারী ও এলাকার সর্বস্তরের মানুষের সহযোগিতায় পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়টি শীর্ষস্থানে রয়েছে। এই সাফল্য ধরে রাখা এবং গতিশীল রাখার জন্য আমরা বদ্ধপরিকর।
+                মহম্মদপুর উপজেলার প্রত্যন্ত অঞ্চল পলাশবাড়ীয়া। এই পলাশ বাড়িয়া ইউনিয়নেই পাকিস্তান আমলের মিনিস্টার এম এ খালেক এবং মাগুরা-২ আসনে পরপর পাঁচবার নির্বাচিত সংসদ সদস্য বীর মুক্তিযোদ্ধা এ্যাড. আছাদুজ্জামানসহ অনেক খ্যাতিমান মানুষের জন্ম। তেমনি একজন খ্যাতিমান ব্যক্তি বীর মুক্তিযোদ্ধা আব্দুল কাইয়ুম মিয়া।তিনি জেলা আওয়ামী লীগের ভারপ্রাপ্ত সভাপতি হিসেবে দায়িত্ব পালনকালে ১৯৬৬ সালে সালে পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়টি প্রতিষ্ঠিত করেন।সরেজমিনে বিদ্যালয়ে গিয়ে দেখা যায়, বিদ্যালয়ে রয়েছে প্রায় ৭শ শিক্ষার্থী। শিক্ষার্থীদের উদ্দেশ্যে এবং লেখাপড়ার মান উন্নয়নের লক্ষ্যে ভোকেশনাল শাখা, ব্যবসা শাখা, কৃষি বিষয়ক শিক্ষা ও কম্পিউটার শাখা খোলা হয়েছে। এছাড়াও রয়েছে- বঙ্গবন্ধু কর্ণার, সততা স্টোর, শহিদ মিনার, স্কাউট ও গার্লস গাইড। এর সবই সম্ভব হয়েছে প্রধান শিক্ষক ফরিদ আহম্মদ এর কারণে। জানা যায়- স্কুলটিতে সকল ধরণের জাতীয় দিবস পালনসহ জাতীয় প্রোগ্রামে অংশগ্রহন করে থাকে বিদ্যালয়টি। প্রতিষ্ঠান সুত্রে জানা যায়, বীর মুক্তিযোদ্ধা আব্দুল কাইয়ুম মিয়া এলাকার সাধারণ মানুষের কথা ভেবে এবং এলাকায় শিক্ষা বিস্তারের লক্ষ্য নিয়ে পলাশবাড়ীয়া বাজারের পাশে ১৯৬৬ সালে গড়ে তোলেন একটি শিক্ষাপ্রতিষ্ঠান। যার নাম দেয়া হয় পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়। এবং তিনিই প্রতিষ্ঠাতা প্রধান শিক্ষক হিসেবে বিদ্যালয়ের হাল ধরেন। দীর্ঘদিন তিনি এই দায়িত্ব পালন করেন। ১৯৬৬ সাল থেকে এ পর্যন্ত বিদ্যালয়টি এলাকায় শিক্ষা ক্ষেত্রে গুরত্বপূর্ন ভূমিকা পালন করে আসছে। এই বিদ্যালয়ের অনেক শিক্ষার্থী দেশের বিভিন্ন পর্যায়ের কর্মক্ষেত্রে নেতৃত্ব দিয়ে আসছেন। এই প্রতিষ্ঠান হতে সৃষ্টি হয়েছে অনেক প্রতিযশা- চিকিৎসক, প্রকৌশলী, প্রশাসক, রাজনীতিবীদ, আইনজীবি, ব্যবসায়ী- যারা দেশ-বিদেশে স্ব-মহিমায় সমুজ্জ্বল ছিলেন এবং বর্তমানে আছেন। পরপর পাঁচ থেকে সাত বছর ধরে পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়টি সকল পাবলিক পরীক্ষায় অংশগ্রহন করে পাশের শতকরা হারে উপজেলায় শীর্ষস্থানে রয়েছে। শিক্ষার মান উন্নয়নে শীর্ষস্থানে আশার মূলে রয়েছে বর্তমান প্রধান শিক্ষক মোঃ ফরিদ আহম্মদ। প্রধান শিক্ষক হিসেবে পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়ে ফরিদ আহম্মদ যোগদান করেন ২০১২ সালে। এরপর থেকে স্কুলটির লেখাপড়ার মান উন্নয়ন শুরু হয়। ২০১৬ সালে স্কুলটি জাতীয় শিক্ষা সপ্তাহে মাগুরা জেলা পর্যায়ে শ্রেষ্ঠ শিক্ষাপ্রতিষ্ঠান হিসেবে নির্বাচিত হয়। পরে মহম্মদপুর উপজেলা পর্যায়ে পরপর তিন বছর শ্রেষ্ঠ শিক্ষাপ্রতিষ্ঠান হিসেবে নির্বাচিত হয়েছে। প্রধান শিক্ষক ফরিদ আহম্মদ নিজেও একাধিকবার জেলা ও উপজেলা পর্যায়ে শ্রেষ্ঠ প্রতিষ্ঠান প্রধান হিসেবে নির্বাচিত হয়েছেন এবং শিক্ষা ক্ষেত্রে বিশেষ অবদান রাখায় দেশের বিভিন্ন সংগঠন থেকে সম্মাননা স্মারক ও সনদপত্র পেয়েছেন। এরপর ২০১৯ সালে সহকারী প্রধান শিক্ষক হিসেবে যোগদান করেন আরেক প্রতিভাবান শিক্ষককবি মোঃ শহিদুজ্জামান। কবি শহিদুজ্জামান শিক্ষা সপ্তাহ ২০২১ ও ২০২২শে শ্রেষ্ঠ শ্রেনি শিক্ষক নির্বাচিত হয়েছেন। প্রধান ও সহকারী প্রধান শিক্ষকসহ সকল শিক্ষকমন্ডলির প্রচেষ্টায় পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়টি শীর্ষস্থানে রয়েছে। প্রধান শিক্ষক মোঃ ফরিদ আহম্মদ জানান, সকল শিক্ষক, কর্মচারী ও এলাকার সর্বস্তরের মানুষের সহযোগিতায় পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়টি শীর্ষস্থানে রয়েছে। এই সাফল্য ধরে রাখা এবং গতিশীল রাখার জন্য আমরা বদ্ধপরিকর।
             </p>
         </div>
 
         <div class="see-more-container">
-            <button class="see-more-btn" id="see-more-toggle-btn">সম্পূর্ণ পড়ুন</button>
+            <button class="see-more-btn font-bengali" id="see-more-toggle-btn">সম্পূর্ণ পড়ুন</button>
         </div>
     </div>
 </div>
 
 <script>
+    // --- 1. About Section Toggle Logic (Enhanced) ---
     document.addEventListener('DOMContentLoaded', () => {
         const content = document.getElementById('about-content');
         const toggleBtn = document.getElementById('see-more-toggle-btn');
+        const initialMaxHeight = 220; // Must match CSS
 
         if (content && toggleBtn) {
+            // Check if content is actually taller than initialMaxHeight, if not, hide the button
+            if (content.scrollHeight <= initialMaxHeight) {
+                toggleBtn.style.display = 'none';
+                content.style.maxHeight = 'none';
+                content.classList.add('is-expanded');
+                return; // Exit if button isn't needed
+            }
+
             toggleBtn.addEventListener('click', () => {
                 const isExpanded = content.classList.toggle('is-expanded');
 
                 if (isExpanded) {
-                    // লেখাটি যখন সম্পূর্ণ দেখা যাবে
-                    content.style.maxHeight = content.scrollHeight + 'px'; // সম্পূর্ণ উচ্চতা সেট করা
+                    content.style.maxHeight = content.scrollHeight + 'px';
                     toggleBtn.textContent = 'সংক্ষিপ্ত করুন';
+                    // Scroll to the top of the 'About' section when expanded on mobile
+                    if (window.innerWidth < 768) {
+                        content.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
                 } else {
-                    // লেখাটি যখন সংক্ষিপ্ত করা হবে
-                    content.style.maxHeight = '220px'; // প্রাথমিক উচ্চতায় ফিরে আসা
-                    toggleBtn.textContent = 'সম্পূর্ণ পড়ুন';
+                    content.style.maxHeight = initialMaxHeight + 'px';
+                    toggleBtn.textContent = 'সম্পূর্ণ পড়ুন';
                 }
             });
         }
     });
-</script>
 
-<script>
-        // Image Slider JavaScript
-        let currentSlideIndex = 0;
-        let slideInterval;
-        let progressInterval;
-        const slides = document.querySelectorAll('.slide');
-        const dots = document.querySelectorAll('.dot');
-        const sliderContainer = document.getElementById('sliderContainer');
-        const progressFill = document.getElementById('progressFill');
-        const totalSlides = slides.length;
-        const slideTime = 5000; // 5 seconds
+    // --- 2. Image Slider JavaScript (Refined) ---
+    let currentSlideIndex = 0;
+    let slideInterval;
+    let progressInterval;
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot');
+    const sliderContainer = document.getElementById('sliderContainer');
+    const progressFill = document.getElementById('progressFill');
+    const totalSlides = slides.length;
+    const slideTime = 6000; // Increased to 6 seconds for a more relaxed, professional pace
 
-        function showSlide(index) {
-            // Update slide position
-            sliderContainer.style.transform = `translateX(-${index * 100}%)`;
-            
-            // Update active dot
-            dots.forEach(dot => dot.classList.remove('active'));
+    function showSlide(index) {
+        // Wrap index around to handle next/prev logic easily
+        index = (index + totalSlides) % totalSlides;
+        
+        // Apply transform
+        sliderContainer.style.transform = `translateX(-${index * 100}%)`;
+        
+        // Update active dot
+        dots.forEach(dot => dot.classList.remove('active'));
+        if (dots[index]) {
             dots[index].classList.add('active');
-            
-            currentSlideIndex = index;
         }
+        
+        // Reset and animate caption (by re-applying the animation class)
+        document.querySelectorAll('.slide-caption h3, .slide-caption p').forEach(el => {
+            el.style.animation = 'none';
+            el.offsetHeight; /* Trigger reflow to restart animation */
+            el.style.animation = '';
+        });
 
-        function nextSlide() {
-            currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
-            showSlide(currentSlideIndex);
-        }
+        currentSlideIndex = index;
+    }
 
-        function changeSlide(direction) {
-            clearInterval(slideInterval);
-            clearInterval(progressInterval);
-            
-            if (direction === 1) {
+    function nextSlide() {
+        showSlide(currentSlideIndex + 1);
+    }
+
+    function changeSlide(direction) {
+        // Clear all timers on manual change
+        clearInterval(slideInterval);
+        clearInterval(progressInterval);
+        
+        showSlide(currentSlideIndex + direction);
+        
+        // Restart the timer after a slight delay
+        setTimeout(startSlideshow, 500); 
+    }
+
+    function currentSlide(index) {
+        clearInterval(slideInterval);
+        clearInterval(progressInterval);
+        showSlide(index - 1);
+        setTimeout(startSlideshow, 500); 
+    }
+
+    function updateProgressBar() {
+        // We use CSS animation for the progress fill for better performance
+        // Resetting the progress fill with a quick transition
+        progressFill.style.transition = 'width 0.1s ease-out';
+        progressFill.style.width = '0%';
+        
+        setTimeout(() => {
+            // Apply the long transition immediately after the reset
+            progressFill.style.transition = `width ${slideTime / 1000}s linear`;
+            progressFill.style.width = '100%';
+        }, 100); 
+    }
+
+    function startSlideshow() {
+        // Stop any running intervals
+        clearInterval(slideInterval);
+        clearInterval(progressInterval);
+
+        updateProgressBar();
+        
+        // Start auto slide
+        slideInterval = setInterval(() => {
+            nextSlide();
+            updateProgressBar();
+        }, slideTime);
+    }
+
+    // Pause slideshow on hover (Desktop)
+    const slider = document.querySelector('.image-slider');
+    slider.addEventListener('mouseenter', () => {
+        clearInterval(slideInterval);
+        clearInterval(progressInterval);
+        progressFill.style.transition = 'none';
+    });
+
+    slider.addEventListener('mouseleave', () => {
+        startSlideshow();
+    });
+
+    // Touch support for mobile (Keep original logic, it works well)
+    let startX = 0;
+    let endX = 0;
+
+    slider.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        clearInterval(slideInterval);
+        clearInterval(progressInterval);
+    });
+
+    slider.addEventListener('touchmove', (e) => {
+        endX = e.touches[0].clientX;
+    });
+
+    slider.addEventListener('touchend', () => {
+        const threshold = 50;
+        const distance = startX - endX;
+        
+        if (Math.abs(distance) > threshold) {
+            if (distance > 0) {
+                // Swipe left - next slide
                 nextSlide();
             } else {
-                currentSlideIndex = (currentSlideIndex - 1 + totalSlides) % totalSlides;
-                showSlide(currentSlideIndex);
+                // Swipe right - previous slide
+                showSlide(currentSlideIndex - 1);
             }
-            
-            startSlideshow();
         }
-
-        function currentSlide(index) {
-            clearInterval(slideInterval);
-            clearInterval(progressInterval);
-            showSlide(index - 1);
-            startSlideshow();
-        }
-
-        function updateProgressBar() {
-            let progress = 0;
-            const progressStep = 100 / (slideTime / 50); // Update every 50ms
-            
-            progressInterval = setInterval(() => {
-                progress += progressStep;
-                progressFill.style.width = progress + '%';
-                
-                if (progress >= 100) {
-                    progressFill.style.width = '0%';
-                    progress = 0;
-                }
-            }, 50);
-        }
-
-        function startSlideshow() {
-            // Reset progress bar
-            progressFill.style.width = '0%';
-            updateProgressBar();
-            
-            // Start auto slide
-            slideInterval = setInterval(nextSlide, slideTime);
-        }
-
-        // Pause slideshow on hover
-        const slider = document.querySelector('.image-slider');
-        slider.addEventListener('mouseenter', () => {
-            clearInterval(slideInterval);
-            clearInterval(progressInterval);
-        });
-
-        slider.addEventListener('mouseleave', () => {
-            startSlideshow();
-        });
-
-        // Touch support for mobile
-        let startX = 0;
-        let endX = 0;
-
-        slider.addEventListener('touchstart', (e) => {
-            startX = e.touches[0].clientX;
-            clearInterval(slideInterval);
-            clearInterval(progressInterval);
-        });
-
-        slider.addEventListener('touchmove', (e) => {
-            endX = e.touches[0].clientX;
-        });
-
-        slider.addEventListener('touchend', () => {
-            const threshold = 50; // minimum distance for swipe
-            const distance = startX - endX;
-            
-            if (Math.abs(distance) > threshold) {
-                if (distance > 0) {
-                    // Swipe left - next slide
-                    nextSlide();
-                } else {
-                    // Swipe right - previous slide
-                    currentSlideIndex = (currentSlideIndex - 1 + totalSlides) % totalSlides;
-                    showSlide(currentSlideIndex);
-                }
-            }
-            
-            startSlideshow();
-        });
-
-        // Initialize slideshow
+        
         startSlideshow();
-    </script>
+    });
+
+    // Initialize slideshow
+    showSlide(0); // Ensure the first slide is visible and caption animates
+    startSlideshow(); 
+</script>
 {% endblock %}

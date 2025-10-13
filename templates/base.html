@@ -1,765 +1,464 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
-<title>{% block title %}Palashbaria Secondary School{% endblock %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    <title>{% block title %}Palashbaria Secondary School{% endblock %}</title>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap" rel="stylesheet">
-  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />
-<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
-<style>
-  /* ==========================================================================
-   New Universal Drawer Header (Refined and Working)
-   ========================================================================== */
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-:root {
-    --pss-header-height: 80px;
-    --pss-primary-accent: #007BFF;
-    --pss-text-dark: #23292e;
-    --pss-text-light: #ffffff;
-    --pss-font-bengali: 'Noto Sans Bengali', sans-serif;
-    --pss-font-english: 'Poppins', sans-serif;
-}
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS Variables - Centralized Theme Configuration */
+        :root {
+            --header-height: 80px;
+            --primary-color: #007bff; 
+            --primary-dark: #0056b3;
+            --text-dark: #23292e;
+            --text-light: #ffffff;
+            --font-bengali: 'Noto Sans Bengali', sans-serif;
+            --font-english: 'Poppins', sans-serif;
+        }
+        .particles-bg {
+            position: fixed; /* Fixed position */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Pushes it to the very back of all content */
+            background-color: #ffffff; /* A very light, subtle background color */
+        }
+        /* General Body Styling */
+        body { 
+            font-family: var(--font-english); 
+            color: var(--text-dark);
+        }
+        body.overflow-hidden { overflow: hidden; }
+        
+        /* Utility Class for Bengali Text */
+        .font-bengali { font-family: var(--font-bengali); }
 
-body.pss-drawer-open { overflow: hidden; }
+        /* HEADER Styling */
+        .app-header {
+            height: var(--header-height);
+            z-index: 1050;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 1px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        /* DESKTOP DROPDOWN STYLES */
+        .dropdown-menu {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+            pointer-events: none;
+        }
+        .dropdown-hover:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        /* Fix for desktop navbar alignment */
+        .nav-link-item {
+            display: flex; /* Ensures text and icons are vertically centered */
+            align-items: center;
+            height: var(--header-height);
+        }
 
-.pss-nav-header {
-    height: var(--pss-header-height);
-    width: 100%;
-    position: sticky;
-    top: 0;
-    z-index: 1050; /* Needs to be higher than most elements */
-    background: linear-gradient(90deg,  rgba(238, 245, 189, 0.869)  0%, rgba(180, 228, 234, 0.476) 50%);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
+        /* NAVIGATION DRAWER Styling (Mobile Menu) */
+        .nav-menu {
+            transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            transform: translateX(100%); 
+            will-change: transform; 
+        }
+        .nav-menu.is-open {
+            transform: translateX(0); 
+        }
+        .nav-menu.is-swiping {
+            transition: none; 
+        }
+        .drawer-overlay {
+            transition: opacity 0.4s ease;
+        }
 
-.pss-nav-container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 100%;
-}
-
-.pss-nav-logo { display: flex; align-items: center; gap: 0px; text-decoration: none; }
-.pss-nav-logo:hover { text-decoration: none; }
-.pss-nav-logo__img { height: 50px; }
-.pss-nav-logo__text { font-family: var(--pss-font-bengali); font-size: 2.0rem; font-weight: 600; color: var(--pss-text-dark); }
-
-.pss-nav-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); z-index: 1999;
-    opacity: 0; visibility: hidden;
-    transition: opacity 0.2s ease, visibility 0.2s ease;
-}
-.pss-nav-overlay.is-visible { opacity: 1; visibility: visible; }
-
-.pss-nav-menu {
-    position: fixed; top: 0; right: -320px;
-    width: 320px; max-width: 40%;
-    height: 100%;
-    background: linear-gradient(90deg,rgb(232, 231, 220)  0%, rgb(210, 237, 237) 50%);
-    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.424);
-    transition: right 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-    z-index: 2000;
-    overflow-y: auto;
-}
-.pss-nav-menu.is-open { right: 0; }
-
-.pss-nav-menu__close {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    font-size: 2.5rem;
-    font-weight: 300;
-    color: #220404;
-    background: none;
-    border: none;
-    cursor: pointer;
-    line-height: 1;
-    padding: 5px;
-    transition: color 0.3s ease, transform 0.3s ease;
-}
-.pss-nav-menu__close:hover { color: #000; transform: rotate(90deg); }
-
-.pss-nav-menu__list {
-    list-style: none; margin: 0; padding: 0;
-    padding-top: 80px; /* Make space for close button */
-}
-.pss-nav-menu__link {
-    display: block; width: 100%;
-    font-family: var(--pss-font-english); font-size: 1.2rem; font-weight: 500;
-    color: var(--pss-text-dark); text-decoration: none;
-    padding: 1rem 2rem;
-    border-bottom: 1px solid #41030310;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-.pss-nav-menu__link:hover { background-color: #f1f3f5; color: var(--pss-primary-accent); text-decoration: none; }
-.pss-nav-menu__link.active { background-color: var(--pss-primary-accent); color: var(--pss-text-light); }
-
-.pss-nav-hamburger {
-    display: block; padding: 10px; cursor: pointer;
-    background-color: transparent; border: none;
-}
-.pss-nav-hamburger__bar {
-    display: block; width: 28px; height: 3px;
-    margin: 6px 0; background-color: var(--pss-text-dark);
-    border-radius: 3px;
-}
-
-
-</style>
+        /* FLASH MESSAGE STYLING */
+        .toast-notification {
+            transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast-notification.show {
+            animation: slideInRight 0.5s ease-out forwards;
+        }
+        @keyframes progress {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+        .toast-notification__progress {
+            animation: progress 4.5s linear forwards; 
+        }
+    </style>
+    {% block head_extra %}{% endblock %} 
 </head>
-<body class="main-body">
-  
-</header>
- <header class="pss-nav-header">
-        <div class="pss-nav-container">
-            <a href="{{ url_for('public.home') }}" class="pss-nav-logo">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Palashbaria School Logo" class="pss-nav-logo__img">
-                <span class="pss-nav-logo__text">পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়</span>
+<body class="min-h-screen flex flex-col">
+    
+    <div id="tsparticles" class="particles-bg"></div>
+    <header class="app-header sticky top-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex justify-between items-center">
+            <a href="{{ url_for('public.home') }}" class="flex items-center space-x-2 text-gray-900 hover:text-gray-700 transition">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="School Logo" class="h-10">
+                <span class="font-bengali text-2xl font-semibold hidden sm:inline">পলাশবাড়ীয়া মাধ্যমিক বিদ্যালয়</span>
+                <span class="font-bengali text-xl font-semibold sm:hidden">প. মা. বি.</span>
             </a>
-            <button class="pss-nav-hamburger" id="pss-unique-hamburger" aria-label="Open navigation menu">
-                <span class="pss-nav-hamburger__bar"></span>
-                <span class="pss-nav-hamburger__bar"></span>
-                <span class="pss-nav-hamburger__bar"></span>
+
+            <nav class="hidden md:block h-full">
+                <ul class="flex space-x-2 lg:space-x-6 text-base font-medium h-full">
+                    <li class="nav-link-item"><a href="{{ url_for('public.home') }}" class="hover:text-blue-600 p-2 {% if request.endpoint=='public.home' %}text-blue-600 font-bold{% endif %} transition">Home</a></li>
+                    
+                    <li class="nav-link-item"><a href="{{ url_for('public.news') }}" class="hover:text-blue-600 p-2 {% if request.endpoint=='public.news' %}text-blue-600 font-bold{% endif %} transition">News</a></li>
+                    
+                    <li class="relative dropdown-hover nav-link-item">
+                        <a href="#" onclick="return false;" class="hover:text-blue-600 p-2 flex items-center transition cursor-default">
+                            Academics <i class="fas fa-chevron-down text-xs ml-1 transition-transform group-hover:rotate-180"></i>
+                        </a>
+                        <div class="dropdown-menu absolute z-50 top-full right-0 mt-0 w-52 rounded-lg shadow-xl bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                            <div class="py-1">
+                                <a href="{{ url_for('public.teachers') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 {% if request.endpoint=='public.teachers' %}bg-blue-100 text-blue-600 font-medium{% endif %}">Teachers</a>
+                                <a href="{{ url_for('public.students') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 {% if request.endpoint=='public.students' %}bg-blue-100 text-blue-600 font-medium{% endif %}">Students</a>
+                                <a href="{{ url_for('public.committees') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 {% if request.endpoint=='public.committees' %}bg-blue-100 text-blue-600 font-medium{% endif %}">Committees</a>
+                                <a href="{{ url_for('public.mpos') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 {% if request.endpoint=='public.mpos' %}bg-blue-100 text-blue-600 font-medium{% endif %}">Accreditations</a>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="relative dropdown-hover nav-link-item">
+                        <a href="#" onclick="return false;" class="hover:text-blue-600 p-2 flex items-center transition cursor-default">
+                            Resources <i class="fas fa-chevron-down text-xs ml-1 transition-transform group-hover:rotate-180"></i>
+                        </a>
+                        <div class="dropdown-menu absolute z-50 top-full right-0 mt-0 w-48 rounded-lg shadow-xl bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                            <div class="py-1">
+                                <a href="{{ url_for('public.results') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 {% if request.endpoint=='public.results' %}bg-blue-100 text-blue-600 font-medium{% endif %}">Results</a>
+                                <a href="{{ url_for('public.routine') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 {% if request.endpoint=='public.routine' %}bg-blue-100 text-blue-600 font-medium{% endif %}">Routine</a>
+                            </div>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-link-item"><a href="{{ url_for('public.gallery') }}" class="hover:text-blue-600 p-2 {% if request.endpoint=='public.gallery' %}text-blue-600 font-bold{% endif %} transition">Gallery</a></li>
+                    <li class="nav-link-item"><a href="{{ url_for('public.contact') }}" class="hover:text-blue-600 p-2 {% if request.endpoint=='public.contact' %}text-blue-600 font-bold{% endif %} transition">Contact</a></li>
+                    <li class="nav-link-item"><a href="{{ url_for('public.login') }}" class="hover:text-blue-600 p-2 {% if request.endpoint=='public.login' %}text-blue-600 font-bold{% endif %} transition">Login</a></li>
+
+                    <li class="nav-link-item">
+                        <a href="{{ url_for('admin_bp.dashboard') }}" class="text-white bg-blue-600 px-3 py-1 rounded-lg hover:bg-blue-700 transition">Dashboard</a>
+                    </li>
+                </ul>
+            </nav>
+
+            <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100 transition" aria-label="Open menu">
+                <i class="fas fa-bars text-xl"></i>
             </button>
         </div>
     </header>
-<nav class="pss-nav-menu" id="pss-unique-nav-menu">
-        <!-- <button class="pss-nav-menu__close" id="pss-unique-close-button" aria-label="Close navigation menu">&times;</button> -->
-        <ul class="pss-nav-menu__list">
-            <li><a href="{{ url_for('public.home') }}" class="pss-nav-menu__link {% if request.endpoint=='public.home' %}active{% endif %}">Home</a></li>
-            <li><a href="{{ url_for('public.news') }}" class="pss-nav-menu__link {% if request.endpoint=='public.news' %}active{% endif %}">News</a></li>
-            <li><a href="{{ url_for('public.teachers') }}" class="pss-nav-menu__link {% if request.endpoint=='public.teachers' %}active{% endif %}">Teachers</a></li>
-            <li><a href="{{ url_for('public.committees') }}" class="pss-nav-menu__link {% if request.endpoint=='public.committees' %}active{% endif %}">Committees</a></li>
-            <li><a href="{{ url_for('public.students') }}" class="pss-nav-menu__link {% if request.endpoint=='public.students' %}active{% endif %}">Students</a></li>
-            <li><a href="{{ url_for('public.routine') }}" class="pss-nav-menu__link {% if request.endpoint=='public.routine' %}active{% endif %}">Routine</a></li>
-            <li><a href="{{ url_for('public.results') }}" class="pss-nav-menu__link {% if request.endpoint=='public.results' %}active{% endif %}">Results</a></li>
-            <li><a href="{{ url_for('public.gallery') }}" class="pss-nav-menu__link {% if request.endpoint=='public.gallery' %}active{% endif %}">Gallery</a></li>
-            <li><a href="{{ url_for('public.mpos') }}" class="pss-nav-menu__link {% if request.endpoint=='public.mpos' %}active{% endif %}">Accreditations</a></li>
-            <li><a href="{{ url_for('public.contact') }}" class="pss-nav-menu__link {% if request.endpoint=='public.contact' %}active{% endif %}">Contact</a></li>
-            <li><a href="{{ url_for('admin.dashboard') }}" class="pss-nav-menu__link {% if request.endpoint=='admin.dashboard' %}active{% endif %}">Dashboard</a></li>
-            <!-- <button class="pss-nav-menu__close" id="pss-unique-close-button" aria-label="Close navigation menu">&times;</button> -->
+    
+    <div id="drawer-overlay" class="drawer-overlay fixed inset-0 bg-black bg-opacity-50 z-40 hidden opacity-0" aria-hidden="true"></div>
+    <nav id="mobile-nav-menu" class="nav-menu fixed top-0 right-0 w-64 max-w-[80%] h-full bg-white shadow-2xl z-50 overflow-y-auto">
+        <div class="p-4 flex justify-end">
+            <button id="drawer-close-button" class="text-gray-500 hover:text-gray-900 text-3xl transition">&times;</button>
+        </div>
+        <ul class="flex flex-col p-4 space-y-1">
+            <li><a href="{{ url_for('public.home') }}" class="block p-3 rounded-lg hover:bg-blue-50 {% if request.endpoint=='public.home' %}text-blue-600 font-semibold bg-blue-100{% endif %}">Home</a></li>
+            <li><a href="{{ url_for('public.news') }}" class="block p-3 rounded-lg hover:bg-blue-50 {% if request.endpoint=='public.news' %}text-blue-600 font-semibold bg-blue-100{% endif %}">News</a></li>
+            <div class="h-px bg-gray-200 my-2"></div>
+            <li class="text-sm font-semibold text-gray-500 px-3 pt-1 pb-1"></li>
+            <li><a href="{{ url_for('public.teachers') }}" class="block p-3 rounded-lg hover:bg-blue-50 {% if request.endpoint=='public.teachers' %}text-blue-600 font-semibold bg-blue-100{% endif %}">Teachers</a></li>
+            <li><a href="{{ url_for('public.students') }}" class="block p-3 rounded-lg hover:bg-blue-50 {% if request.endpoint=='public.students' %}text-blue-600 font-semibold bg-blue-100{% endif %}">Students</a></li>
+            <li><a href="{{ url_for('public.committees') }}" class="block p-3 rounded-lg hover:bg-blue-50 {% if request.endpoint=='public.committees' %}text-blue-600 font-semibold bg-blue-100{% endif %}">Committees</a></li>
+            <li><a href="{{ url_for('public.mpos') }}" class="block p-3 rounded-lg hover:bg-blue-50 {% if request.endpoint=='public.mpos' %}text-blue-600 font-semibold bg-blue-100{% endif %}">Accreditations</a></li>
+            <div class="h-px bg-gray-200 my-2"></div>
+            <li class="text-sm font-semibold text-gray-500 px-3 pt-1 pb-1"></li>
+            <li><a href="{{ url_for('public.results') }}" class="block p-3 rounded-lg hover:bg-blue-50 {% if request.endpoint=='public.results' %}text-blue-600 font-semibold bg-blue-100{% endif %}">Results</a></li>
+            <li><a href="{{ url_for('public.routine') }}" class="block p-3 rounded-lg hover:bg-blue-50 {% if request.endpoint=='public.routine' %}text-blue-600 font-semibold bg-blue-100{% endif %}">Routine</a></li>
+            <div class="h-px bg-gray-200 my-2"></div>
+            <li><a href="{{ url_for('public.gallery') }}" class="block p-3 rounded-lg hover:bg-blue-50 {% if request.endpoint=='public.gallery' %}text-blue-600 font-semibold bg-blue-100{% endif %}">Gallery</a></li>
+            <li><a href="{{ url_for('public.contact') }}" class="block p-3 rounded-lg hover:bg-blue-50 {% if request.endpoint=='public.contact' %}text-blue-600 font-semibold bg-blue-100{% endif %}">Contact</a></li>
+            <li><a href="{{ url_for('public.login') }}" class="block p-3 rounded-lg hover:bg-blue-50 {% if request.endpoint=='public.login' %}text-blue-600 font-semibold bg-blue-100{% endif %}">Login</a></li>
+            <div class="h-px bg-gray-200 my-2"></div>
+            <li><a href="{{ url_for('admin_bp.login') }}" class="block p-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-semibold transition"> Dashboard</a></li>
         </ul>
     </nav>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% for category, msg in messages %}
-        {% set is_error = category == 'error' %}
-        <div class="toast-notification" data-is-error="{{ is_error|lower }}">
-            <div class="toast-notification__icon">
-                <i class="fas {{ 'fa-times-circle' if is_error else 'fa-check-circle' }}"></i>
-            </div>
-            <div class="toast-notification__content">
-                <p class="toast-notification__title">{{ 'Error' if is_error else 'Success' }}</p>
-                <p class="toast-notification__message">{{ msg }}</p>
-            </div>
-            <button class="toast-notification__close">&times;</button>
-            <div class="toast-notification__progress"></div>
+    <div id="toast-container" class="fixed top-[calc(var(--header-height)+10px)] right-4 z-[9999] space-y-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, msg in messages %}
+                {% set is_error = category != 'success' %}
+                <div class="toast-notification p-4 rounded-xl shadow-lg flex items-start w-full max-w-xs transition-transform transform translate-x-full opacity-0"
+                     data-is-error="{{ is_error|lower }}" 
+                     data-timeout="5000"
+                     data-message="{{ msg }}"
+                     data-title="{{ 'Error' if is_error else 'Success' }}"
+                     data-icon="{{ 'fa-circle-xmark' if is_error else 'fa-circle-check' }}">
+                </div>
+            {% endfor %}
+        {% endwith %}
+    </div>
+
+    <main class="flex-grow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {% block content %}{% endblock %}
         </div>
-    {% endfor %}
-{% endwith %}
+    </main>
 
-<style>
-    /* New styles for the Toast Notification */
-    .toast-notification {
-        position: fixed;
-        top: 60px;
-        right: 20px;
-        max-width: 350px;
-        width: 90%;
-        background-color: #fff;
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-        display: flex;
-        align-items: flex-start;
-        padding: 1rem;
-        z-index: 9999;
-        font-family: 'Poppins', sans-serif;
-        border-left: 5px solid;
-        animation: toast-slide-in 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-        overflow: hidden;
-    }
-
-    .toast-notification[data-is-error="true"] {
-        border-left-color: #dc3545; /* Red for error */
-    }
-
-    .toast-notification[data-is-error="false"] {
-        border-left-color: #28a745; /* Green for success */
-    }
-
-    .toast-notification__icon {
-        font-size: 1.5rem;
-        margin-right: 1rem;
-        line-height: 1;
-    }
-    
-    .toast-notification[data-is-error="true"] .toast-notification__icon {
-        color: #dc3545;
-    }
-
-    .toast-notification[data-is-error="false"] .toast-notification__icon {
-        color: #28a745;
-    }
-
-    .toast-notification__content {
-        flex-grow: 1;
-    }
-    .toast-notification__title {
-        font-size: 1rem;
-        font-weight: 600;
-        margin: 0 0 0.25rem 0;
-        color: #212529;
-    }
-    .toast-notification__message {
-        font-size: 0.9rem;
-        color: #6c757d;
-        margin: 0;
-    }
-
-    .toast-notification__close {
-        background: none;
-        border: none;
-        color: #adb5bd;
-        font-size: 1.5rem;
-        font-weight: 300;
-        cursor: pointer;
-        padding: 0 0 0 1rem;
-        line-height: 1;
-        opacity: 0.7;
-        transition: opacity 0.3s ease;
-    }
-    .toast-notification__close:hover {
-        opacity: 1;
-    }
-
-    .toast-notification__progress {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        height: 4px;
-        width: 100%;
-        animation: toast-progress 5s linear forwards;
-    }
-
-    .toast-notification[data-is-error="true"] .toast-notification__progress {
-        background-color: #dc3545;
-    }
-
-    .toast-notification[data-is-error="false"] .toast-notification__progress {
-        background-color: #28a745;
-    }
-    
-    @keyframes toast-slide-in {
-        from { transform: translateX(110%); }
-        to { transform: translateX(0); }
-    }
-    
-    @keyframes toast-slide-out {
-        from { transform: translateX(0); }
-        to { transform: translateX(110%); }
-    }
-    
-    @keyframes toast-progress {
-        from { width: 100%; }
-        to { width: 0%; }
-    }
-</style>
-
-
-<style>
-    @keyframes flash-fade-in {
-        from { opacity: 0; transform: translateY(-20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes flash-fade-out {
-        from { opacity: 1; transform: translateY(0); }
-        to { opacity: 0; transform: translateY(-20px); }
-    }
-</style>
-
-
-    {% block content %}{% endblock %}
-</main>
-
-<style>
-    @keyframes flash-fade-in {
-        from { opacity: 0; transform: translateY(-20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes flash-fade-out {
-        from { opacity: 1; transform: translateY(0); }
-        to { opacity: 0; transform: translateY(-20px); }
-    }
-</style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const flashMessages = document.querySelectorAll('.flash-message-container');
-        
-        flashMessages.forEach(message => {
-            setTimeout(() => {
-                if (message) {
-                    message.remove();
-                }
-            }, 5000);
-        });
-    });
-</script>
-
-
-<script>
-  function toggleDrawer() {
-    const nav = document.getElementById('nav-drawer');
-    nav.classList.toggle('open');
-  }
-</script>
-<script src="{{ url_for('static', filename='script.js') }}"></script>
-
-
-<!-- <div id="chatbot-icon">
-  
-
-</div> -->
-
-<div id="chat-popup">
-  <div id="chat-header">
-    <span>Palashbaria School AI Assistant</span>
-    <button id="chat-close">×</button>
-  </div>
-  <div id="chat-messages">
-    <div class="message bot">
-      <div class="message-content">
-        Hello! I'm here to help you learn about Palashbaria Secondary School. Ask me anything about the school's history, facilities, staff, or programs!
-      </div>
-    </div>
-  </div>
-  <div class="typing-indicator" id="typing-indicator">AI is typing...</div>
-  <div id="chat-input-area">
-    <input type="text" id="chat-input" placeholder="Ask me about the school..." />
-    <button id="send-btn">Send</button>
-  </div>
-</div>
-<footer class="site-footer">
-  <div class="footer-container">
-    <div class="footer-col">
-      <h4>About</h4>
-      <p>Palashbaria Secondary School is committed to academic excellence and character building.</p>
-    </div>
-    <div class="footer-col">
-      <h4>Contact</h4>
-      <p>Email: s118044@gmail.com<br>Phone: 01714850660</p>
-    </div>
-    <div class="footer-col">
-      <h4>Follow Us</h4>
-      <p><a href="https://www.facebook.com" target="_blank">Facebook</a><br><a href="https://twitter.com">Twitter</a><br><a href="https://instagram.com">Instagram</a></p>
-    </div>
-  </div>
-</footer>
-
-<script>
-  const chatIcon = document.getElementById('chatbot-icon');
-  const chatPopup = document.getElementById('chat-popup');
-  const chatClose = document.getElementById('chat-close');
-  const sendBtn = document.getElementById('send-btn');
-  const chatInput = document.getElementById('chat-input');
-  const chatMessages = document.getElementById('chat-messages');
-  const typingIndicator = document.getElementById('typing-indicator');
-
-  // Toggle chat popup
-  chatIcon.addEventListener('click', () => {
-    chatPopup.style.display = chatPopup.style.display === 'flex' ? 'none' : 'flex';
-    if (chatPopup.style.display === 'flex') {
-      chatInput.focus();
-    }
-  });
-
-  // Close chat popup
-  chatClose.addEventListener('click', () => {
-    chatPopup.style.display = 'none';
-  });
-
-  // Send message on button click
-  sendBtn.addEventListener('click', sendMessage);
-
-  // Send message on Enter key press
-  chatInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  });
-
-  async function sendMessage() {
-    const userMsg = chatInput.value.trim();
-    if (!userMsg || sendBtn.disabled) return;
-
-    // Add user message
-    addMessage('user', userMsg);
-    chatInput.value = '';
-    
-    // Disable input while processing
-    sendBtn.disabled = true;
-    sendBtn.textContent = 'Sending...';
-    chatInput.disabled = true;
-    
-    // Show typing indicator
-    typingIndicator.style.display = 'block';
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-
-    try {
-      const res = await fetch('/ai-chat', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ message: userMsg }),
-      });
-
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-
-      const data = await res.json();
-      
-      // Hide typing indicator
-      typingIndicator.style.display = 'none';
-      
-      // Add AI response
-      addMessage('bot', data.answer || data.response || 'Sorry, I couldn\'t understand that.');
-      
-    } catch (err) {
-      console.error('Chat error:', err);
-      typingIndicator.style.display = 'none';
-      addMessage('bot', 'Sorry, I\'m having trouble connecting right now. Please try again later.');
-    } finally {
-      // Re-enable input
-      sendBtn.disabled = false;
-      sendBtn.textContent = 'Send';
-      chatInput.disabled = false;
-      chatInput.focus();
-    }
-  }
-
-  function addMessage(sender, message) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${sender}`;
-    
-    const messageContent = document.createElement('div');
-    messageContent.className = 'message-content';
-    messageContent.textContent = message;
-    
-    messageDiv.appendChild(messageContent);
-    chatMessages.appendChild(messageDiv);
-    
-    // Scroll to bottom
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  }
-
-  // Auto-focus input when popup opens
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-        if (chatPopup.style.display === 'flex') {
-          setTimeout(() => chatInput.focus(), 100);
-        }
-      }
-    });
-  });
-
-  observer.observe(chatPopup, {
-    attributes: true,
-    attributeFilter: ['style']
-  });
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  // --- Staggered Animation for Cards ---
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.style.animationDelay = `${entry.target.dataset.index * 0.08}s`;
-        entry.target.classList.add('in-view');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.1 });
-
-  document.querySelectorAll('.content-card').forEach((card, index) => {
-    card.dataset.index = index;
-    observer.observe(card);
-  });
-
-  // --- Live Filter for Teachers/Students ---
-  const filterInput = document.getElementById('filter-input');
-  if (filterInput) {
-    const cards = document.querySelectorAll('.person-card');
-    const noResultsMessage = document.getElementById('no-results-message');
-
-    filterInput.addEventListener('input', (e) => {
-      const searchTerm = e.target.value.toLowerCase();
-      let visibleCount = 0;
-
-      cards.forEach(card => {
-        const name = card.querySelector('h3').textContent.toLowerCase();
-        if (name.includes(searchTerm)) {
-          card.style.display = 'block';
-          visibleCount++;
-        } else {
-          card.style.display = 'none';
-        }
-      });
-      
-      noResultsMessage.style.display = visibleCount === 0 ? 'block' : 'none';
-    });
-  }
-});
-// --- Contact Page Interactivity ---
-const contactForm = document.getElementById('contact-form');
-
-if (contactForm) {
-  const formResult = document.getElementById('form-result');
-
-  // --- Copy to Clipboard ---
-  document.querySelectorAll('.copy-btn').forEach(button => {
-    button.addEventListener('click', () => {
-      const textToCopy = button.dataset.copy;
-      navigator.clipboard.writeText(textToCopy).then(() => {
-        const originalIcon = button.innerHTML;
-        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
-        setTimeout(() => {
-          button.innerHTML = originalIcon;
-        }, 2000);
-      }).catch(err => {
-        console.error('Failed to copy: ', err);
-      });
-    });
-  });
-
-  // --- Form Validation & Submission ---
-  contactForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    let isValid = true;
-    formResult.style.display = 'none';
-
-    // Simple validation
-    ['name', 'email', 'subject', 'message'].forEach(id => {
-      const field = document.getElementById(id);
-      const errorEl = document.getElementById(`${id}-error`);
-      if (!field.value.trim()) {
-        errorEl.style.display = 'block';
-        isValid = false;
-      } else {
-        errorEl.style.display = 'none';
-      }
-    });
-
-    // Email format validation
-    const emailField = document.getElementById('email');
-    const emailError = document.getElementById('email-error');
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (emailField.value.trim() && !emailRegex.test(emailField.value)) {
-      emailError.textContent = 'Please enter a valid email address.';
-      emailError.style.display = 'block';
-      isValid = false;
-    }
-
-    if (!isValid) return;
-
-    // --- AJAX Submission ---
-    const submitBtn = document.getElementById('submit-btn');
-    const originalBtnText = submitBtn.innerHTML;
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = 'Sending...';
-
-    const formData = new FormData(contactForm);
-    
-    // NOTE: You need to create a backend endpoint (e.g., in Flask) at '/submit-contact' to receive this data.
-    fetch('{{ url_for("public.contact") }}', {
-    method: 'POST',
-    body: formData,
-    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-})
-
-    .then(response => response.json())
-    .then(data => {
-      formResult.style.display = 'block';
-      if (data.success) {
-        formResult.className = 'success';
-        formResult.textContent = 'Thank you! Your message has been sent successfully.';
-        contactForm.reset();
-      } else {
-        formResult.className = 'error';
-        formResult.textContent = 'Sorry, there was an error. Please try again later.';
-      }
-    })
-    .catch(error => {
-      formResult.style.display = 'block';
-      formResult.className = 'error';
-      formResult.textContent = 'An unexpected error occurred. Please check your connection.';
-      console.error('Error:', error);
-    })
-    .finally(() => {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = originalBtnText;
-    });
-  });
-}
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // --- 1. Live Search Functionality ---
-    const searchInput = document.getElementById('committeeSearch');
-    if (searchInput) {
-        const committeeCards = document.querySelectorAll('.ts-card');
-        const noResultsMessage = document.getElementById('noResultsMessage');
-
-        searchInput.addEventListener('keyup', (event) => {
-            const searchTerm = event.target.value.toLowerCase();
-            let visibleCards = 0;
-
-            committeeCards.forEach(card => {
-                const name = card.dataset.name.toLowerCase();
-                const position = card.dataset.position.toLowerCase();
-
-                if (name.includes(searchTerm) || position.includes(searchTerm)) {
-                    card.style.display = 'block';
-                    visibleCards++;
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-            noResultsMessage.style.display = visibleCards === 0 ? 'block' : 'none';
-        });
-    }
-
-    // --- 2. Scroll Reveal Animation ---
-    const animatedCards = document.querySelectorAll('.ts-card');
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                observer.unobserve(entry.target);
-            }
-        });
-    }, {
-        threshold: 0.1 // Trigger when 10% of the card is visible
-    });
-
-    animatedCards.forEach(card => {
-        observer.observe(card);
-    });
-});
-// --- Script for the Universal Header Drawer ---
-document.addEventListener('DOMContentLoaded', () => {
-
-    const hamburgerButton = document.getElementById('pss-unique-hamburger');
-    const navMenu = document.getElementById('pss-unique-nav-menu');
-    const body = document.body;
-
-    // --- Create the page overlay element if it doesn't exist ---
-    let overlay = document.querySelector('.pss-nav-overlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.className = 'pss-nav-overlay';
-        body.appendChild(overlay);
-    }
-
-    // Function to open the menu
-    const openMenu = () => {
-        hamburgerButton.classList.add('is-active');
-        navMenu.classList.add('is-open');
-        overlay.classList.add('is-visible');
-        body.classList.add('pss-drawer-open'); // Prevents body scrolling
-    };
-
-    // Function to close the menu
-    const closeMenu = () => {
-        hamburgerButton.classList.remove('is-active');
-        navMenu.classList.remove('is-open');
-        overlay.classList.remove('is-visible');
-        body.classList.remove('pss-drawer-open');
-    };
-
-    // Event listener for the hamburger button
-    if (hamburgerButton && navMenu) {
-        hamburgerButton.addEventListener('click', () => {
-            // If menu is already open, close it. Otherwise, open it.
-            if (navMenu.classList.contains('is-open')) {
-                closeMenu();
-            } else {
-                openMenu();
-            }
-        });
-
-        // Event listener for the overlay (to close the menu when clicking outside)
-        overlay.addEventListener('click', closeMenu);
-    }
-});
-</script>
-<style>
-  /* This small style block is for the JS animation to work */
-  .content-card { opacity: 0; }
-  .content-card.in-view { opacity: 2; transform: translateY(1); }
-</style>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <footer class="bg-gray-800 text-white mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="space-y-2">
+                    <h4 class="text-xl font-semibold mb-2 text-blue-400">About Palashbaria</h4>
+                    <p class="text-gray-400 text-sm">Palashbaria Secondary School is committed to academic excellence, character building, and fostering a spirit of community service.</p>
+                </div>
+                <div class="space-y-2">
+                    <h4 class="text-xl font-semibold mb-2 text-blue-400">Contact Details</h4>
+                    <p class="text-gray-400 text-sm">
+                        <i class="fas fa-envelope mr-2"></i>Email: s118044@gmail.com<br>
+                        <i class="fas fa-phone mr-2"></i>Phone: 01714850660
+                    </p>
+                </div>
+                <div class="space-y-2">
+                    <h4 class="text-xl font-semibold mb-2 text-blue-400">Connect</h4>
+                    <div class="flex space-x-4 text-lg">
+                        <a href="https://www.facebook.com" target="_blank" class="text-gray-400 hover:text-blue-500 transition"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://twitter.com" target="_blank" class="text-gray-400 hover:text-blue-500 transition"><i class="fab fa-twitter"></i></a>
+                        <a href="https://instagram.com" target="_blank" class="text-gray-400 hover:text-blue-500 transition"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 pt-4 border-t border-gray-700 text-center text-gray-500 text-sm">
+                &copy; 2025 Palashbaria Secondary School. All rights reserved.
+            </div>
+        </div>
+    </footer>
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.toast-notification').forEach(toast => {
-        
-        // Function to dismiss the toast
-        const dismissToast = () => {
-            toast.style.animation = 'toast-slide-out 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards';
-            // Remove the element from the page after the animation completes
-            setTimeout(() => {
-                toast.remove();
-            }, 500);
-        };
+        // --- 1. Mobile Navigation Drawer Logic (with Swipe Gesture) ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuButton = document.getElementById('mobile-menu-button');
+            const navMenu = document.getElementById('mobile-nav-menu');
+            const closeButton = document.getElementById('drawer-close-button');
+            const overlay = document.getElementById('drawer-overlay');
+            const body = document.body;
 
-        // Automatically dismiss after 5 seconds
-        const autoDismissTimer = setTimeout(dismissToast, 5000);
+            let touchStartX = 0;
+            const swipeThreshold = 50; 
 
-        // Allow user to dismiss by clicking the close button
-        const closeButton = toast.querySelector('.toast-notification__close');
-        if (closeButton) {
-            closeButton.addEventListener('click', () => {
-                clearTimeout(autoDismissTimer); // Stop the automatic dismissal
-                dismissToast();
+            const openMenu = () => {
+                navMenu.classList.add('is-open');
+                overlay.classList.remove('hidden');
+                // Ensure overlay transition starts smoothly
+                setTimeout(() => overlay.classList.add('opacity-50'), 10);
+                body.classList.add('overflow-hidden');
+            };
+
+            const closeMenu = () => {
+                navMenu.classList.remove('is-open');
+                overlay.classList.remove('opacity-50');
+                body.classList.remove('overflow-hidden');
+                // Use a short delay before hiding the overlay to allow transition to finish
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    // Reset transform to default for the next open animation
+                    navMenu.style.transform = ''; 
+                }, 400); 
+            };
+
+            // Event listeners for open/close buttons
+            menuButton.addEventListener('click', openMenu);
+            closeButton.addEventListener('click', closeMenu);
+            overlay.addEventListener('click', closeMenu);
+
+            // Close on any menu item click
+            navMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', closeMenu);
             });
-        }
-    });
-});
+
+            // --- Swipe Gesture Logic ---
+            navMenu.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+                navMenu.classList.add('is-swiping');
+            });
+
+            navMenu.addEventListener('touchmove', (e) => {
+                if (!navMenu.classList.contains('is-open')) return;
+                
+                const touchCurrentX = e.touches[0].clientX;
+                const distance = touchCurrentX - touchStartX;
+                const menuWidth = navMenu.offsetWidth;
+
+                // Handle swipes to the right (closing the drawer)
+                if (distance > 0) {
+                    e.preventDefault(); 
+                    
+                    // The drawer is fully open (translateX(0)). We move it right (positive distance).
+                    const newTransform = distance; 
+                    navMenu.style.transform = `translateX(${newTransform}px)`;
+                    
+                    // Dim the overlay as the drawer slides away (0.5 max opacity -> 0 min opacity)
+                    const opacity = 0.5 - (distance / menuWidth) * 0.5;
+                    overlay.style.opacity = Math.max(0, opacity);
+                }
+            });
+
+            navMenu.addEventListener('touchend', (e) => {
+                navMenu.classList.remove('is-swiping');
+                navMenu.style.transition = ''; 
+                overlay.style.transition = ''; 
+
+                const touchEndX = e.changedTouches[0].clientX;
+                const swipeDistance = touchEndX - touchStartX;
+
+                if (swipeDistance > swipeThreshold) {
+                    // Swipe successful, close the menu
+                    closeMenu();
+                } else if (navMenu.classList.contains('is-open')) {
+                    // Swipe unsuccessful, snap back to open position
+                    navMenu.style.transform = `translateX(0)`;
+                    overlay.style.opacity = '0.5';
+                }
+            });
+        });
+
+        // --- 2. Toast Notification Logic (Flash Messages) ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const toastContainer = document.getElementById('toast-container');
+            const toasts = Array.from(toastContainer.querySelectorAll('.toast-notification'));
+
+            toasts.forEach(toast => {
+                const isError = toast.dataset.isError === 'true';
+                const timeout = parseInt(toast.dataset.timeout || '5000', 10);
+                const message = toast.dataset.message;
+                const title = toast.dataset.title;
+                const iconClass = toast.dataset.icon;
+                
+                // Set colors based on type
+                const bgColor = isError ? 'bg-red-50' : 'bg-green-50';
+                const borderColor = isError ? 'border-red-500' : 'border-green-500';
+                const iconColor = isError ? 'text-red-500' : 'text-green-500';
+                const progressColor = isError ? 'bg-red-500' : 'bg-green-500';
+                
+                // Build internal HTML structure
+                toast.classList.add(bgColor, borderColor, 'border-l-4', 'shadow-xl');
+                toast.innerHTML = `
+                    <div class="flex-shrink-0 ${iconColor} text-xl mr-3">
+                        <i class="fas ${iconClass}"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <p class="text-sm font-semibold text-gray-900">${title}</p>
+                        <p class="text-sm text-gray-600 mt-0.5">${message}</p>
+                    </div>
+                    <button class="flex-shrink-0 text-gray-400 hover:text-gray-700 ml-4 transition text-xl leading-none close-toast" aria-label="Close">&times;</button>
+                    <div class="absolute bottom-0 left-0 h-1 ${progressColor} w-full toast-notification__progress"></div>
+                `;
+
+                // Show the toast with animation
+                setTimeout(() => {
+                    toast.classList.add('show');
+                }, 50); 
+
+                // Dismiss function
+                const dismissToast = () => {
+                    toast.style.animation = 'none'; 
+                    toast.style.transform = 'translateX(110%)'; 
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 400); 
+                };
+
+                // Auto-dismiss timer
+                const autoDismissTimer = setTimeout(dismissToast, timeout);
+
+                // Close button listener
+                toast.querySelector('.close-toast').addEventListener('click', () => {
+                    clearTimeout(autoDismissTimer);
+                    dismissToast();
+                });
+            });
+        });
+        tsParticles.load({
+            id: "tsparticles",
+            options: {
+                fullScreen: {
+                    enable: false, // We use the custom .particles-bg div
+                },
+                background: {
+                    color: {
+                        value: "transparent", // Let CSS handle the background color
+                    },
+                },
+                fpsLimit: 60,
+                interactivity: {
+                    events: {
+                        onHover: {
+                            enable: true,
+                            mode: "repulse", // Particles gently move away from the cursor
+                        },
+                        resize: true,
+                    },
+                    modes: {
+                        repulse: {
+                            distance: 100,
+                            duration: 0.4,
+                        },
+                    },
+                },
+                particles: {
+                    number: {
+                        value: 50, // Subtle quantity
+                        density: {
+                            enable: true,
+                            value_area: 800,
+                        },
+                    },
+                    color: {
+                        value: "#adb5bd", // Soft, professional gray/blue color
+                    },
+                    shape: {
+                        type: "circle",
+                    },
+                    opacity: {
+                        value: 0.5,
+                        random: true,
+                    },
+                    size: {
+                        value: 3, // Small size
+                        random: true,
+                    },
+                    line_linked: {
+                        enable: true, // Lines connecting the dots
+                        distance: 150,
+                        color: "#adb5bd",
+                        opacity: 0.4,
+                        width: 1,
+                    },
+                    move: {
+                        enable: true,
+                        speed: 1, // Slow, gentle movement
+                        direction: "none",
+                        random: false,
+                        straight: false,
+                        out_mode: "out",
+                        bounce: false,
+                    },
+                },
+                detectRetina: true,
+            },
+        });
     </script>
+    {% block scripts_extra %}{% endblock %}
 </body>
 </html>

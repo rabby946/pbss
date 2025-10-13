@@ -1,0 +1,223 @@
+{% extends "teacher/base.html" %}
+
+{% block title %}Teacher Dashboard{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block head %}
+<style>
+    /* Page-specific styles for the new dashboard */
+    .welcome-card {
+        background: linear-gradient(135deg, var(--teacher-primary), #0056b3);
+        color: #fff;
+        border: none;
+    }
+    .welcome-card h3 { font-weight: 600; }
+
+    .stat-card {
+        background-color: var(--teacher-sidebar-bg);
+        border: 1px solid var(--teacher-border);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--teacher-shadow);
+    }
+    .stat-card__icon {
+        font-size: 1.5rem;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #eef5ff;
+        color: var(--teacher-primary);
+        flex-shrink: 0;
+    }
+    .stat-card__info .value {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--teacher-text-dark);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .stat-card__info .label {
+        font-size: 0.9rem;
+        color: var(--teacher-text-light);
+    }
+
+    .content-card {
+        background-color: var(--teacher-sidebar-bg);
+        border: 1px solid var(--teacher-border);
+        border-radius: 1rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        height: 100%;
+    }
+    .content-card__header {
+        font-size: 1.2rem;
+        font-weight: 600;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--teacher-border);
+    }
+
+    /* Custom Tab Styles */
+    .schedule-tabs .nav-link {
+        color: var(--teacher-text-light);
+        font-weight: 500;
+    }
+    .schedule-tabs .nav-link.active {
+        color: var(--teacher-primary);
+        border-color: var(--teacher-primary) !important;
+        font-weight: 600;
+    }
+
+    .quick-action-list a {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.85rem 1.5rem;
+        color: var(--teacher-text-dark);
+        text-decoration: none;
+        font-weight: 500;
+        border-bottom: 1px solid var(--teacher-border);
+        transition: background-color 0.2s ease;
+    }
+    .quick-action-list a:last-child { border-bottom: none; }
+    .quick-action-list a:hover { background-color: #f8fafc; }
+    .quick-action-list .icon {
+        width: 20px;
+        text-align: center;
+        color: var(--teacher-text-light);
+    }
+
+    .animate-in {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+    @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+</style>
+{% endblock %}
+
+{% block teacher_content %}
+<div class="container-fluid">
+
+    <div class="welcome-card card border-0 shadow-lg rounded-4 text-white p-4 mb-4 animate-in">
+        <div class="card-body">
+            <h3 class="mb-2">Welcome back, {{ session['teacher_name'] }} 👋</h3>
+            <p class="mb-0 opacity-75">Here's your overview for today. Let's make it a great one!</p>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4 animate-in" style="animation-delay: 0.1s;">
+            <div class="stat-card">
+                <div class="stat-card__icon"><i class="fa-solid fa-chalkboard-user"></i></div>
+                <div class="stat-card__info">
+                    <div class="value">{{ routines|length }}</div>
+                    <div class="label">Classes Today</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 animate-in" style="animation-delay: 0.2s;">
+            <div class="stat-card">
+                <div class="stat-card__icon"><i class="fa-solid fa-house-user"></i></div>
+                <div class="stat-card__info">
+                    <div class="value">{{ countclass }}</div>
+                    <div class="label">Total Assigned Classes</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 animate-in" style="animation-delay: 0.3s;">
+            <div class="stat-card">
+                <div class="stat-card__icon"><i class="fa-solid fa-users"></i></div>
+                <div class="stat-card__info">
+                    <div class="value">{{ assigned_class.name }} ({{ assigned_class.section }})</div>
+                    <div class="label">You are Class Teacher Here</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-xl-8">
+            <div class="content-card animate-in" style="animation-delay: 0.4s;">
+                <ul class="nav nav-tabs schedule-tabs px-4 pt-2" id="scheduleTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="today-tab" data-bs-toggle="tab" data-bs-target="#today-pane" type="button">Today's Schedule</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="all-classes-tab" data-bs-toggle="tab" data-bs-target="#all-classes-pane" type="button">All My Classes</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="scheduleTabContent">
+                    <div class="tab-pane fade show active" id="today-pane" role="tabpanel">
+                        <div class="list-group list-group-flush">
+                            {% for routine, subject in routines %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                    <div>
+                                        <div class="fw-bold">{{ routine.class_rel.name }} - {{ subject.name }}</div>
+                                        <small class="text-muted">
+                                            <i class="fa-regular fa-clock me-1"></i>
+                                            {{ routine.start_time.strftime('%I:%M %p') }} - {{ routine.end_time.strftime('%I:%M %p') }}
+                                        </small>
+                                    </div>
+                                    {% set now = now_time %}
+                                    {% if routine.start_time <= now and now <= routine.end_time %}
+                                        <span class="badge bg-danger-subtle text-danger-emphasis rounded-pill">Live</span>
+                                    {% elif now > routine.end_time %}
+                                        <span class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill">Finished</span>
+                                    {% else %}
+                                        <span class="badge bg-primary-subtle text-primary-emphasis rounded-pill">Upcoming</span>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <div class="list-group-item text-center p-4">
+                                    <p class="text-muted mb-0">No classes scheduled for today. Enjoy your day!</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="all-classes-pane" role="tabpanel">
+                        <div class="list-group list-group-flush">
+                             {% for class in classes %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                    <div>
+                                        <div class="fw-bold">{{ class.subject.name }}</div>
+                                        <small class="text-muted">Class: {{ class.class_.name }} ({{ class.class_.section }})</small>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="list-group-item text-center p-4">
+                                    <p class="text-muted mb-0">No classes have been assigned to you yet.</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4">
+            <div class="content-card animate-in" style="animation-delay: 0.5s;">
+                <div class="content-card__header">Quick Actions</div>
+                <div class="quick-action-list list-group-flush">
+                    <a href="{{ url_for('teacher_bp.routine') }}"><i class="icon fa-solid fa-calendar-week"></i> Class Routine</a>
+                    <a href="{{ url_for('teacher_bp.attendance', class_id=1) }}"><i class="icon fa-solid fa-user-check"></i> Take Attendance</a>
+                    <a href="{{ url_for('teacher_bp.assigned_subjects', class_id=1) }}"><i class="icon fa-solid fa-book"></i> Enter Results</a>
+                    <a href="{{ url_for('teacher_bp.students_list') }}"><i class="icon fa-solid fa-users"></i> View Students</a>
+                    <a href="{{ url_for('teacher_bp.view_news') }}"><i class="icon fa-solid fa-bullhorn"></i> Announcements</a>
+                    <a href="{{ url_for('teacher_bp.profile') }}"><i class="icon fa-solid fa-user-circle"></i> My Profile</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

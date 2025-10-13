@@ -1,0 +1,209 @@
+{% extends "student/base.html" %}
+
+{% block title %}Attendance Record{% endblock %}
+
+{% block head_extra %}
+<style>
+    /* --- ATTENDANCE PAGE SPECIFIC STYLES --- */
+
+    /* 1. Summary Statistic Cards */
+    .summary-stat-card {
+        display: flex;
+        align-items: center;
+        padding: 1.25rem;
+        border-radius: 12px;
+        background-color: #fff;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        border-left: 5px solid;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .summary-stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+    .summary-stat-card .icon-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1.5rem;
+        color: #fff;
+    }
+    .summary-stat-card .stat-text h3 {
+        margin-bottom: 0;
+        font-weight: 700;
+        font-size: 1.75rem;
+    }
+    .summary-stat-card .stat-text p {
+        margin-bottom: 0;
+        color: var(--student-text-light);
+        font-weight: 500;
+    }
+    
+    /* Card Colors */
+    .border-present { border-color: #198754; }
+    .icon-present { background-color: #198754; }
+    .text-present { color: #198754; }
+
+    .border-absent { border-color: #dc3545; }
+    .icon-absent { background-color: #dc3545; }
+    .text-absent { color: #dc3545; }
+
+    .border-late { border-color: #ffc107; }
+    .icon-late { background-color: #ffc107; }
+    .text-late { color: #ffc107; }
+
+
+    /* 2. Attendance Table */
+    .table-attendance {
+        font-size: 0.95rem;
+    }
+    .table-attendance thead {
+        background-color: var(--student-primary-light);
+        color: white;
+        font-weight: 600;
+    }
+    .table-attendance th, .table-attendance td {
+        vertical-align: middle;
+    }
+
+    /* 3. Status Badges */
+    .status-badge {
+        padding: 0.35em 0.8em;
+        font-weight: 600;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    .status-badge i {
+        font-size: 0.9rem;
+    }
+
+    /* 4. Progress Bar for Percentage */
+    .attendance-progress-bar {
+        height: 12px;
+        border-radius: 6px;
+    }
+</style>
+{% endblock %}
+
+
+{% block student_content %}
+
+<div class="page-title-header">
+    <h1><i class="fas fa-clipboard-check me-2" style="color: var(--student-primary);"></i>Attendance History</h1>
+</div>
+
+<div class="content-card mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center">
+        <h5 class="mb-2 mb-md-0">
+            Showing Records for: <span class="fw-bold" style="color: var(--student-primary-light);">{{ ["January","February","March","April","May","June","July","August","September","October","November","December"][month-1] }}, {{ year }}</span>
+        </h5>
+        <form method="get" class="d-flex align-items-center gap-2">
+            <select name="month" class="form-select form-select-sm" style="width: 120px;">
+                {% for m in range(1, 13) %}
+                <option value="{{ m }}" {% if m == month %}selected{% endif %}>
+                    {{ ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m-1] }}
+                </option>
+                {% endfor %}
+            </select>
+            <select name="year" class="form-select form-select-sm" style="width: 90px;">
+                {% for y in range(2023, 2031) %}
+                <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
+                {% endfor %}
+            </select>
+            <button class="btn btn-sm" style="background-color: var(--student-primary); color: white;">
+                <i class="fas fa-search me-1"></i> View
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-4 col-md-6">
+        <div class="summary-stat-card border-present">
+            <div class="icon-circle icon-present"><i class="fas fa-check"></i></div>
+            <div class="stat-text">
+                <h3 class="text-present">{{ stats.present }} Days</h3>
+                <p>Present</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6">
+        <div class="summary-stat-card border-absent">
+            <div class="icon-circle icon-absent"><i class="fas fa-times"></i></div>
+            <div class="stat-text">
+                <h3 class="text-absent">{{ stats.absent }} Days</h3>
+                <p>Absent</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6">
+        <div class="summary-stat-card border-late">
+            <div class="icon-circle icon-late"><i class="fas fa-clock"></i></div>
+            <div class="stat-text">
+                <h3 class="text-late">{{ stats.late }} Days</h3>
+                <p>Late Arrival</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content-card">
+    <h5 class="mb-3">Monthly Log</h5>
+    <div class="table-responsive">
+        <table class="table table-attendance table-striped table-hover text-center">
+            <thead class="thead-light">
+                <tr>
+                    <th>Date</th>
+                    <th>Day</th>
+                    <th>Status</th>
+                    <th>Check-In Time</th>
+                    <th>Check-Out Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in days %}
+                <tr>
+                    <td><strong>{{ d.day }}</strong></td>
+                    <td>{{ d.weekday }}</td>
+                    <td>
+                        {% if d.status == 'present' %}
+                            <span class="badge rounded-pill text-bg-success status-badge"><i class="fas fa-check-circle"></i> Present</span>
+                        {% elif d.status == 'absent' %}
+                            <span class="badge rounded-pill text-bg-danger status-badge"><i class="fas fa-times-circle"></i> Absent</span>
+                        {% elif d.status == 'late' %}
+                            <span class="badge rounded-pill text-bg-warning status-badge"><i class="fas fa-exclamation-triangle"></i> Late</span>
+                        {% else %}
+                            <span class="badge rounded-pill text-bg-secondary status-badge"><i class="fas fa-minus-circle"></i> N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ d.check_in_at or '---' }}</td>
+                    <td>{{ d.check_out_at or '---' }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center p-4">No attendance data found for this period.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="content-card mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-0">Overall Attendance Rate</h5>
+        <h5 class="mb-0 fw-bold" style="color: var(--student-primary);">{{ stats.percentage }}%</h5>
+    </div>
+    <div class="progress attendance-progress-bar">
+        <div class="progress-bar" role="progressbar" style="width: {{ stats.percentage }}%; background-color: var(--student-primary);" aria-valuenow="{{ stats.percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+</div>
+
+{% endblock %}

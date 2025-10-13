@@ -1,0 +1,36 @@
+{% extends "student/base.html" %}
+{% block title %}Transactions{% endblock %}
+{% block page_title %}Payment History{% endblock %}
+{% block student_content %}
+<div class="container mt-4">
+  <div class="card shadow-sm border-0">
+    <div class="card-body">
+      <h5 class="mb-3">Your Transactions</h5>
+      <table class="table table-bordered table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Amount (৳)</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2025-09-25</td>
+            <td>Monthly Tuition Fee</td>
+            <td>500</td>
+            <td><span class="badge bg-success">Paid</span></td>
+          </tr>
+          <tr>
+            <td>2025-08-25</td>
+            <td>Library Fine</td>
+            <td>100</td>
+            <td><span class="badge bg-danger">Unpaid</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

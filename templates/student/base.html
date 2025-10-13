@@ -1,0 +1,324 @@
+{% block student_html_structure %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Student Dashboard{% endblock %}</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <style>
+        /* --- STUDENT DASHBOARD THEME & VARIABLES --- */
+        :root {
+            --student-primary: #1e40af; /* Deep Blue - Professional */
+            --student-primary-light: #3b82f6; 
+            --student-text-dark: #1f2937;
+            --student-text-light: #6b7280;
+            --student-bg: #f8fafc; /* Very light background */
+            --sidebar-bg: #ffffff;
+            --border-color: #e5eeef;
+            --sidebar-width: 250px;
+            --mobile-header-height: 60px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--student-bg);
+            margin: 0;
+            padding: 0;
+        }
+
+        .dashboard-wrapper {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--student-bg);
+        }
+        
+        /* 1. Mobile Header (Sticky and Professional) */
+        .mobile-dashboard-header {
+            display: none; 
+            width: 100%;
+            height: var(--mobile-header-height);
+            background-color: var(--sidebar-bg);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            left: 0;
+            z-index: 1000; /* High Z-index to cover everything */
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .mobile-dashboard-header .btn {
+            background-color: var(--student-primary-light);
+            color: white;
+        }
+
+
+        /* 2. Sidebar Styling (Desktop View) */
+        .student-sidebar {
+            width: var(--sidebar-width);
+            flex-shrink: 0;
+            background-color: var(--sidebar-bg);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+            position: fixed; 
+            top: 0;
+            left: 0;
+            height: 100%;
+            padding: 1.5rem 0;
+            z-index: 999; 
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+        .sidebar-header h5 {
+            font-weight: 700;
+            color: var(--student-text-dark);
+            margin-bottom: 0.25rem;
+        }
+        .sidebar-header small {
+            color: var(--student-text-light);
+        }
+
+        .sidebar-nav-item {
+            margin: 0 1rem 0.5rem 1rem;
+        }
+        .sidebar-nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--student-text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+        }
+        
+        /* Active and Hover States */
+        .sidebar-nav-item a:hover {
+            background-color: #eef2ff; 
+            color: var(--student-primary);
+        }
+        .sidebar-nav-item a.active {
+            background-color: var(--student-primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(30, 64, 175, 0.3);
+        }
+
+        /* 3. Main Content Area (Desktop) */
+        .student-main-content {
+            margin-left: var(--sidebar-width); 
+            flex-grow: 1;
+            padding: 2rem 2.5rem;
+            min-height: 100vh;
+        }
+        
+        /* Utility/Future Page Styling */
+        .content-card {
+            background-color: var(--sidebar-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+        .page-title-header {
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+        .page-title-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--student-text-dark);
+        }
+
+        /* 4. Mobile Adjustments (Crucial for UX) */
+        @media (max-width: 768px) {
+            .mobile-dashboard-header {
+                display: flex; /* Show the sticky mobile header */
+            }
+            .student-sidebar {
+                /* When the sidebar is collapsed (default on mobile), it is hidden by Bootstrap's .collapse */
+                position: absolute; 
+                height: auto;
+                width: 100%;
+                padding-bottom: 2rem;
+                top: var(--mobile-header-height); /* Position under the sticky header */
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+                border-right: none;
+                z-index: 998; /* Lower than mobile header */
+            }
+            .student-main-content {
+                margin-left: 0;
+                padding: 1.5rem;
+                padding-top: calc(var(--mobile-header-height) + 1.5rem);
+            }
+            .dashboard-wrapper {
+                flex-direction: column;
+            }
+            /* Adjust sidebar header and nav items for mobile layout */
+            .sidebar-header {
+                text-align: center;
+                border-bottom: none;
+            }
+            .sidebar-nav-item {
+                 margin: 0.5rem 0.5rem;
+            }
+            .sidebar-nav-item a {
+                padding: 0.75rem 0.75rem;
+                justify-content: center; /* Center links on mobile menu */
+            }
+        }
+        
+        /* 5. Footer (Simple and independent) */
+        .student-footer {
+            width: 100%;
+            text-align: center;
+            padding: 15px;
+            color: var(--student-text-light);
+            border-top: 1px solid var(--border-color);
+            background-color: var(--sidebar-bg);
+            font-size: 0.9rem;
+            margin-top: auto; /* Push to the bottom */
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    
+    <div class="mobile-dashboard-header d-md-none">
+        <button class="btn btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#studentSidebar" aria-controls="studentSidebar" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i> Menu
+        </button>
+        <span class="font-weight-bold text-sm" style="color: var(--student-text-dark);">
+            {{ session.get('student_name', 'Student') }}
+        </span>
+    </div>
+
+    <div class="student-sidebar collapse d-md-block" id="studentSidebar">
+        <div class="sidebar-header">
+            <h5 class="mb-0">
+                <i class="fas fa-user-circle" style="color: var(--student-primary-light);"></i> 
+                Student Portal
+            </h5>
+            <small class="text-muted">{{ session.get('student_name', 'ID: 12345') }}</small>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="sidebar-nav-item">
+                <a href="{{ url_for('student_bp.dashboard') }}" class="{% if request.endpoint == 'student_bp.dashboard' %}active{% endif %}">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </div>
+            <div class="sidebar-nav-item">
+                <a href="{{ url_for('student_bp.profile') }}" class="{% if request.endpoint == 'student_bp.profile' %}active{% endif %}">
+                    <i class="fas fa-user-graduate"></i> My Profile
+                </a>
+            </div>
+            <div class="sidebar-nav-item">
+                <a href="{{ url_for('student_bp.attendance') }}" class="{% if request.endpoint == 'student_bp.attendance' %}active{% endif %}">
+                    <i class="fas fa-clipboard-check"></i> Attendance
+                </a>
+            </div>
+            <div class="sidebar-nav-item">
+                <a href="{{ url_for('student_bp.results') }}" class="{% if request.endpoint == 'student_bp.results' %}active{% endif %}">
+                    <i class="fas fa-poll-h"></i> Results & Grades
+                </a>
+            </div>
+            <div class="sidebar-nav-item">
+                <a href="{{ url_for('student_bp.routines') }}" class="{% if request.endpoint == 'student_bp.routines' %}active{% endif %}">
+                    <i class="fas fa-calendar-alt"></i> Class Routine
+                </a>
+            </div>
+            <div class="sidebar-nav-item">
+                <a href="{{ url_for('student_bp.payments') }}" class="{% if request.endpoint == 'student_bp.payments' %}active{% endif %}">
+                    <i class="fas fa-file-invoice-dollar"></i> Fee Payments
+                </a>
+            </div>
+            <div class="sidebar-nav-item">
+                <a href="{{ url_for('student_bp.notices') }}" class="{% if request.endpoint == 'student_bp.notices' %}active{% endif %}">
+                    <i class="fas fa-bell"></i> Notices
+                </a>
+            </div>
+            
+            <hr class="mx-4 my-3 border-gray-200">
+            
+            <div class="sidebar-nav-item">
+                <a href="{{ url_for('student_bp.student_logout') }}" class="text-danger">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <div class="student-main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="content-card">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="content-body">
+            {% block student_content %}
+                {% endblock %}
+        </div>
+    </div>
+</div>
+
+<footer class="student-footer">
+    &copy; {{ current_year if current_year else 2025 }} Palashbaria Secondary School — Student Portal
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Active link highlighting based on current URL
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.sidebar-nav-item a').forEach(link => {
+            if (link.href && link.href.endsWith(currentPath)) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+        
+        // Mobile UX: Close the sidebar automatically after clicking a link
+        const studentSidebar = document.getElementById('studentSidebar');
+        if (window.innerWidth <= 768) {
+            document.querySelectorAll('.sidebar-nav-item a').forEach(link => {
+                link.addEventListener('click', () => {
+                    // Check if the sidebar is currently open/collapsed
+                    if (studentSidebar.classList.contains('show')) {
+                        // Use Bootstrap's native collapse method to hide the menu
+                        const collapseInstance = bootstrap.Collapse.getInstance(studentSidebar);
+                        if (collapseInstance) {
+                            collapseInstance.hide();
+                        }
+                    }
+                });
+            });
+        }
+    });
+</script>
+</body>
+</html>
+{% endblock student_html_structure %}

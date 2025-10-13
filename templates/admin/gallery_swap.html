@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 {% block title %}Reorder Gallery Items{% endblock %}
 
 {% block content %}
@@ -155,7 +155,7 @@
 <div class="reorder-container">
     <header class="reorder-header">
         <h2 class="reorder-header__title">Reorder Gallery Items</h2>
-        <a href="{{ url_for('admin.gallery') }}" class="reorder-btn--back">
+        <a href="{{ url_for('admin_bp.gallery') }}" class="reorder-btn--back">
             <i class="fas fa-arrow-left"></i>
             <span>Back to Gallery</span>
         </a>
@@ -176,7 +176,7 @@
             <div class="reorder-card__controls">
                 {# The loop variable from Jinja2 gives us access to the index #}
                 {% if not loop.first %}
-                    <a href="{{ url_for('admin.gallery_swap_between', id1=item.id, id2=items[loop.index0 - 1].id) }}" class="reorder-control-btn" title="Move Up">
+                    <a href="{{ url_for('admin_bp.gallery_swap_between', id1=item.id, id2=items[loop.index0 - 1].id) }}" class="reorder-control-btn" title="Move Up">
                         <i class="fas fa-chevron-up"></i>
                     </a>
                 {% else %}
@@ -184,7 +184,7 @@
                 {% endif %}
 
                 {% if not loop.last %}
-                    <a href="{{ url_for('admin.gallery_swap_between', id1=item.id, id2=items[loop.index0 + 1].id) }}" class="reorder-control-btn" title="Move Down">
+                    <a href="{{ url_for('admin_bp.gallery_swap_between', id1=item.id, id2=items[loop.index0 + 1].id) }}" class="reorder-control-btn" title="Move Down">
                         <i class="fas fa-chevron-down"></i>
                     </a>
                 {% else %}

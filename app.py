@@ -7,7 +7,8 @@ from extensions import db
 from config import Config
 from routes.public import public_bp
 from routes.admin import admin_bp
-
+from routes.student import student_bp
+from routes.teacher import teacher_bp    
 
 # Load environment variables
 load_dotenv()
@@ -20,7 +21,7 @@ cloudinary.config(cloud_name=app.config["CLOUDINARY_CLOUD_NAME"],api_key=app.con
 # Initialize extensions
 db.init_app(app)
 migrate = Migrate(app, db)
- 
+
 # -----------------------
 # Create tables safely (optional when using migrations)
 with app.app_context():
@@ -28,6 +29,8 @@ with app.app_context():
 # Register blueprints
 app.register_blueprint(public_bp)
 app.register_blueprint(admin_bp, url_prefix="/admin")
+app.register_blueprint(student_bp, url_prefix="/student")
+app.register_blueprint(teacher_bp, url_prefix="/teacher")
 
 
 if __name__ == "__main__":

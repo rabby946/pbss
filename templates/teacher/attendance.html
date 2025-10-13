@@ -1,0 +1,85 @@
+{% extends "teacher/base.html" %}
+
+{% block title %}Mark Attendance{% endblock %}
+{% block page_title %}Mark Attendance{% endblock %}
+
+{% block teacher_content %}
+<div class="container mt-4 mb-5">
+  <div class="card shadow-lg border-0 rounded-4">
+    <div class="card-header text-white" style="background: linear-gradient(90deg, #007bfeb9, #00bbd4ab);">
+      <h4 class="mb-0"><i class="bi bi-check2-square me-2"></i>Mark Attendance</h4>
+    </div>
+
+    <div class="card-body p-4">
+
+      <form method="GET" action="{{ url_for('teacher_bp.attendance') }}" class="mb-4 d-flex align-items-center gap-2 flex-wrap">
+        <label for="date" class="form-label fw-bold mb-0">Select Date:</label>
+        <input type="date" class="form-control w-auto" name="date" id="date" value="{{ selected_date.strftime('%Y-%m-%d') }}" max="{{ today.strftime('%Y-%m-%d') }}">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>View</button>
+      </form>
+
+      {% if students|length == 0 %}
+        <div class="text-center py-5 text-muted">
+          <i class="bi bi-inbox display-5"></i>
+          <p class="mt-3 mb-0">No students found for this class.</p>
+        </div>
+      {% else %}
+        {% if selected_date < today %}
+          <div class="alert alert-info">
+            Attendance for {{ selected_date.strftime('%d %b %Y') }} (Read-only)
+          </div>
+        {% endif %}
+
+        {% if selected_date == today %}
+          <form method="POST" action="{{ url_for('teacher_bp.mark_attendance') }}">
+            <input type="hidden" name="class_id" value="{{ class_id }}">
+        {% endif %}
+
+        <table class="table table-hover table-striped align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>Roll</th>
+              <th>Name</th>
+              <th>Present</th>
+              <th>Absent</th>
+              {% if selected_date != today %}
+              <th>Late</th>
+              {%endif%}
+            </tr>
+          </thead>
+          <tbody>
+            {% for student in students %}
+            <tr>
+              <td>{{ student.roll or 'N/A' }}</td>
+              <td>{{ student.name }}</td>
+              {% set status = attendance_dict.get(student.id) %}
+              {% if selected_date == today %}
+              <td><input type="radio" name="student_{{ student.id }}" value="present" {% if status == 'present' %}checked{% endif %}></td>
+              <td><input type="radio" name="student_{{ student.id }}" value="absent" {% if status == 'absent' %}checked{% endif %}></td>
+              {% else %}
+              <td>{{ '✔️' if status == 'present' else '' }}</td>
+              <td>{{ '❌' if status == 'absent' else '' }}</td>
+              <td>{{ '⏰' if status == 'late' else '' }}</td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        {% if selected_date == today %}
+          <div class="d-flex justify-content-end mt-3">
+            <button type="submit" class="btn btn-success"><i class="bi bi-check-circle me-1"></i>Submit Attendance</button>
+          </div>
+          </form>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+.table td, .table th { vertical-align: middle; }
+.table-hover tbody tr:hover { background-color: #f1f7ff; transition: background-color 0.2s ease; }
+@media (max-width: 768px) { h4 { font-size: 1.1rem; } table { font-size: 0.9rem; } }
+</style>
+{% endblock %}

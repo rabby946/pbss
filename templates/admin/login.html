@@ -1,227 +1,252 @@
 {% extends 'base.html' %}
 {% block title %}Admin Login{% endblock %}
+
 {% block content %}
 <style>
-    /* --- SCHOOL WEBSITE ADMIN LOGIN --- */
-
-    /* 1. Theme & Variables */
+    /* New, Simplified, and Professional Login Page Design */
     :root {
-        --font-sans: 'Poppins', sans-serif;
-        --color-bg-light: #f8f9fa;
-        --color-primary: #253582bf; /* A friendly, professional blue */
-        --color-primary-light: #EAF2FB;
-        --color-secondary: #3e7b3d; /* A vibrant, eye-catching teal accent */
-        --color-text-dark: #333A45;
-        --color-text-light: #8A94A6;
-        --color-border: #7e8996;
-        --color-white: #FFFFFF;
-        --color-error: #fa0000f9;
-        --shadow-soft: 0 4px 15px rgba(89, 27, 27, 0.6);
-        /* background: linear-gradient(90deg, rgba(203, 235, 160, 0.524) 0%, rgba(146, 210, 232, 0.53) 50%); */
+        --login-bg: #f8fafc;
+        --login-primary: #007bff; /* A clean, professional blue */
+        --login-primary-light: rgba(0, 123, 255, 0.1);
+        --login-text: #212529;
+        --login-text-muted: #6c757d;
+        --login-border: #dee2e6;
+        --login-white: #ffffff;
+        --login-error: #dc3545;
+        --login-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --login-font: 'Poppins', sans-serif;
     }
 
-    /* Override base body style for this page */
     body {
-        background-color: var(--color-bg-light);
-        font-family: var(--font-sans);
-        color: var(--color-text-dark);
-        -webkit-font-smoothing: antialiased;
-        
-        -moz-osx-font-smoothing: grayscale;
-    }
-
-    /* 2. Main Layout */
-    .school-login__container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        padding: 2rem;
-    }
-
-    /* 3. The Login Card */
-    .school-login__card {
-        width: 100%;
-        max-width: 450px;
-        padding: 3rem;
-        background-color: var(--color-white);
-        border-radius: 16px;
-        box-shadow: var(--shadow-soft);
-        text-align: center;
-        border-top: 5px solid var(--color-primary);
-        
-        /* Entrance animation */
-        opacity: 0;
-        transform: translateY(20px);
-        animation: cardFadeIn 0.5s ease-out forwards;
+        background-color: var(--login-bg);
+        font-family: var(--login-font);
     }
     
-    @keyframes cardFadeIn {
-        to {
-            opacity: 1;
-            transform: translateY(0);
+    .login-container {
+        display: grid;
+        min-height: 100vh;
+        grid-template-columns: 1fr;
+    }
+    @media (min-width: 992px) {
+        .login-container {
+            grid-template-columns: 1fr 1fr;
         }
     }
-    
-    .school-login__header {
-        font-size: 2.25rem; /* Big and readable */
+
+    /* Left Panel with Branding */
+    .image-panel {
+        display: none; /* Hidden on mobile */
+        background-color: var(--login-primary);
+        color: var(--login-white);
+        padding: 3rem;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        opacity: 0;
+        animation: fadeInLeft 0.8s ease-out forwards;
+    }
+    @media (min-width: 992px) {
+        .image-panel {
+            display: flex;
+        }
+    }
+    .image-panel img {
+        max-width: 100px;
+        margin: 0 auto 1rem;
+    }
+    .image-panel h1 {
+        font-size: 2rem;
         font-weight: 600;
         margin-bottom: 0.5rem;
-        color: var(--color-text-dark);
     }
+    .image-panel p {
+        opacity: 0.8;
+    }
+    @keyframes fadeInLeft { to { opacity: 1; } }
 
-    .school-login__subheader {
-        font-size: 1rem;
-        color: var(--color-text-light);
+    /* Right Panel with the Form */
+    .form-panel {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.6s 0.2s ease-out forwards;
+    }
+    @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+    .login-card {
+        width: 100%;
+        max-width: 400px;
+    }
+    .login-header {
+        text-align: center;
         margin-bottom: 2.5rem;
     }
+    .login-header img {
+        max-width: 60px;
+        margin-bottom: 1rem;
+    }
+    .login-header h2 {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--login-text);
+    }
+    .login-header p {
+        color: var(--login-text-muted);
+    }
 
-    /* 4. Form Elements */
-    .school-login__form-group {
-        margin-bottom: 1.5rem;
+    /* Modern Floating Label Form */
+    .form-group {
         position: relative;
-        text-align: left;
+        margin-bottom: 1.5rem;
     }
-
-    .school-login__label {
-        display: block;
-        font-size: 0.9rem;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-        color: var(--color-text-light);
-    }
-
-    .school-login__input {
+    .form-input {
         width: 100%;
-        height: 55px; /* Taller for easier interaction */
-        padding: 0 1.5rem;
-        font-size: 1.1rem; /* Larger font for readability */
-        font-family: var(--font-sans);
-        color: var(--color-text-dark);
-        background-color: var(--color-bg-light);
-        border: 1px solid var(--color-border);
+        height: 55px;
+        padding: 1rem;
+        font-size: 1rem;
+        border: 1px solid var(--login-border);
         border-radius: 8px;
-        box-sizing: border-box; /* Ensures padding doesn't affect width */
-        transition: border-color 0.3s, box-shadow 0.3s;
+        background-color: var(--login-bg);
+        transition: border-color 0.2s ease;
     }
-
-    .school-login__input:focus {
+    .form-input:focus {
         outline: none;
-        border-color: var(--color-primary);
-        box-shadow: 0 0 0 3px var(--color-primary-light);
+        border-color: var(--login-primary);
+        box-shadow: 0 0 0 3px var(--login-primary-light);
+    }
+    .form-label {
+        position: absolute;
+        left: 1rem;
+        top: 1rem;
+        color: var(--login-text-muted);
+        background-color: var(--login-bg);
+        padding: 0 0.25rem;
+        transition: all 0.2s ease;
+        pointer-events: none;
+    }
+    .form-input:focus + .form-label,
+    .form-input:not(:placeholder-shown) + .form-label {
+        top: -0.6rem;
+        font-size: 0.85rem;
+        color: var(--login-primary);
     }
     
-    /* Specific padding for password to not overlap with icon */
-    .school-login__input[type="password"],
-    .school-login__input[type="text"] {
-         padding-right: 3.5rem;
-    }
-
-    .school-login__toggle-btn {
+    .toggle-password {
         position: absolute;
         top: 50%;
         right: 1rem;
-        transform: translateY(25%);
+        transform: translateY(-50%);
         background: none;
         border: none;
-        color: var(--color-text-light);
+        color: var(--login-text-muted);
         cursor: pointer;
-        font-size: 1.2rem;
-        padding: 0.5rem;
     }
 
-    /* 5. Login Button & Flash Messages */
-    .school-login__button {
+    .btn-submit {
         width: 100%;
-        padding: 1rem;
-        margin-top: 1rem;
-        font-family: var(--font-sans);
+        height: 55px;
+        border: none;
+        background-color: var(--login-primary);
+        color: var(--login-white);
+        border-radius: 8px;
         font-size: 1.1rem;
         font-weight: 600;
-        background-color: var(--color-primary);
-        color: var(--color-white);
-        border: none;
-        border-radius: 8px;
         cursor: pointer;
-        transition: background-color 0.3s, transform 0.2s;
-        /* background: linear-gradient(90deg, rgba(114, 27, 27, 0.787) 0%, rgba(0, 14, 164, 0.964) 50%); */
-        background: linear-gradient(90deg, rgba(33, 69, 25, 0.751) 0%, rgba(57, 122, 144, 0.777) 50%);
+        transition: all 0.3s ease;
     }
-
-    .school-login__button:hover {
-        /* background: linear-gradient(90deg, rgba(95, 197, 75, 0.524) 0%, rgba(84, 177, 208, 0.53) 50%); */
+    .btn-submit:hover {
+        background-color: #0056b3;
         transform: translateY(-2px);
-        color: #ffffff;
-        font-weight: bold;
-        font-size: medium ;
     }
-    
-    .school-login__button:active {
-        transform: translateY(0);
+    .btn-submit:disabled {
+        background-color: var(--login-text-muted);
+        cursor: not-allowed;
     }
 
-    .school-login__flash {
+    .flash-message {
         margin-top: 1.5rem;
         padding: 1rem;
         border-radius: 8px;
-        border: 1px solid var(--color-error);
-        background-color: rgba(233, 78, 119, 0.1);
-        color: var(--color-error);
+        background-color: rgba(220, 53, 69, 0.1);
+        color: var(--login-error);
         text-align: center;
         font-weight: 500;
     }
-
 </style>
 
-<div class="school-login__container">
-    <div class="school-login__card">
-        <h2 class="school-login__header">Admin Portal</h2>
-        <p class="school-login__subheader">Please sign in to continue</p>
-
-        <form method="POST" action="">
-            
-
-            <div class="school-login__form-group">
-                <label for="password" class="school-login__label">Password</label>
-                <input type="password" id="password" name="password" class="school-login__input" required autocomplete="current-password">
-                <button type="button" class="school-login__toggle-btn" id="toggle-password" title="Show/Hide Password">
-                    <i class="fas fa-eye"></i>
-                </button>
+<div class="login-container">
+    <div class="image-panel">
+        <div>
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="School Logo">
+            <h1>Palashbaria Secondary School</h1>
+            <p>Admin Control Panel</p>
+        </div>
+    </div>
+    <div class="form-panel">
+        <div class="login-card">
+            <div class="login-header">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="School Logo" class="d-lg-none">
+                <h2>Admin Portal</h2>
+                <p>Please sign in to continue</p>
             </div>
-            
-            <button type="submit" class="school-login__button">Sign In</button>
-            
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="school-login__flash {{ category }}">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-        </form>
+
+            <form method="POST" id="login-form">
+                <div class="form-group">
+                    <input type="password" id="password" name="password" class="form-input" placeholder=" " required autocomplete="current-password">
+                    <label for="password" class="form-label">Password</label>
+                    <button type="button" class="toggle-password" id="toggle-password" title="Show/Hide Password">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                
+                <button type="submit" class="btn-submit" id="submit-btn">
+                    Sign In
+                </button>
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </form>
+        </div>
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // Password Toggle
     const passwordInput = document.getElementById('password');
     const toggleButton = document.getElementById('toggle-password');
-    const toggleIcon = toggleButton.querySelector('i');
+    if (toggleButton) {
+        const toggleIcon = toggleButton.querySelector('i');
+        toggleButton.addEventListener('click', () => {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            toggleIcon.classList.toggle('fa-eye');
+            toggleIcon.classList.toggle('fa-eye-slash');
+        });
+    }
 
-    toggleButton.addEventListener('click', () => {
-        // Check the current type of the input
-        const isPassword = passwordInput.type === 'password';
-        
-        if (isPassword) {
-            // Change to text to show password
-            passwordInput.type = 'text';
-            toggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
-        } else {
-            // Change back to password to hide it
-            passwordInput.type = 'password';
-            toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
-        }
-    });
+    // Prevent Duplicate Submissions
+    const loginForm = document.getElementById('login-form');
+    const submitBtn = document.getElementById('submit-btn');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            if (!loginForm.checkValidity()) return;
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Signing In...
+            `;
+        });
+    }
 });
 </script>
 {% endblock %}

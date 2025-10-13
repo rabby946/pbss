@@ -1,124 +1,85 @@
-{% extends 'base.html' %}
+{% extends 'admin/base.html' %}
 {% block title %}Add Gallery Item{% endblock %}
 
-{% block content %}
+{% block head_extra %}
 <style>
     /* Scoped styles for the Add Gallery page */
-    :root {
-        --admin-bg: #f8f9fa;
-        --admin-card-bg: #ffffff;
-        --admin-primary: #6f42c1; /* Stylish Purple for Gallery */
-        --admin-border: #dee2e6;
-        --admin-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        --admin-text-dark: #212529;
-        --admin-text-light: #6c757d;
-        --admin-font: 'Poppins', sans-serif;
-    }
-
     .add-form-container {
-        font-family: var(--admin-font);
         max-width: 1100px;
-        margin: 2rem auto;
-        padding: 2rem;
+        margin: 0 auto;
     }
 
     .add-form-card {
         background-color: var(--admin-card-bg);
-        padding: 3rem;
-        border-radius: 16px;
-        box-shadow: var(--admin-shadow);
         border: 1px solid var(--admin-border);
+        border-radius: var(--admin-radius, 1rem);
+        box-shadow: var(--admin-shadow);
+        overflow: hidden;
     }
     
     .add-form-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 2.5rem;
-        padding-bottom: 1.5rem;
+        padding: 1.5rem 2rem;
         border-bottom: 1px solid var(--admin-border);
     }
     .add-form-header__title {
-        font-size: 2.2rem;
+        font-size: 1.8rem;
         font-weight: 600;
-        color: var(--admin-text-dark);
+        color: var(--admin-text);
         margin: 0;
     }
     .admin-btn--back {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        font-size: 1rem;
         font-weight: 500;
         text-decoration: none;
-        padding: 10px 20px;
+        padding: 0.5rem 1rem;
         border-radius: 8px;
-        color: var(--admin-text-dark);
-        background-color: #e9ecef;
-        transition: all 0.3s ease;
+        color: var(--admin-text);
+        background-color: var(--admin-bg);
         border: 1px solid var(--admin-border);
+        transition: all 0.2s ease;
     }
-    .admin-btn--back:hover {
-        background-color: #dee2e6;
-        transform: translateY(-2px);
-    }
+    .admin-btn--back:hover { background-color: #e9ecef; }
 
-    .add-form-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 3rem;
-    }
-    @media (min-width: 1024px) {
-        .add-form-grid {
-            grid-template-columns: 1fr 1fr;
-        }
-    }
-
-    .form-group {
-        margin-bottom: 2rem;
-    }
-    .form-group label {
+    .form-content { padding: 2.5rem; }
+    .form-group { margin-bottom: 2rem; }
+    .form-label {
         display: block;
         font-size: 1rem;
         font-weight: 500;
-        color: var(--admin-text-dark);
+        color: var(--admin-text);
         margin-bottom: 0.75rem;
     }
-    .form-input, .form-textarea {
-        width: 100%;
-        padding: 12px 15px;
-        font-size: 1rem;
-        border: 1px solid var(--admin-border);
-        border-radius: 8px;
-        background-color: #fff;
-        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    .form-control {
+        border-radius: 8px !important;
+        border: 1px solid var(--admin-border) !important;
+        padding: 0.75rem 1rem !important;
     }
-    .form-input:focus, .form-textarea:focus {
-        outline: none;
-        border-color: var(--admin-primary);
-        box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.15);
+    .form-control:focus {
+        border-color: var(--admin-brand) !important;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2) !important;
     }
-    .form-textarea {
-        min-height: 150px;
-        resize: vertical;
-    }
+    .form-textarea { min-height: 150px; }
 
-    /* --- New Multi-Image Uploader --- */
+    /* Polished Multi-Image Uploader */
     #drop-area {
         border: 2px dashed var(--admin-border);
         border-radius: 12px;
         padding: 2rem;
         text-align: center;
-        color: var(--admin-text-light);
+        color: var(--admin-text-muted);
         transition: all 0.3s ease;
         cursor: pointer;
     }
     #drop-area.is-active {
-        border-color: var(--admin-primary);
-        background-color: #f3effc;
+        border-color: var(--admin-brand);
+        background-color: #f3f4f6; /* A light gray for active state */
     }
-    #drop-area-icon { font-size: 3rem; color: var(--admin-primary); margin-bottom: 1rem; }
-    #drop-area p { margin: 0; font-weight: 500; }
+    #drop-area i { font-size: 2.5rem; color: var(--admin-brand); margin-bottom: 1rem; }
     #file-input-native { display: none; }
 
     #previews-container {
@@ -136,133 +97,107 @@
     }
     .preview-thumbnail img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .remove-btn {
-        position: absolute;
-        top: 0.25rem;
-        right: 0.25rem;
-        width: 1.5rem;
-        height: 1.5rem;
-        border-radius: 50%;
-        background-color: rgba(0,0,0,0.6);
-        color: white;
-        border: none;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.8rem;
+        position: absolute; top: 0.25rem; right: 0.25rem;
+        width: 1.5rem; height: 1.5rem; border-radius: 50%;
+        background-color: rgba(0,0,0,0.6); color: white;
+        border: none; cursor: pointer; display: flex; align-items: center;
+        justify-content: center; font-size: 0.8rem;
     }
 
     .form-actions {
-        margin-top: 2rem;
-        padding-top: 2rem;
+        padding: 1.5rem 2.5rem;
         border-top: 1px solid var(--admin-border);
+        background-color: var(--admin-bg);
+        text-align: right;
     }
-    .btn-submit {
-        font-size: 1.1rem;
-        font-weight: 600;
-        padding: 12px 25px;
-        border-radius: 8px;
-        border: none;
-        background-color: var(--admin-primary);
-        color: #fff;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    .btn-submit:hover {
-        background-color: #5b21b6;
-        transform: translateY(-2px);
+    .btn-submit:disabled {
+        cursor: not-allowed;
+        opacity: 0.7;
     }
 </style>
+{% endblock %}
 
+{% block content %}
 <div class="add-form-container">
     <div class="add-form-card">
         <header class="add-form-header">
-            <h2 class="add-form-header__title">Add New Gallery Item</h2>
-            <a href="{{ url_for('admin.gallery') }}" class="admin-btn--back">
-                <i class="fas fa-times"></i>
-                <span>Cancel</span>
+            <h1 class="add-form-header__title">Create New Gallery</h1>
+            <a href="{{ url_for('admin_bp.gallery') }}" class="admin-btn--back">
+                <i class="fas fa-times me-2"></i> Cancel
             </a>
         </header>
 
         <form id="gallery-form" method="POST" enctype="multipart/form-data">
-            <div class="add-form-grid">
-
-                <div class="form-details">
-                    <div class="form-group">
-                        <label for="title-input">Gallery Title</label>
-                        <input type="text" id="title-input" name="title" class="form-input" placeholder="e.g., Annual Sports Day 2024" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="description-input">Description</label>
-                        <textarea id="description-input" name="description" class="form-textarea" placeholder="A brief description of the gallery..." required></textarea>
-                    </div>
-                </div>
-
-                <div class="form-uploader">
-                    <div class="form-group">
-                        <label for="file-input-native">Gallery Images</label>
-                        <div id="drop-area">
-                            <input type="file" id="file-input-native" name="filename" multiple required accept="image/*">
-                            <div id="drop-area-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                            <p><strong>Drag & drop images here</strong></p>
-                            <p class="text-sm">or click to select files</p>
+            <div class="form-content">
+                <div class="row g-5">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label for="title-input" class="form-label">Gallery Title</label>
+                            <input type="text" id="title-input" name="title" class="form-control" placeholder="e.g., Annual Sports Day 2025" required>
                         </div>
-                        <div id="previews-container"></div>
+                        <div class="form-group">
+                            <label for="description-input" class="form-label">Description</label>
+                            <textarea id="description-input" name="description" class="form-control form-textarea" placeholder="A brief description of the event or gallery..." required></textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label for="file-input-native" class="form-label">Gallery Images</label>
+                            <div id="drop-area">
+                                <input type="file" id="file-input-native" name="filename" multiple required accept="image/*">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p><strong>Drag & drop images here</strong></p>
+                                <p class="text-sm">or click to select files</p>
+                            </div>
+                            <div id="previews-container"></div>
+                        </div>
                     </div>
                 </div>
-
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn-submit">Create Gallery</button>
+                <button type="submit" class="btn btn-primary btn-submit px-4 py-2">
+                    <span class="btn-text">Create Gallery</span>
+                </button>
             </div>
         </form>
     </div>
 </div>
+{% endblock %}
 
+{% block scripts_extra %}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Drag and Drop Uploader Logic ---
     const dropArea = document.getElementById('drop-area');
     const fileInput = document.getElementById('file-input-native');
     const previewsContainer = document.getElementById('previews-container');
-    let selectedFiles = []; // Use an array to manage the files
+    let selectedFiles = [];
 
-    // Trigger file input click when drop area is clicked
     dropArea.addEventListener('click', () => fileInput.click());
-
-    // Highlight drop area when file is dragged over
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropArea.addEventListener(eventName, e => {
-            e.preventDefault();
-            e.stopPropagation();
-        }, false);
+        dropArea.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); });
     });
     ['dragenter', 'dragover'].forEach(eventName => {
-        dropArea.addEventListener(eventName, () => dropArea.classList.add('is-active'), false);
+        dropArea.addEventListener(eventName, () => dropArea.classList.add('is-active'));
     });
     ['dragleave', 'drop'].forEach(eventName => {
-        dropArea.addEventListener(eventName, () => dropArea.classList.remove('is-active'), false);
+        dropArea.addEventListener(eventName, () => dropArea.classList.remove('is-active'));
     });
 
-    // Handle file selection (both drop and click)
     const handleFiles = (files) => {
         [...files].forEach(file => {
-            if (file.type.startsWith('image/')) {
-                // To avoid duplicates, we check if a file with the same name and size is already there
-                if (!selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
-                    selectedFiles.push(file);
-                    previewFile(file);
-                }
+            if (file.type.startsWith('image/') && !selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                selectedFiles.push(file);
+                previewFile(file);
             }
         });
         updateFileInput();
     };
 
-    dropArea.addEventListener('drop', e => handleFiles(e.dataTransfer.files), false);
+    dropArea.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
     fileInput.addEventListener('change', () => handleFiles(fileInput.files));
 
-    // Create a visual preview for a file
     function previewFile(file) {
         let reader = new FileReader();
         reader.readAsDataURL(file);
@@ -270,36 +205,52 @@ document.addEventListener('DOMContentLoaded', () => {
             const id = `file-${Math.random().toString(36).substr(2, 9)}`;
             let thumb = document.createElement('div');
             thumb.className = 'preview-thumbnail';
-            thumb.dataset.fileId = id; // Custom ID for the file object
-            
-            thumb.innerHTML = `
-                <img src="${reader.result}" alt="${file.name}">
-                <button type="button" class="remove-btn" data-file-id="${id}">&times;</button>
-            `;
+            thumb.dataset.fileId = id;
+            thumb.innerHTML = `<img src="${reader.result}" alt="${file.name}"><button type="button" class="remove-btn" data-file-id="${id}">&times;</button>`;
             previewsContainer.appendChild(thumb);
-            file.id = id; // Assign the same ID to the file object for tracking
+            file.id = id;
         }
     }
 
-    // Handle removing a previewed image
     previewsContainer.addEventListener('click', function(e) {
         if (e.target.classList.contains('remove-btn')) {
             const fileId = e.target.dataset.fileId;
-            // Remove the visual thumbnail
             document.querySelector(`.preview-thumbnail[data-file-id="${fileId}"]`).remove();
-            // Remove the file from our array
             selectedFiles = selectedFiles.filter(file => file.id !== fileId);
-            // Update the actual file input
             updateFileInput();
         }
     });
 
-    // This crucial function syncs our 'selectedFiles' array with the actual <input>
     function updateFileInput() {
         const dataTransfer = new DataTransfer();
         selectedFiles.forEach(file => dataTransfer.items.add(file));
         fileInput.files = dataTransfer.files;
     }
+
+    // ======================================================================
+    // START: The Fix - Prevent Duplicate Submissions                     -->
+    // ======================================================================
+    const galleryForm = document.getElementById('gallery-form');
+    const submitBtn = galleryForm.querySelector('.btn-submit');
+
+    if (galleryForm && submitBtn) {
+        galleryForm.addEventListener('submit', function(e) {
+            if (!galleryForm.checkValidity()) {
+                return; // Let browser handle validation
+            }
+            
+            // Disable button and show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Creating...
+            `;
+            // The form will submit normally after this.
+        });
+    }
+    // ======================================================================
+    // END: The Fix                                                       -->
+    // ======================================================================
 });
 </script>
 {% endblock %}

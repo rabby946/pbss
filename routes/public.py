@@ -1,8 +1,13 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
-from models import News, Gallery, Teacher, Student, Committee, MPO, Result, Routine, Report
+from models import News, Gallery, Teacher, Student, Committee, MPO, Result, Routine, Report, User
 from flask_mail import Message
 from extensions import  db
+from datetime import datetime
 public_bp = Blueprint("public", __name__)
+
+@public_bp.context_processor
+def inject_year():
+    return {'moment': datetime.now().year} 
 
 # ---------- Home ----------
 @public_bp.route("/")
@@ -10,7 +15,9 @@ def home():
     headline_item = News.query.order_by(News.id.desc()).first()
     headline = headline_item.title if headline_item else "No news yet"
     headline2 = headline_item.description if headline_item else ""
-    return render_template("public/home.html", text=headline, text2=headline2)
+    notice = notice = News.query.order_by(News.id.desc()).limit(3)
+
+    return render_template("public/home.html", text=headline, text2=headline2, notice=notice)
 
 # ---------- News ----------
 @public_bp.route("/news")
@@ -39,7 +46,7 @@ def gallery_detail(id):
 # ---------- Teachers ----------
 @public_bp.route("/teachers")
 def teachers():
-    items = Teacher.query.order_by(Teacher.id.desc()).all()
+    items = Teacher.query.order_by(Teacher.position.desc()).all()
     return render_template("public/entity.html",entity_items=items,entity_name="Teachers",detail_endpoint="public.teacher_detail")
 
 @public_bp.route("/teacher/<int:id>")
@@ -58,19 +65,15 @@ def students():
 def student_detail(id):
     item = Student.query.get_or_404(id)
     return render_template("public/entity_detail.html",item=item,description=item.roll, endpoint="public.students")
-
-
 # ---------- Committee ----------
 @public_bp.route("/committees")
 def committees():
     items = Committee.query.order_by(Committee.id.desc()).all()
     return render_template("public/entity.html",entity_items=items,entity_name="Committee",detail_endpoint="public.committee_detail")
-
 @public_bp.route("/committee/<int:id>")
 def committee_detail(id):
     item = Committee.query.get_or_404(id)
     return render_template("public/entity_detail.html",item=item,description=item.designation, endpoint="public.committees")
-
 # ---------- MPO ----------
 @public_bp.route("/mpos")
 def mpos():
@@ -81,20 +84,16 @@ def mpos():
 def mpo_detail(id):
     item = MPO.query.get_or_404(id)
     return render_template("public/entity_detail.html",item=item,description=item.designation, endpoint="public.mpos")
-
-
 # ---------- Results ----------
 @public_bp.route("/results")
 def results():
     items = Result.query.order_by(Result.id.desc()).all()
     return render_template("public/results.html", items=items)
-
 # ---------- Routine ----------
 @public_bp.route("/routine")
 def routine():
     items = Routine.query.order_by(Routine.id.desc()).all()
     return render_template("public/routine.html",items=items)
-
 # ---------- Contact ----------
 @public_bp.route("/contact", methods=["GET", "POST"])
 def contact():
@@ -106,12 +105,25 @@ def contact():
         report = Report(name=name, email=email, purpose=purpose, message=message)
         db.session.add(report)
         db.session.commit()
-
         if request.is_json or request.headers.get("X-Requested-With") == "XMLHttpRequest":
             return {"success": True}
-
         flash("posted your issue")
         return redirect(url_for("public.contact"))
 
     return render_template("public/contact.html")
 
+@public_bp.route("/login")
+def login():
+    return render_template("public/login.html")
+
+@public_bp.route("/forgot_password")
+def forgot_password():
+    return render_template("public/forgot_password.html")
+
+@public_bp.route("/fix")
+def f():
+    users_without_email = User.query.filter(User.email.is_(None)).all()
+    for user in users_without_email:
+        user.email = 'palashbariasecondaryschool@gmail.com'
+    db.session.commit()
+    print(f"Updated {len(users_without_email)} users with default email.")

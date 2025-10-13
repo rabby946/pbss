@@ -1,70 +1,79 @@
 {% extends "base.html" %}
 {% block title %}Photo Gallery{% endblock %}
 
-{% block content %}
+{% block head_extra %}
 <style>
-    /* Scoped styles for the new Professional Gallery page */
+    /* ---------------------------------- */
+    /* --- GALLERY DESIGN: IMAGE FIRST ---*/
+    /* ---------------------------------- */
+    
     :root {
-        --gallery-bg: #f8f9fa;
-        --gallery-text-dark: #212529;
+        --gallery-bg: #f7f7f7;
+        --gallery-text-dark: #1e293b; 
         --gallery-text-light: #ffffff;
-        --gallery-primary: #0d6efd; /* A professional blue */
+        --gallery-primary: #10b981; /* Fresh Teal/Green */
+        --gallery-primary-dark: #059669;
+        --gallery-border: #e2e8f0;
         --gallery-font: 'Poppins', sans-serif;
     }
 
     .gallery-container-pro {
         font-family: var(--gallery-font);
-        max-width: 1200px;
-        margin: 2rem auto;
-        padding: 2rem;
+        background-color: var(--gallery-bg);
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 3rem 1.5rem;
+    }
+    
+    /* Base content cleanup */
+    main > div {
+        padding: 0 !important;
+        max-width: none !important;
     }
 
+    /* --- Header Design --- */
     .gallery-header {
         text-align: center;
-        margin-bottom: 3.5rem;
+        margin-bottom: 4rem;
+        padding-top: 1rem;
     }
     .gallery-header__title {
-        font-size: 2.8rem;
-        font-weight: 600;
+        font-size: 3rem;
+        font-weight: 700;
         color: var(--gallery-text-dark);
+        letter-spacing: -0.02em;
         position: relative;
-        display: inline-block;
-        padding-bottom: 0.75rem;
     }
     .gallery-header__title::after {
         content: '';
         position: absolute;
-        bottom: 0;
+        bottom: -10px;
         left: 50%;
         transform: translateX(-50%);
-        width: 80px;
-        height: 4px;
-        background: linear-gradient(90deg, #0d6efd, #6f42c1);
-        border-radius: 2px;
+        width: 100px;
+        height: 5px;
+        background-color: var(--gallery-primary);
+        border-radius: 5px;
     }
     .gallery-header__subtitle {
-        font-size: 1.1rem;
-        color: #6c757d;
-        margin-top: 0.5rem;
-        max-width: 600px;
-        margin-left: auto;
-        margin-right: auto;
+        font-size: 1.2rem;
+        color: #6b7280;
+        margin-top: 2rem;
+        position: relative;
+        z-index: 1;
     }
 
-    /* 1. Professional Grid Layout (3-4 items per row on web) */
+    /* --- Strict Grid Layout (Uniform Size) --- */
     .gallery-grid-pro {
         display: grid;
-        /* Start with 1 column for mobile */
         grid-template-columns: 1fr;
         gap: 2rem;
     }
-    /* 2 columns for tablets */
     @media (min-width: 768px) {
         .gallery-grid-pro {
             grid-template-columns: repeat(2, 1fr);
         }
     }
-    /* 3 columns for desktops */
     @media (min-width: 1024px) {
         .gallery-grid-pro {
             grid-template-columns: repeat(3, 1fr);
@@ -72,126 +81,171 @@
     }
 
 
+    /* --- Card Structure and Animation --- */
     .gallery-card-pro {
-        display: block;
+        display: flex;
+        flex-direction: column;
         text-decoration: none;
-        border-radius: 16px;
+        background-color: var(--gallery-text-light);
+        border-radius: 12px;
         overflow: hidden;
-        position: relative;
-        aspect-ratio: 4 / 3; /* Maintain a consistent shape */
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        transform: perspective(1000px); /* Enable 3D transforms */
-        /* Animation setup */
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.4s ease-out;
+        
+        /* Animation State */
         opacity: 0;
-        transform: translateY(30px) perspective(1000px);
+        transform: translateY(20px) scale(0.98);
     }
+    
     .gallery-card-pro.is-visible {
         opacity: 1;
-        transform: translateY(0) perspective(1000px);
+        transform: translateY(0) scale(1);
     }
+    
     .gallery-card-pro:hover {
-        transform: translateY(-10px) perspective(1000px) rotateX(5deg) rotateY(-3deg);
-        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+        transform: translateY(-5px) scale(1.01);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Container for the image, maintaining strict aspect ratio */
+    .gallery-image-wrapper {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 4 / 3; /* Fixed, uniform ratio */
+        overflow: hidden;
     }
 
     .gallery-card-pro__image {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.4s ease;
+        transition: transform 0.5s ease;
+    }
+    .gallery-card-pro:hover .gallery-card-pro__image {
+        transform: scale(1.08); /* Clean zoom effect on image */
     }
 
-    /* 2. Glassmorphism Overlay */
-    .gallery-card-pro__overlay {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(to top, rgba(10, 20, 40, 0.9) 0%, rgba(10, 20, 40, 0) 70%);
-        padding: 1.5rem;
+    /* --- Clean Footer Overlay (Title/Meta) --- */
+    .gallery-card-pro__footer {
+        padding: 1rem 1.25rem 1.5rem;
         display: flex;
         flex-direction: column;
-        justify-content: flex-end;
+        flex-grow: 1;
+        justify-content: space-between;
     }
 
     .gallery-card-pro__title {
-        font-size: 1.3rem;
-        font-weight: 600;
-        color: var(--gallery-text-light);
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--gallery-text-dark);
         margin: 0 0 0.5rem 0;
     }
     .gallery-card-pro__meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 0.5rem;
+    }
+    .gallery-card-pro__info {
         display: flex;
         align-items: center;
         gap: 0.5rem;
         font-size: 0.9rem;
         font-weight: 500;
-        color: rgba(255, 255, 255, 0.8);
+        color: #6b7280;
     }
     
-    /* 3. "View Gallery" Button for Clearer Link Indication */
+    /* --- View Button (Always visible in the footer) --- */
     .gallery-card-pro__button {
-        position: absolute;
-        bottom: 1.5rem;
-        right: 1.5rem;
         background-color: var(--gallery-primary);
         color: white;
         padding: 8px 16px;
-        border-radius: 50px;
-        font-size: 0.9rem;
-        font-weight: 500;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
         text-decoration: none;
-        opacity: 0;
-        transform: translateY(20px);
-        transition: all 0.4s ease;
+        transition: background-color 0.3s ease;
+        text-align: center;
+        min-width: 120px;
     }
-    .gallery-card-pro:hover .gallery-card-pro__button {
-        opacity: 1;
-        transform: translateY(0);
+    
+    .gallery-card-pro__button:hover {
+        background-color: var(--gallery-primary-dark);
     }
 </style>
+{% endblock %}
 
+{% block content %}
 <div class="gallery-container-pro">
     <header class="gallery-header">
-        <h2 class="gallery-header__title">Our Gallery</h2>
-        <p class="gallery-header__subtitle">Explore moments and memories from our school's events and activities.</p>
+        <h2 class="gallery-header__title">Official <span style="color: var(--gallery-primary);">Photo Gallery</span></h2>
+        <p class="gallery-header__subtitle">Explore the cherished moments and vibrant memories from our school's recent events and academic milestones.</p>
     </header>
 
     <main>
         {% if items %}
         <div class="gallery-grid-pro">
             {% for item in items %}
-            <a href="{{ url_for('public.gallery_detail', id=item.id) }}" class="gallery-card-pro" style="animation-delay: {{ loop.index0 * 0.07 }}s;">
-                <img src="{{ item.images.split(',')[0] }}" alt="{{ item.title }}" class="gallery-card-pro__image">
-                <div class="gallery-card-pro__overlay">
+            <a href="{{ url_for('public.gallery_detail', id=item.id) }}" 
+               class="gallery-card-pro" 
+               style="animation-delay: 0.1s;" 
+               title="View {{ item.title }} Photos">
+                
+                <div class="gallery-image-wrapper">
+                    <img src="{{ item.images.split(',')[0] }}" alt="{{ item.title }} - Album Cover" class="gallery-card-pro__image">
+                </div>
+                
+                <div class="gallery-card-pro__footer">
                     <div>
                         <h3 class="gallery-card-pro__title">{{ item.title }}</h3>
-                        <div class="gallery-card-pro__meta">
-                            <i class="fas fa-images"></i>
-                            <span>{{ item.images.split(',')|length }} Image(s)</span>
+                        <div class="gallery-card-pro__info">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>{{ item.timestamp.strftime('%d %B %Y')  if item.timestamp else 'Recent Event' }}</span>
                         </div>
                     </div>
-                    <div class="gallery-card-pro__button">
-                        View Gallery <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+                    
+                    <div class="gallery-card-pro__meta">
+                        <div class="gallery-card-pro__info">
+                            <i class="fas fa-images"></i>
+                            <span class="font-bold text-gray-700">{{ item.images.split(',')|length }} Photo{{ 's' if item.images.split(',')|length != 1 }}</span>
+                        </div>
+                        
+                        <span class="gallery-card-pro__button" aria-hidden="true">
+                            View Album
+                        </span>
                     </div>
                 </div>
             </a>
             {% endfor %}
         </div>
         {% else %}
-            <div class="alert alert-info text-center">There are no gallery items to display at the moment. Please check back later!</div>
+            <div class="text-center py-10 bg-white shadow-lg rounded-xl mt-10 border border-gray-200">
+                <i class="fas fa-camera text-5xl text-gray-400 mb-4"></i>
+                <p class="text-xl text-gray-600">The photo gallery is currently empty. Check back soon for new memories!</p>
+            </div>
         {% endif %}
     </main>
 </div>
 
+{% endblock %}
+
+{% block scripts_extra %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Scroll Reveal Animation for the cards
+    // Scroll Reveal Animation
     const animatedCards = document.querySelectorAll('.gallery-card-pro');
+    
     if ("IntersectionObserver" in window) {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
+                const delay = parseFloat(entry.target.style.animationDelay || '0');
+                
                 if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
+                    // Apply 'is-visible' after the calculated CSS delay
+                    setTimeout(() => {
+                        entry.target.classList.add('is-visible');
+                    }, delay * 1000);
+
                     observer.unobserve(entry.target);
                 }
             });

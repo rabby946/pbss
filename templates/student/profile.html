@@ -1,0 +1,52 @@
+{% extends "student/base.html" %}
+{% block title %}My Profile{% endblock %}
+{% block student_content %}
+<div class="container mt-5">
+  <div class="card shadow-sm border-0 p-4">
+    <div class="text-center mb-4">
+      <img src="{{ student.image_url or url_for('static', filename='images/default-avatar.png') }}" 
+           class="rounded-circle shadow-sm" width="140" height="140" style="object-fit: cover;">
+      <h4 class="mt-3 text-primary">{{ student.name }}</h4>
+      <p class="mb-1 text-muted">{{ user.email }}</p>
+      <p class="small text-secondary">Last Updated: {{ student.updated_at.strftime('%Y-%m-%d %H:%M') if student.updated_at else 'N/A' }}</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Full Name</label>
+          <input type="text" name="name" class="form-control" value="{{ student.name }}" required>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Blood Group</label>
+          <input type="text" name="blood_group" class="form-control" value="{{ student.blood_group or '' }}">
+        </div>
+
+        <div class="col-md-12 mb-3">
+          <label class="form-label">Address</label>
+          <textarea name="address" class="form-control" rows="2">{{ student.address or '' }}</textarea>
+        </div>
+
+        <div class="col-md-12 mb-3">
+          <label class="form-label">Profile Image</label>
+          <input type="file" name="image" class="form-control">
+        </div>
+      </div>
+
+      <div class="text-center mt-3">
+        <button type="submit" class="btn btn-primary px-4">Update Profile</button>
+      </div>
+    </form>
+
+    <hr class="my-4">
+    <div>
+      <h6>Student Information</h6>
+      <p><strong>Student ID:</strong> {{ student.studentID }}</p>
+      <p><strong>Class:</strong> {{ student.class_.name if student.class_ else 'N/A' }}</p>
+      <p><strong>Roll:</strong> {{ student.roll or 'N/A' }}</p>
+      <p><strong>Batch:</strong> {{ student.batch or 'N/A' }}</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

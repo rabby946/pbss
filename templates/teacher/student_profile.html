@@ -1,0 +1,134 @@
+{% extends "teacher/base.html" %}
+
+{% block title %}{{ student.name }} - Profile{% endblock %}
+{% block page_title %}Student Profile{% endblock %}
+
+{% block teacher_content %}
+<div class="container py-4">
+
+  <!-- Student Info Card -->
+  <div class="card shadow-lg border-0 rounded-4 mb-4 overflow-hidden">
+    <div class="row g-0 align-items-center" style="background: linear-gradient(135deg, #0072ff, #00c6ff); color: white;">
+      <div class="col-md-3 text-center p-4">
+        <img src="{{ student.image_url or url_for('static', filename='img/default-avatar.png') }}"
+             alt="Student Photo"
+             class="rounded-circle border border-3 border-white shadow-sm"
+             width="130" height="130"
+             style="object-fit: cover;">
+      </div>
+      <div class="col-md-9 py-4 px-4">
+        <h3 class="fw-bold mb-1">{{ student.name }}</h3>
+        <p class="mb-1"><i class="bi bi-person-badge"></i> <strong>ID:</strong> {{ student.studentID }}</p>
+        <p class="mb-1"><i class="bi bi-person-badge"></i> <strong>Roll:</strong> {{ student.roll }}</p>
+        <p class="mb-1"><i class="bi bi-journal-bookmark"></i> <strong>Class:</strong> {{ student.class_.name }} ({{ student.class_.section }})</p>
+        <p class="mb-1"><i class="bi bi-geo-alt"></i> <strong>Address:</strong> {{ student.address or 'Not provided' }}</p>
+        <p class="mb-1"><i class="bi bi-envelope"></i> <strong>Email:</strong> {{ student.user.email or 'N/A' }}</p>
+        <p class="mb-0">
+          {% if student.due_amount > 0 %}
+            <span class="badge bg-danger fs-6 p-2 mt-2">💰 Due Amount: ${{ "%.2f"|format(student.due_amount) }}</span>
+          {% else %}
+            <span class="badge bg-success fs-6 p-2 mt-2">✅ All Fees Cleared</span>
+          {% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Summary Section -->
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body">
+          <h5 class="fw-bold mb-3"><i class="bi bi-credit-card"></i> Payment History</h5>
+
+          <div class="table-responsive">
+            <table class="table table-striped align-middle mb-0">
+              <thead class="text-white" style="background: #0072ff;">
+                <tr>
+                  <th>#</th>
+                  <th>Amount</th>
+                  <th>Payment Method</th>
+                  <th>Reference</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for t in transactions %}
+                <tr>
+                  <td>{{ loop.index }}</td>
+                  <td>${{ "%.2f"|format(t.amount) }}</td>
+                  <td>{{ t.payment_method }}</td>
+                  <td>{{ t.reference or '—' }}</td>
+                  <td>{{ t.created_at.strftime('%Y-%m-%d') }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="5" class="text-center text-muted py-3">No payment records found.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Summary -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body">
+          <h5 class="fw-bold mb-3"><i class="bi bi-info-circle"></i> Account Summary</h5>
+
+          <ul class="list-group list-group-flush mb-3">
+            <li class="list-group-item d-flex justify-content-between">
+              <span>Total Paid</span>
+              <strong class="text-success">${{ "%.2f"|format(total_paid) }}</strong>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+              <span>Due Amount</span>
+              {% if student.due_amount > 0 %}
+                <strong class="text-danger">${{ "%.2f"|format(student.due_amount) }}</strong>
+              {% else %}
+                <strong class="text-success">$0.00</strong>
+              {% endif %}
+            </li>
+          </ul>
+
+          {% if is_cleared %}
+          <form method="POST">
+            <button type="submit" class="btn btn-success w-100 fw-bold rounded-pill">
+              ✅ Issue Exam Clearance 
+            </button>
+          </form>
+          {% else %}
+          <div class="alert alert-warning text-center fw-semibold rounded-3">
+            ⚠️ Clearance denied. Please clear all dues first.
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<style>
+.table th, .table td {
+  vertical-align: middle;
+}
+.card {
+  transition: transform 0.25s ease;
+}
+.card:hover {
+  transform: translateY(-3px);
+}
+.badge {
+  font-weight: 500;
+}
+@media (max-width: 768px) {
+  .card .col-md-9 {
+    text-align: center;
+  }
+}
+</style>
+{% endblock %}

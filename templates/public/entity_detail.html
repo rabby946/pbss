@@ -119,7 +119,12 @@
         <div class="profile-details-magazine">
             <h1 class="profile-name-magazine">{{ item.name }}</h1>
             <p class="profile-position-magazine">{{ item.position }}</p>
-            <p class="profile-description-magazine">{{ description }}</p>
+            {%if item.designation: %}
+                <p class="profile-description-magazine">{{ item.designation }}</p>
+                {%else %}
+                    <p class="profile-description-magazine">{{ description }}</p>
+            {%endif%}
+            
             <a href="{{ url_for(endpoint) }}" class="back-button-magazine">
                 <i class="fas fa-arrow-left"></i>
                 <span>Go Back</span>

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 {% block title %}Gallery Management{% endblock %}
 
 {% block content %}
@@ -219,15 +219,15 @@
     <header class="admin-header">
         <div class="admin-header__top">
             <h2 class="admin-header__title">Gallery Management</h2>
-            <a href="{{ url_for('admin.dashboard') }}" class="admin-btn--back">
+            <a href="{{ url_for('admin_bp.dashboard') }}" class="admin-btn--back">
                 <i class="fas fa-arrow-left"></i> Back to Dashboard
             </a>
         </div>
         <div class="admin-header__controls">
-            <a href="{{ url_for('admin.gallery_swap') }}" class="admin-btn admin-btn--secondary">
+            <a href="{{ url_for('admin_bp.gallery_swap') }}" class="admin-btn admin-btn--secondary">
                 <i class="fas fa-exchange-alt"></i> Reorder Gallery
             </a>
-            <a href="{{ url_for('admin.add_gallery') }}" class="admin-btn admin-btn--primary">
+            <a href="{{ url_for('admin_bp.add_gallery') }}" class="admin-btn admin-btn--primary">
                 <i class="fas fa-plus"></i> Add New Gallery
             </a>
         </div>
@@ -257,13 +257,13 @@
                            <i class="fas fa-calendar-alt"></i> {{ item.timestamp.strftime('%d %b %Y') }}
                         </span>
                         <div class="gallery-card__actions">
-                            <a href="{{ url_for('admin.edit_gallery', id=item.id) }}" class="action-btn action-btn--edit" title="Edit">
+                            <a href="{{ url_for('admin_bp.edit_gallery', id=item.id) }}" class="action-btn action-btn--edit" title="Edit">
                                 <i class="fas fa-pencil-alt"></i>
                             </a>
                             <button class="action-btn action-btn--delete delete-btn" 
                                     title="Delete"
                                     data-title="{{ item.title }}"
-                                    data-url="{{ url_for('admin.delete_gallery', id=item.id) }}">
+                                    data-url="{{ url_for('admin_bp.delete_gallery', id=item.id) }}">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>

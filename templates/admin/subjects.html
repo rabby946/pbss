@@ -1,0 +1,302 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Manage Subjects{% endblock %}
+
+{% block head_extra %}
+<style>
+    /* These styles perfectly match your admin/base.html design system */
+    .page-header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+    .page-title {
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--admin-text);
+    }
+    .search-wrapper {
+        position: relative;
+        max-width: 350px;
+        width: 100%;
+    }
+    .search-input {
+        padding-left: 2.75rem;
+        border-radius: 50px;
+    }
+    .search-wrapper .fa-search {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--admin-text-muted);
+    }
+    .form-card {
+        background-color: var(--admin-card-bg);
+        border: 1px solid var(--admin-border);
+        border-radius: var(--admin-radius, 0.75rem);
+        box-shadow: var(--admin-shadow);
+        margin-bottom: 2rem;
+    }
+    .table-card {
+        background-color: var(--admin-card-bg);
+        border: 1px solid var(--admin-border);
+        border-radius: var(--admin-radius, 0.75rem);
+        box-shadow: var(--admin-shadow);
+        overflow: hidden;
+    }
+    .subject-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .subject-table thead th {
+        text-align: left;
+        padding: 1rem 1.5rem;
+        font-weight: 500;
+        color: var(--admin-text-muted);
+        background-color: var(--admin-bg);
+        text-transform: uppercase;
+        font-size: 0.8rem;
+    }
+    .subject-table tbody td {
+        padding: 1rem 1.5rem;
+        vertical-align: middle;
+        border-top: 1px solid var(--admin-border);
+    }
+    .subject-table tbody tr:hover {
+        background-color: #f8fafc;
+    }
+    .action-buttons a, .action-buttons button {
+        color: var(--admin-text-muted);
+        transition: color 0.2s ease;
+    }
+    .action-buttons a:hover, .action-buttons button:hover { color: var(--admin-brand); }
+    .action-btn--delete:hover { color: var(--bs-danger, #dc3545); }
+    .subject-row {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    }
+    .subject-row.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    @media (max-width: 992px) {
+        .subject-table thead { display: none; }
+        .subject-table tbody, .subject-table tr, .subject-table td { display: block; width: 100%; }
+        .subject-table tr {
+            margin-bottom: 1rem;
+            border: 1px solid var(--admin-border);
+            border-radius: var(--admin-radius, 0.75rem);
+            padding: 1rem;
+        }
+        .subject-table tbody {
+            padding: 1rem;
+            background-color: var(--admin-bg);
+        }
+        .table-card { background: transparent; border: none; box-shadow: none; }
+        .subject-table td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border: none;
+        }
+        .subject-table td:not(:last-child) { border-bottom: 1px solid var(--admin-border); }
+        .subject-table td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: var(--admin-text);
+            margin-right: 1rem;
+        }
+    }
+    .no-results { display: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Manage Subjects</h1>
+    <div class="d-flex gap-2">
+        <div class="search-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" id="subjectSearch" class="form-control search-input" placeholder="Filter subjects...">
+        </div>
+        <button class="btn btn-primary" id="add-subject-btn">
+            <i class="fa fa-plus me-2"></i> Add Subject
+        </button>
+    </div>
+</div>
+
+<div class="collapse" id="subject-form-collapse">
+    <div class="form-card">
+        <form method="POST" id="subject-form" class="p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 id="form-title" class="mb-0 fs-5 fw-semibold"></h3>
+                <button type="button" class="btn-close" id="form-close-btn"></button>
+            </div>
+            <input type="hidden" name="action" id="form-action">
+            <input type="hidden" name="subject_id" id="form-subject-id">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Subject Name</label>
+                    <input type="text" class="form-control" name="name" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Subject Code</label>
+                    <input type="text" class="form-control" name="code" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Class</label>
+                    <select name="class_id" class="form-select" required>
+                        <option value="">-- Select Class --</option>
+                        {% for cls in classes %}
+                        <option value="{{ cls.id }}">{{ cls.name }} ({{ cls.section }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="mt-4 text-end">
+                <button type="button" class="btn btn-secondary" id="form-cancel-btn">Cancel</button>
+                <button type="submit" class="btn" id="form-submit-btn"></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="subject-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Code</th>
+                    <th>Class</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sub in subjects %}
+                <tr class="subject-row" data-search-term="{{ sub.name|lower }} {{ sub.code|lower }} {{ sub.class_.name|lower }}">
+                    <td data-label="Name"><strong>{{ sub.name }}</strong></td>
+                    <td data-label="Code">{{ sub.code or '-' }}</td>
+                    <td data-label="Class">{{ sub.class_.name }} ({{ sub.class_.section }})</td>
+                    <td data-label="Actions" class="text-end">
+                        <div class="action-buttons d-inline-flex gap-3">
+                            <button class="btn btn-link p-0 edit-subject-btn" title="Edit Subject"
+                                    data-subject-id="{{ sub.id }}"
+                                    data-name="{{ sub.name }}"
+                                    data-code="{{ sub.code }}"
+                                    data-class-id="{{ sub.class_id }}">
+                                <i class="fa fa-edit fs-5"></i>
+                            </button>
+                            <a href="{{ url_for('admin_bp.manage_subjects', delete_id=sub.id) }}" class="btn btn-link p-0 action-btn--delete" title="Delete Subject"
+                               onclick="return confirm('Are you sure you want to delete this subject?')">
+                                <i class="fa fa-trash fs-5"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr class="no-results">
+                    <td colspan="4" class="text-center text-muted p-5">No subjects found matching your search.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Live Search ---
+    const searchInput = document.getElementById('subjectSearch');
+    const tableRows = document.querySelectorAll('.subject-row');
+    const noResultsRow = document.querySelector('.no-results');
+    if (searchInput) {
+        searchInput.addEventListener('keyup', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            let visibleCount = 0;
+            tableRows.forEach(row => {
+                if (row.dataset.searchTerm.includes(searchTerm)) {
+                    row.style.display = 'table-row';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            noResultsRow.style.display = visibleCount === 0 ? 'table-row' : 'none';
+        });
+    }
+
+    // --- Staggered Animation on Scroll ---
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.subject-row').forEach((row, index) => {
+        
+        observer.observe(row);
+    });
+    
+    // --- Accordion Form Logic ---
+    const formCollapseEl = document.getElementById('subject-form-collapse');
+    const formCollapse = new bootstrap.Collapse(formCollapseEl, { toggle: false });
+    
+    const formEl = document.getElementById('subject-form');
+    const formTitle = document.getElementById('form-title');
+    const formSubmitBtn = document.getElementById('form-submit-btn');
+    const formActionInput = document.getElementById('form-action');
+    const formSubjectIdInput = document.getElementById('form-subject-id');
+
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Configure and open for ADDING
+    document.getElementById('add-subject-btn').addEventListener('click', () => {
+        formEl.reset();
+        formTitle.textContent = 'Add New Subject';
+        formActionInput.value = 'add';
+        formSubjectIdInput.value = '';
+        formSubmitBtn.textContent = 'Add Subject';
+        formSubmitBtn.className = 'btn btn-success';
+        formCollapse.show();
+        scrollToTop();
+    });
+
+    // Configure and open for EDITING
+    document.querySelectorAll('.edit-subject-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            formEl.reset();
+            formTitle.textContent = `Edit Subject: ${button.dataset.name}`;
+            formActionInput.value = 'edit';
+            formSubjectIdInput.value = button.dataset.subjectId;
+            formSubmitBtn.textContent = 'Save Changes';
+            formSubmitBtn.className = 'btn btn-primary';
+
+            // Populate form fields
+            formEl.querySelector('[name="name"]').value = button.dataset.name;
+            formEl.querySelector('[name="code"]').value = button.dataset.code;
+            formEl.querySelector('[name="class_id"]').value = button.dataset.classId;
+
+            formCollapse.show();
+            scrollToTop();
+        });
+    });
+
+    // Close buttons for the form
+    document.getElementById('form-close-btn').addEventListener('click', () => formCollapse.hide());
+    document.getElementById('form-cancel-btn').addEventListener('click', () => formCollapse.hide());
+});
+</script>
+{% endblock %}

@@ -8,6 +8,9 @@ from config import Config
 from routes.public import public_bp
 from routes.admin import admin_bp
 from routes.student import student_bp
+
+
+
 from routes.teacher import teacher_bp    
 
 # Load environment variables
@@ -35,4 +38,4 @@ app.register_blueprint(teacher_bp, url_prefix="/teacher")
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, debug=True)

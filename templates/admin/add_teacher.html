@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container mt-4">
     <h2>Add New Teacher</h2>
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data" id="addTeacherForm">
         <div class="mb-3">
             <label>Name *</label>
             <input type="text" name="name" class="form-control" required>
@@ -48,8 +48,18 @@
             <input type="file" name="image" class="form-control">
         </div>
 
-        <button type="submit" class="btn btn-success">Add Teacher</button>
+        <button type="submit" id="submitBtn" class="btn btn-success">
+            Add Teacher
+        </button>
         <a href="{{ url_for('admin_bp.list_teachers') }}" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
+
+<script>
+document.getElementById('addTeacherForm').addEventListener('submit', function(e) {
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting...';
+});
+</script>
 {% endblock %}

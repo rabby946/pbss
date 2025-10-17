@@ -64,9 +64,9 @@ class Report(db.Model):
 # Users - central auth table
 class User(db.Model):
     __tablename__ = 'users'
-    email = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(255), nullable=True)
 
-    id = db.Column(db.BigInteger, primary_key=True)
+    id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
     user_type = db.Column(
         db.Enum('student', 'teacher', 'admin', name='user_types'),
         nullable=False,
@@ -223,7 +223,7 @@ class ExamResult(db.Model):
     subject_id = db.Column(db.BigInteger, db.ForeignKey('subjects.id', ondelete='CASCADE'), nullable=False)
     exam_type = db.Column(db.Enum('midterm', 'final', 'quiz', 'class_test', name='exam_types'), nullable=False)
     marks = db.Column(db.Float)
-    grade = db.Column(db.String(10))   # flexible: 'A+', 'A', or numeric string if you prefer
+    grade = db.Column(db.String(10))   
     exam_date = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

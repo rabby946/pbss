@@ -16,54 +16,60 @@
                 <label for="day" class="form-label fw-bold mb-0">Select Day:</label>
                 <select name="day" id="day" class="form-select w-auto" onchange="this.form.submit()">
                     {% for day in ['Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday'] %}
-                        <option value="{{ day }}" {% if selected_day == day %}selected{% endif %}>{{ day }}</option>
+                    <option value="{{ day }}" {% if selected_day==day %}selected{% endif %}>{{ day }}</option>
                     {% endfor %}
                 </select>
             </form>
 
             {% if routines|length == 0 %}
-                <div class="text-center py-5 text-muted">
-                    <i class="bi bi-inbox display-5"></i>
-                    <p class="mt-3 mb-0">No classes scheduled for {{ selected_day }}.</p>
-                </div>
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-inbox display-5"></i>
+                <p class="mt-3 mb-0">No classes scheduled for {{ selected_day }}.</p>
+            </div>
             {% else %}
-                <ul class="list-group list-group-flush">
-                    {% set colors = ['#e3f2fd', '#e8f5e9', '#fff3e0', '#fce4ec'] %}
-                    {% for routine, subject in routines %}
-                        {% set bg_color = colors[loop.index0 % colors|length] %}
-                        <li class="list-group-item border-0 mb-3 rounded-3 shadow-sm"
-                            style="background-color: {{ bg_color }}">
-                            <div class="d-flex justify-content-between flex-wrap align-items-center">
-                                <h5 class="mb-1 text-primary fw-bold">{{ subject.name }}</h5>
-                                <small class="text-muted">
-                                    <i class="bi bi-clock me-1"></i>
-                                    {{ routine.start_time.strftime('%I:%M %p') }} - {{ routine.end_time.strftime('%I:%M %p') }}
-                                    ({{ ((routine.end_time.hour*60 + routine.end_time.minute) - (routine.start_time.hour*60 + routine.start_time.minute)) }} mins)
-                                </small>
-                            </div>
-                            <p class="mb-0">
-                                <i class="bi bi-person-badge me-1"></i>
-                                Teacher: {{ routine.teacher.name }}
-                            </p>
-                        </li>
-                    {% endfor %}
-                </ul>
+            <ul class="list-group list-group-flush">
+                {% set colors = ['#e3f2fd', '#e8f5e9', '#fff3e0', '#fce4ec'] %}
+                {% for routine in routines %}
+                {% set bg_color = colors[loop.index0 % colors|length] %}
+                <li class="list-group-item border-0 mb-3 rounded-3 shadow-sm" style="background-color: {{ bg_color }}">
+                    <div class="d-flex justify-content-between flex-wrap align-items-center">
+                        <h5 class="mb-1 text-primary fw-bold">{{ routine.subject.name }}</h5>
+                        <small class="text-muted">
+                            <i class="bi bi-clock me-1"></i>
+                            {{ routine.start_time.strftime('%I:%M %p') }} - {{ routine.end_time.strftime('%I:%M %p') }}
+                        </small>
+                    </div>
+                    <p class="mb-0">
+                        <i class="bi bi-person-badge me-1"></i>
+                        Teacher: {{ routine.teacher.name }}
+                    </p>
+                </li>
+                {% endfor %}
+
+            </ul>
             {% endif %}
         </div>
     </div>
 </div>
 
 <style>
-.list-group-item {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.list-group-item:hover {
-    transform: scale(1.02);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-}
-@media (max-width: 768px) {
-    h4 { font-size: 1.1rem; }
-    h5 { font-size: 1rem; }
-}
+    .list-group-item {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .list-group-item:hover {
+        transform: scale(1.02);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    @media (max-width: 768px) {
+        h4 {
+            font-size: 1.1rem;
+        }
+
+        h5 {
+            font-size: 1rem;
+        }
+    }
 </style>
 {% endblock %}

@@ -1,186 +1,396 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ item.title }} : Palashbaria Secondary School{% endblock %}
+{% block title %}{{ item.title }} - Palashbaria Secondary School{% endblock %}
+
+{% block head_extra %}
+<style>
+    /* Article Container */
+    .article-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem 0;
+    }
+    
+    /* Breadcrumb Navigation */
+    .breadcrumb-nav {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    .breadcrumb-nav a {
+        color: #667eea;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    
+    .breadcrumb-nav a:hover {
+        color: #764ba2;
+    }
+    
+    .breadcrumb-separator {
+        color: #d1d5db;
+    }
+    
+    /* Article Card */
+    .article-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    
+    /* Article Header */
+    .article-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 3rem 2rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .article-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: pulse 8s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.5; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+    }
+    
+    .article-header-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .article-category {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        backdrop-filter: blur(10px);
+    }
+    
+    .article-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin: 0 0 1rem 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .article-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        font-size: 0.9375rem;
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .meta-item i {
+        opacity: 0.8;
+    }
+    
+    /* Article Body */
+    .article-body {
+        padding: 2.5rem 2rem;
+    }
+    
+    .article-content {
+        font-size: 1.125rem;
+        line-height: 1.8;
+        color: #374151;
+    }
+    
+    .article-content p {
+        margin-bottom: 1.5rem;
+    }
+    
+    .article-content p:last-child {
+        margin-bottom: 0;
+    }
+    
+    /* Article Footer */
+    .article-footer {
+        padding: 2rem;
+        background: #f9fafb;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    /* Back Button */
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: white;
+        color: #667eea;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        border: 2px solid #667eea;
+        transition: all 0.3s;
+    }
+    
+    .back-button:hover {
+        background: #667eea;
+        color: white;
+        transform: translateX(-4px);
+        box-shadow: 0 4px 6px -1px rgba(102, 126, 234, 0.3);
+    }
+    
+    .back-button i {
+        transition: transform 0.3s;
+    }
+    
+    .back-button:hover i {
+        transform: translateX(-4px);
+    }
+    
+    /* Share Buttons */
+    .share-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .share-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #6b7280;
+    }
+    
+    .share-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .share-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        color: white;
+        text-decoration: none;
+        transition: all 0.3s;
+        font-size: 1.125rem;
+    }
+    
+    .share-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    }
+    
+    .share-btn.facebook {
+        background: #1877f2;
+    }
+    
+    .share-btn.twitter {
+        background: #1da1f2;
+    }
+    
+    .share-btn.whatsapp {
+        background: #25d366;
+    }
+    
+    .share-btn.copy {
+        background: #6b7280;
+    }
+    
+    /* Related News Section */
+    .related-section {
+        margin-top: 3rem;
+        padding: 2rem;
+        background: #f9fafb;
+        border-radius: 12px;
+    }
+    
+    .related-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .related-title i {
+        color: #667eea;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .article-wrapper {
+            padding: 1rem 0;
+        }
+        
+        .article-header {
+            padding: 2rem 1.5rem;
+        }
+        
+        .article-title {
+            font-size: 1.875rem;
+        }
+        
+        .article-body {
+            padding: 1.5rem;
+        }
+        
+        .article-content {
+            font-size: 1rem;
+        }
+        
+        .article-footer {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 1.5rem;
+        }
+        
+        .share-section {
+            width: 100%;
+            justify-content: space-between;
+        }
+        
+        .back-button {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<style>
-  /*
- * ===============================================
- * STYLES FOR THE NEWS ARTICLE VISTA
- * ===============================================
- */
+<div class="article-wrapper">
+    <!-- Breadcrumb Navigation -->
+    <nav class="breadcrumb-nav">
+        <a href="{{ url_for('public.home') }}">
+            <i class="fas fa-home"></i> Home
+        </a>
+        <span class="breadcrumb-separator">/</span>
+        <a href="{{ url_for('public.news') }}">News</a>
+        <span class="breadcrumb-separator">/</span>
+        <span class="text-gray-900">{{ item.title[:30] }}{% if item.title|length > 30 %}...{% endif %}</span>
+    </nav>
 
-/* --- Variable Definitions for Easy Customization --- */
-:root {
-  --vista-bg-color-1: #0d023a;
-  --vista-bg-color-2: #1c0f5c;
-  --vista-glow-color-1: #ff00c1;
-  --vista-glow-color-2: #9b4aff;
-  --vista-glow-color-3: #00d9ff;
-  --vista-text-primary: #f0f0f0;
-  --vista-text-secondary: #c0c0c0;
-  --vista-border-color: rgba(255, 255, 255, 0.2);
-  --vista-card-background: rgba(22, 12, 65, 0.5);
-  --vista-font-family: 'Poppins', sans-serif;
-  --vista-animation-duration: 12s;
-}
+    <!-- Article Card -->
+    <article class="article-card">
+        <!-- Article Header -->
+        <header class="article-header">
+            <div class="article-header-content">
+                <div class="article-category">
+                    <i class="fas fa-newspaper"></i>
+                    <span>School News</span>
+                </div>
+                
+                <h1 class="article-title">{{ item.title }}</h1>
+                
+                <div class="article-meta">
+                    <div class="meta-item">
+                        <i class="far fa-calendar"></i>
+                        <span>{{ item.timestamp.strftime('%B %d, %Y') }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="far fa-clock"></i>
+                        <span>{{ item.timestamp.strftime('%I:%M %p') }}</span>
+                    </div>
+                </div>
+            </div>
+        </header>
 
-/* --- Animated Aurora Background --- */
-/* This style should be applied to the body or a full-page wrapper in your base.html */
-body {
-  background-color: var(--vista-bg-color-1);
-  background-image:
-    radial-gradient(at 20% 25%, var(--vista-glow-color-1) 0px, transparent 50%),
-    radial-gradient(at 75% 30%, var(--vista-glow-color-2) 0px, transparent 50%),
-    radial-gradient(at 50% 80%, var(--vista-glow-color-3) 0px, transparent 50%),
-    radial-gradient(at 80% 95%, var(--vista-glow-color-1) 0px, transparent 50%);
-  background-repeat: no-repeat;
-  background-size: 200% 200%;
-  color: var(--vista-text-primary);
-  font-family: var(--vista-font-family);
-  animation: aurora-flow var(--vista-animation-duration) ease-in-out infinite;
-  overflow-x: hidden; /* Prevents horizontal scrollbar */
-}
+        <!-- Article Body -->
+        <div class="article-body">
+            <div class="article-content">
+                <p>{{ item.description }}</p>
+            </div>
+        </div>
 
-@keyframes aurora-flow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* --- Main Container --- */
-.news-article-vista--container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 80vh; /* Adjust as needed */
-  padding: 2rem 1rem;
-}
-
-/* --- The Glassmorphism Card --- */
-@keyframes fadeInSlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.news-article-vista--card {
-  width: 100%;
-  max-width: 800px;
-  background: var(--vista-card-background);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px); /* For Safari */
-  border: 1px solid var(--vista-border-color);
-  border-radius: 20px;
-  padding: 2rem 2.5rem;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem; /* Space between header, body, footer */
-  animation: fadeInSlideUp 0.8s ease-out forwards;
-}
-
-/* --- Header and Title --- */
-.news-article-vista--header {
-  text-align: center;
-  border-bottom: 1px solid var(--vista-border-color);
-  padding-bottom: 1.5rem;
-}
-
-.news-article-vista--title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  line-height: 1.2;
-  margin: 0 0 0.5rem 0;
-  background: linear-gradient(90deg, #e0e0e0, #ffffff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-}
-
-.news-article-vista--meta {
-  font-size: 0.9rem;
-  font-weight: 300;
-  color: var(--vista-text-secondary);
-  letter-spacing: 0.5px;
-}
-
-/* --- Body Content --- */
-.news-article-vista--body p {
-  font-size: 1.1rem;
-  font-weight: 400;
-  line-height: 1.8;
-  color: var(--vista-text-primary);
-  margin: 0;
-}
-
-/* --- Footer and Back Link --- */
-.news-article-vista--footer {
-  margin-top: 1rem;
-}
-
-.news-article-vista--back-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--vista-text-primary);
-  text-decoration: none;
-  border-radius: 50px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.news-article-vista--back-link svg {
-  transition: transform 0.3s ease;
-}
-
-.news-article-vista--back-link:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
-  transform: translateY(-2px);
-}
-
-.news-article-vista--back-link:hover svg {
-  transform: translateX(-4px);
-}
-
-/* --- Media Queries for Responsiveness --- */
-@media (max-width: 768px) {
-  .news-article-vista--card {
-    padding: 1.5rem;
-  }
-  .news-article-vista--title {
-    font-size: 2rem;
-  }
-  .news-article-vista--body p {
-    font-size: 1rem;
-  }
-}
-</style>
-<div class="news-article-vista--container">
-  <article class="news-article-vista--card">
-    <header class="news-article-vista--header">
-      <h1 class="news-article-vista--title">{{ item.title }}</h1>
-      <small class="news-article-vista--meta">Published: {{ item.timestamp.strftime('%B %d, %Y') }}</small>
-    </header>
-    <div class="news-article-vista--body">
-      <p>{{ item.description }}</p>
-    </div>
-    <footer class="news-article-vista--footer">
-      <a href="{{ url_for('public.news') }}" class="news-article-vista--back-link">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
-        </svg>
-        <span>Back to News</span>
-      </a>
-    </footer>
-  </article>
+        <!-- Article Footer -->
+        <footer class="article-footer">
+            <a href="{{ url_for('public.news') }}" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to News</span>
+            </a>
+            
+            <div class="share-section">
+                <span class="share-label">Share:</span>
+                <div class="share-buttons">
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}" 
+                       target="_blank" 
+                       class="share-btn facebook"
+                       title="Share on Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?url={{ request.url }}&text={{ item.title }}" 
+                       target="_blank" 
+                       class="share-btn twitter"
+                       title="Share on Twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="https://wa.me/?text={{ item.title }}%20{{ request.url }}" 
+                       target="_blank" 
+                       class="share-btn whatsapp"
+                       title="Share on WhatsApp">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                    <button onclick="copyLink()" 
+                            class="share-btn copy"
+                            title="Copy Link">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+            </div>
+        </footer>
+    </article>
 </div>
+
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+    function copyLink() {
+        const url = window.location.href;
+        navigator.clipboard.writeText(url).then(() => {
+            // Show a temporary success message
+            const btn = event.target.closest('.share-btn');
+            const originalIcon = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i>';
+            btn.style.background = '#10b981';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalIcon;
+                btn.style.background = '#6b7280';
+            }, 2000);
+        });
+    }
+</script>
 {% endblock %}

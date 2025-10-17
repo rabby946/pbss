@@ -1,266 +1,53 @@
-{% extends 'base.html' %}
-{% block title %}Add New Student{% endblock %}
+{% extends "admin/base.html" %}
+{% block title %}Add Student{% endblock %}
 
 {% block content %}
-<style>
-    /* Scoped styles for the Add Student page */
-    :root {
-        --admin-bg: #f8f9fa;
-        --admin-card-bg: #ffffff;
-        --admin-primary: #0d6efd;
-        --admin-border: #dee2e6;
-        --admin-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        --admin-text-dark: #212529;
-        --admin-text-light: #6c757d;
-        --admin-font: 'Poppins', sans-serif;
-    }
-
-    .add-form-container {
-        font-family: var(--admin-font);
-        max-width: 700px;
-        margin: 2rem auto;
-        padding: 2rem;
-    }
-
-    .add-form-card {
-        background-color: var(--admin-card-bg);
-        padding: 2.5rem;
-        border-radius: 16px;
-        box-shadow: var(--admin-shadow);
-        border: 1px solid var(--admin-border);
-    }
-
-    .add-form-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2.5rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px solid var(--admin-border);
-    }
-    .add-form-header__title {
-        font-size: 2.2rem;
-        font-weight: 600;
-        color: var(--admin-text-dark);
-        margin: 0;
-    }
-    .admin-btn--back {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 1rem;
-        font-weight: 500;
-        text-decoration: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        color: var(--admin-text-dark);
-        background-color: #e9ecef;
-        transition: all 0.3s ease;
-        border: 1px solid var(--admin-border);
-    }
-    .admin-btn--back:hover {
-        background-color: #dee2e6;
-        transform: translateY(-2px);
-    }
-
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-    .form-group label {
-        display: block;
-        font-size: 1rem;
-        font-weight: 500;
-        color: var(--admin-text-dark);
-        margin-bottom: 0.5rem;
-    }
-    .form-input {
-        width: 100%;
-        padding: 12px 15px;
-        font-size: 1rem;
-        border: 1px solid var(--admin-border);
-        border-radius: 8px;
-        background-color: #fff;
-        transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-    .form-input:focus {
-        outline: none;
-        border-color: var(--admin-primary);
-        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
-    }
-
-    /* --- New File Upload Styling --- */
-    .file-upload-wrapper .file-input-native {
-        display: none;
-    }
-    .file-input-custom {
-        border: 2px dashed var(--admin-border);
-        border-radius: 8px;
-        padding: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 1.5rem;
-        transition: background-color 0.3s ease, border-color 0.3s ease;
-    }
-    .file-input-custom.is-dragging {
-        background-color: #e9ecef;
-        border-color: var(--admin-primary);
-    }
-    .file-preview {
-        width: 120px;
-        height: 120px;
-        border-radius: 8px;
-        background-color: #e9ecef;
-        background-size: cover;
-        background-position: center;
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--admin-text-light);
-        font-size: 2.5rem;
-    }
-    .file-instructions {
-        cursor: pointer;
-    }
-    .file-instructions .upload-text {
-        font-weight: 500;
-        color: var(--admin-text-dark);
-    }
-    .file-instructions .upload-hint, #file-name-display {
-        font-size: 0.9rem;
-        color: var(--admin-text-light);
-    }
-    #file-name-display {
-        font-weight: 500;
-        color: var(--admin-primary);
-        margin-top: 0.5rem;
-        display: block; /* Ensure it takes its own line */
-    }
-
-    .form-actions {
-        margin-top: 2rem;
-        text-align: right;
-    }
-    .btn-submit {
-        font-size: 1.1rem;
-        font-weight: 600;
-        padding: 12px 25px;
-        border-radius: 8px;
-        border: none;
-        background-color: var(--admin-primary);
-        color: #fff;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    .btn-submit:hover {
-        background-color: #0b5ed7;
-        transform: translateY(-2px);
-    }
-</style>
-
-<div class="add-form-container">
-    <div class="add-form-card">
-        <header class="add-form-header">
-            <h2 class="add-form-header__title">Add New Student</h2>
-            <a href="{{ url_for('admin.students') }}" class="admin-btn--back">
-                <i class="fas fa-times"></i>
-                <span>Cancel</span>
-            </a>
-        </header>
-
-        <form method="POST" enctype="multipart/form-data">
-            
-            <div class="form-group">
-                <label for="name-input">Student's Name:</label>
-                <input type="text" id="name-input" name="name" class="form-input" required>
-            </div>
-
-            <div class="form-group">
-                <label for="roll-input">Description:</label>
-                <input type="text" id="roll-input" name="roll" class="form-input" required>
-            </div>
-
-            <div class="form-group">
-                <label for="photo-input">Student's Photo:</label>
-                
-                <div class="file-upload-wrapper" id="file-upload-wrapper">
-                    <input type="file" name="photo" id="photo-input" class="file-input-native" accept="image/*" required>
-                    
-                    <div class="file-input-custom">
-                        <div id="file-preview" class="file-preview">
-                            <i class="fas fa-image"></i>
-                        </div>
-                        <label for="photo-input" class="file-instructions">
-                            <span class="upload-text">Drag & drop an image here</span>
-                            <span class="upload-hint">or click to select a file</span>
-                            <span id="file-name-display"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="form-actions">
-                <button type="submit" class="btn-submit">Add Student</button>
-            </div>
-        </form>
-    </div>
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-title">Add Student</h1>
+    <a href="{{ url_for('admin_bp.list_students') }}" class="btn btn-secondary">
+        <i class="fa fa-arrow-left me-2"></i> Back to List
+    </a>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const fileUploadWrapper = document.getElementById('file-upload-wrapper');
-    const fileInputNative = document.getElementById('photo-input');
-    const fileNameDisplay = document.getElementById('file-name-display');
-    const filePreview = document.getElementById('file-preview');
+<div class="table-card p-4">
+    <form method="POST" action="{{ url_for('admin_bp.add_student') }}">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Full Name</label>
+                <input type="text" name="name" class="form-control" placeholder="Enter full name" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" placeholder="Enter student email" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Class</label>
+                <select name="class_id" class="form-select" required>
+                    <option value="">Select Class</option>
+                    {% for c in classes %}
+                    <option value="{{ c.id }}">{{ c.name }} ({{ c.section }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Batch</label>
+                <input type="number" name="batch" class="form-control" placeholder="e.g. 2025">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Roll</label>
+                <input type="number" name="roll" class="form-control" placeholder="Roll number " required>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Address</label>
+                <textarea name="address" class="form-control" rows="2" placeholder="Enter address"></textarea>
+            </div>
+        </div>
 
-    if (fileUploadWrapper && fileInputNative && fileNameDisplay && filePreview) {
-        
-        // Function to update the preview and file name
-        const updateDisplay = (file) => {
-            if (file) {
-                fileNameDisplay.textContent = `Selected: ${file.name}`;
-                // Create a URL for the selected image to show a preview
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    filePreview.style.backgroundImage = `url('${e.target.result}')`;
-                    filePreview.innerHTML = ''; // Remove the icon
-                };
-                reader.readAsDataURL(file);
-            }
-        };
-
-        // Update display when a file is chosen via click
-        fileInputNative.addEventListener('change', () => {
-            if (fileInputNative.files.length > 0) {
-                updateDisplay(fileInputNative.files[0]);
-            }
-        });
-
-        // Add visual feedback for drag-and-drop
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            fileUploadWrapper.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-            }, false);
-        });
-        ['dragenter', 'dragover'].forEach(eventName => {
-            fileUploadWrapper.addEventListener(eventName, () => fileUploadWrapper.classList.add('is-dragging'));
-        });
-        ['dragleave', 'drop'].forEach(eventName => {
-            fileUploadWrapper.addEventListener(eventName, () => fileUploadWrapper.classList.remove('is-dragging'));
-        });
-
-        // Handle the file drop
-        fileUploadWrapper.addEventListener('drop', (e) => {
-            const droppedFiles = e.dataTransfer.files;
-            if (droppedFiles.length > 0) {
-                // Assign the dropped files to our hidden input
-                fileInputNative.files = droppedFiles;
-                updateDisplay(droppedFiles[0]);
-            }
-        });
-    }
-});
-</script>
-
+        <div class="mt-4 text-end">
+            <button type="submit" class="btn btn-success px-4">
+                <i class="fa fa-save me-2"></i> Save Student
+            </button>
+        </div>
+    </form>
+</div>
 {% endblock %}

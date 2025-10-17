@@ -1,97 +1,46 @@
 {% extends "admin/base.html" %}
+
 {% block title %}Gallery Management{% endblock %}
 
-{% block content %}
+{% block head_extra %}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <style>
-    /* Scoped styles for the redesigned Gallery Management page */
-    :root {
-        --admin-bg: #f8f9fa;
-        --admin-card-bg: #ffffff;
-        --admin-primary: #6f42c1; /* Stylish Purple for Gallery */
-        --admin-secondary: #6c757d;
-        --admin-danger: #dc3545;
-        --admin-edit: #17a2b8;
-        --admin-border: #e9ecef;
-        --admin-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        --admin-text-dark: #212529;
-        --admin-text-light: #6c757d;
-        --admin-font: 'Poppins', sans-serif;
+    /* * This stylesheet uses the CSS variables from your admin/base.html 
+     * for seamless visual consistency (colors, fonts, shadows, etc.).
+    */
+
+    .page-wrapper {
+        animation: fadeIn 0.5s ease-out;
     }
 
-    .admin-container {
-        font-family: var(--admin-font);
-        max-width: 1200px;
-        margin: 2rem auto;
-        padding: 2rem;
-    }
-
-    .admin-header {
-        margin-bottom: 2.5rem;
-    }
-    .admin-header__top {
+    .page-header {
         display: flex;
+        flex-wrap: wrap;
         justify-content: space-between;
         align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
         padding-bottom: 1.5rem;
-        border-bottom: 1px solid var(--admin-border);
+        border-bottom: 1px solid var(--border-color);
     }
-    .admin-header__title {
+    .page-header h1 {
         font-size: 2.2rem;
-        font-weight: 600;
-        color: var(--admin-text-dark);
+        font-weight: 700;
+        color: var(--text-dark);
         margin: 0;
     }
-    .admin-btn--back {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 1rem;
-        font-weight: 500;
-        text-decoration: none;
-        padding: 10px 20px;
+    .page-header .btn {
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
         border-radius: 8px;
-        color: var(--admin-text-dark);
-        background-color: #e9ecef;
-        transition: all 0.3s ease;
-        border: 1px solid var(--admin-border);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .admin-btn--back:hover {
-        background-color: #dee2e6;
+    .page-header .btn:hover {
         transform: translateY(-2px);
-    }
-    
-    .admin-header__controls {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        align-items: center;
-        gap: 1.5rem;
-        padding-top: 1.5rem;
-    }
-    .admin-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.75rem;
-        font-size: 1rem;
-        font-weight: 500;
-        text-decoration: none;
-        padding: 12px 22px;
-        border-radius: 8px;
-        color: #fff;
-        transition: all 0.3s ease;
-        border: none;
-    }
-    .admin-btn--primary { background-color: var(--admin-primary); }
-    .admin-btn--secondary { background-color: var(--admin-secondary); }
-    .admin-btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        box-shadow: var(--shadow);
     }
 
+    /* --- Main Gallery Grid --- */
     .gallery-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -99,26 +48,29 @@
     }
 
     .gallery-card {
-        background: var(--admin-card-bg);
-        border-radius: 16px;
-        border: 1px solid var(--admin-border);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        background: rgb(255, 255, 255);
+        border-radius: var(--radius);
+        border: 1px solid rgb(201, 0, 0);
+        box-shadow: var(--shadow);
         display: flex;
         flex-direction: column;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.7s ease-out forwards;
     }
     .gallery-card:hover {
-        transform: translateY(-10px);
-        box-shadow: var(--admin-shadow);
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 10px 30px rgba(0, 31, 53, 0.588);
     }
 
-    /* --- NEW: Image Cycler --- */
+    /* --- Image Cycler --- */
     .gallery-card__image-wrapper {
         height: 220px;
         position: relative;
         overflow: hidden;
-        border-top-left-radius: 16px;
-        border-top-right-radius: 16px;
+        border-top-left-radius: var(--radius);
+        border-top-right-radius: var(--radius);
     }
     .gallery-card__image {
         width: 100%;
@@ -129,32 +81,27 @@
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        background-color: rgba(0,0,0,0.4);
-        color: white;
-        border: none;
+        background-color: rgba(255,255,255,0.8);
+        color: var(--text-dark);
+        border: 1px solid rgba(0,0,0,0.1);
         border-radius: 50%;
-        width: 32px;
-        height: 32px;
+        width: 36px; height: 36px;
         cursor: pointer;
         opacity: 0;
-        transition: opacity 0.3s ease;
+        transition: opacity 0.3s ease, transform 0.2s ease;
         z-index: 10;
     }
     .gallery-card:hover .gallery-card__nav { opacity: 1; }
+    .gallery-card__nav:hover { transform: translateY(-50%) scale(1.1); }
     .gallery-card__nav.prev { left: 10px; }
     .gallery-card__nav.next { right: 10px; }
     .gallery-card__counter {
-        position: absolute;
-        bottom: 10px;
-        right: 10px;
-        background-color: rgba(0,0,0,0.6);
-        color: white;
-        font-size: 0.8rem;
-        padding: 2px 8px;
-        border-radius: 10px;
+        position: absolute; bottom: 10px; right: 10px;
+        background-color: rgba(15, 23, 42, 0.7); /* slate-900 with alpha */
+        color: white; font-size: 0.8rem;
+        padding: 3px 10px; border-radius: 50px;
     }
-    /* End of Image Cycler Styles */
-
+    
     .gallery-card__content {
         padding: 1.5rem;
         flex-grow: 1;
@@ -164,71 +111,54 @@
     .gallery-card__title {
         font-size: 1.3rem;
         font-weight: 600;
-        color: var(--admin-text-dark);
+        color: var(--text-dark);
         margin: 0 0 0.5rem 0;
     }
     .gallery-card__description {
-        color: var(--admin-text-light);
+        color: var(--text-muted);
         flex-grow: 1;
         margin-bottom: 1.5rem;
         line-height: 1.6;
     }
-    .gallery-card__meta {
+    
+    .gallery-card__footer {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-top: 1px solid var(--admin-border);
+        border-top: 1px solid var(--border-color);
         padding-top: 1rem;
     }
-    .gallery-card__date { /* Using this for timestamp */
-        color: var(--admin-text-light);
+    .gallery-card__date {
+        color: var(--text-muted);
         font-weight: 500;
         font-size: 0.875rem;
     }
-    .gallery-card__actions {
-        display: flex;
-        gap: 0.75rem;
-    }
+    .gallery-card__actions { display: flex; gap: 0.75rem; }
     .action-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        border: none;
-        background-color: #f8f9fa;
-        color: var(--admin-text-light);
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
+        background: none; border: none; padding: 0; cursor: pointer;
+        color: var(--text-muted); font-size: 1rem;
+        width: 38px; height: 38px; border-radius: 50%;
+        transition: all 0.2s ease;
     }
-    .action-btn--edit:hover {
-        background-color: var(--admin-edit);
-        color: #fff;
-    }
-    .action-btn--delete:hover {
-        background-color: var(--admin-danger);
-        color: #fff;
-    }
+    .action-btn:hover { color: #05009b; transform: scale(1.1); }
+    .action-btn--edit:hover { background-color: var(--brand-primary); }
+    .action-btn--delete:hover { background-color: var(--bs-danger); }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 </style>
+{% endblock %}
 
-<div class="admin-container">
-
-    <header class="admin-header">
-        <div class="admin-header__top">
-            <h2 class="admin-header__title">Gallery Management</h2>
-            <a href="{{ url_for('admin_bp.dashboard') }}" class="admin-btn--back">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
+{% block content %}
+<div class="container mt-4 page-wrapper">
+    <header class="page-header">
+        <h1>Gallery Management</h1>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('admin_bp.gallery_swap') }}" class="btn btn-secondary">
+                <i class="fas fa-exchange-alt me-2"></i> Reorder Gallery
             </a>
-        </div>
-        <div class="admin-header__controls">
-            <a href="{{ url_for('admin_bp.gallery_swap') }}" class="admin-btn admin-btn--secondary">
-                <i class="fas fa-exchange-alt"></i> Reorder Gallery
-            </a>
-            <a href="{{ url_for('admin_bp.add_gallery') }}" class="admin-btn admin-btn--primary">
-                <i class="fas fa-plus"></i> Add New Gallery
+            <a href="{{ url_for('admin_bp.add_gallery') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i> Add New Gallery
             </a>
         </div>
     </header>
@@ -239,22 +169,23 @@
             {% for item in items %}
             <div class="gallery-card" 
                  data-images="{{ item.images }}" 
-                 data-title="{{ item.title }}">
+                 data-title="{{ item.title }}"
+                 style="animation-delay: {{ loop.index0 * 10 }}ms;">
                 <div class="gallery-card__image-wrapper">
                     <img src="{{ item.images.split(',')[0] }}" alt="Preview for {{ item.title }}" class="gallery-card__image">
                     {% set image_list = item.images.split(',') %}
                     {% if image_list|length > 1 %}
-                        <button class="gallery-card__nav prev">&lt;</button>
-                        <button class="gallery-card__nav next">&gt;</button>
+                        <button class="gallery-card__nav prev" aria-label="Previous image">&lt;</button>
+                        <button class="gallery-card__nav next" aria-label="Next image">&gt;</button>
                         <span class="gallery-card__counter">1 / {{ image_list|length }}</span>
                     {% endif %}
                 </div>
                 <div class="gallery-card__content">
                     <h3 class="gallery-card__title">{{ item.title }}</h3>
                     <p class="gallery-card__description">{{ item.description[:120] }}{% if item.description|length > 120 %}...{% endif %}</p>
-                    <div class="gallery-card__meta">
+                    <div class="gallery-card__footer">
                         <span class="gallery-card__date">
-                           <i class="fas fa-calendar-alt"></i> {{ item.timestamp.strftime('%d %b %Y') }}
+                           <i class="fas fa-calendar-alt me-1"></i> {{ item.timestamp.strftime('%d %b %Y') }}
                         </span>
                         <div class="gallery-card__actions">
                             <a href="{{ url_for('admin_bp.edit_gallery', id=item.id) }}" class="action-btn action-btn--edit" title="Edit">
@@ -273,11 +204,13 @@
             {% endfor %}
         </div>
         {% else %}
-            <div class="alert alert-warning">No gallery items found! Click "Add New Gallery" to get started.</div>
+            <div class="alert alert-light text-center">No gallery items found! Click "Add New Gallery" to get started.</div>
         {% endif %}
     </main>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const galleryGrid = document.getElementById('gallery-grid');
@@ -287,7 +220,7 @@ document.addEventListener('DOMContentLoaded', function() {
         galleryGrid.addEventListener('click', function(e) {
             const navButton = e.target.closest('.gallery-card__nav');
             if (navButton) {
-                e.stopPropagation(); // Prevent other actions on the card
+                e.stopPropagation();
                 
                 const card = navButton.closest('.gallery-card');
                 const images = card.dataset.images.split(',');
@@ -328,6 +261,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
+                    // To show feedback, you could disable the button before navigating
+                    this.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`;
+                    this.disabled = true;
                     window.location.href = url;
                 }
             });

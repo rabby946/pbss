@@ -1,253 +1,417 @@
-{% extends "base.html" %}
-{% block title %}Exam routine{% endblock %}
+{% extends 'base.html' %}
 
-{% block content %}
+{% block head_extra %}
 <style>
-    /* Scoped styles for the NEW stylish routine page design */
-    :root {
-        --routine-primary: #3b82f6; /* A modern, vibrant blue */
-        --routine-text-dark: #e5e7eb; /* Light text for dark cards */
-        --routine-text-light: #9ca3af;
-        --routine-font: 'Poppins', sans-serif;
-    }
-
-    .routine-page-container {
-        font-family: var(--routine-font);
-        max-width: 900px;
-        margin: 2rem auto;
-        padding: 2rem;
-    }
-
     .routine-header {
-        text-align: center;
-        margin-bottom: 3.5rem;
-    }
-    .routine-header h2 {
-        font-size: 2.8rem;
-        font-weight: 600;
-        /* Using a text color from your refined style.css */
-        color: #1F2937; 
-        position: relative;
-        display: inline-block;
-        padding-bottom: 0.75rem;
-    }
-    .routine-header h2::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 60%;
-        height: 4px;
-        background: linear-gradient(90deg, #3b82f6, #9333ea);
-        border-radius: 2px;
-    }
-
-    .routine-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: grid;
-        gap: 1.5rem;
-    }
-
-    /* The "Glassmorphism" Card */
-    .result-card-glass {
-        background: rgba(22, 27, 34, 0.5); /* Semi-transparent dark background */
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border-radius: 16px;
-        padding: 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 1.5rem;
-        transition: all 0.4s ease;
-        position: relative;
-        overflow: hidden; /* Important for the hover glow */
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
-
-    /* The "Wow" Hover Effect */
-    .result-card-glass::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
+    
+    .filter-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .filter-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #4b5563;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .filter-select {
         width: 100%;
-        height: 100%;
-        background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(59, 130, 246, 0.2), transparent 40%);
-        opacity: 0;
-        transition: opacity 0.5s ease;
-        z-index: 1;
-    }
-    .result-card-glass:hover::before {
-        opacity: 1;
-    }
-    .result-card-glass:hover {
-        border-color: rgba(59, 130, 246, 0.5);
-        transform: translateY(-5px);
+        padding: 0.625rem 0.875rem;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        color: #1f2937;
+        background-color: #f9fafb;
+        transition: all 0.2s;
     }
     
-    .result-card-glass > * {
-        z-index: 2; /* Ensure content is above the glow effect */
+    .filter-select:focus {
+        outline: none;
+        border-color: #667eea;
+        background-color: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
-
-    .result-card-glass__icon {
-        font-size: 2.5rem;
-        color: #e5e7eb;
+    
+    .filter-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.625rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 6px -1px rgba(102, 126, 234, 0.3);
     }
-
-    .result-card-glass__info {
-        flex-grow: 1;
+    
+    .filter-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px -1px rgba(102, 126, 234, 0.4);
     }
-    .result-card-glass__title {
-        font-size: 1.2rem;
+    
+    .reset-btn {
+        background: white;
+        color: #6b7280;
+        padding: 0.625rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        border: 1.5px solid #e5e7eb;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-left: 0.75rem;
+    }
+    
+    .reset-btn:hover {
+        background: #f9fafb;
+        border-color: #d1d5db;
+    }
+    
+    .routine-table-container {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .routine-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .routine-table thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .routine-table th {
+        padding: 1rem;
+        text-align: left;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .routine-table tbody tr {
+        border-bottom: 1px solid #f3f4f6;
+        transition: background-color 0.2s;
+    }
+    
+    .routine-table tbody tr:hover {
+        background-color: #f9fafb;
+    }
+    
+    .routine-table tbody tr:last-child {
+        border-bottom: none;
+    }
+    
+    .routine-table td {
+        padding: 1rem;
+        font-size: 0.875rem;
+        color: #374151;
+    }
+    
+    .day-badge {
+        display: inline-block;
+        padding: 0.375rem 0.875rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.8125rem;
+    }
+    
+    .day-sunday { background: #fef3c7; color: #92400e; }
+    .day-monday { background: #dbeafe; color: #1e40af; }
+    .day-tuesday { background: #e0e7ff; color: #4338ca; }
+    .day-wednesday { background: #fce7f3; color: #9f1239; }
+    .day-thursday { background: #d1fae5; color: #065f46; }
+    .day-friday { background: #fef3c7; color: #92400e; }
+    .day-saturday { background: #f3e8ff; color: #6b21a8; }
+    
+    .time-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.375rem 0.75rem;
+        background: #f3f4f6;
+        border-radius: 6px;
         font-weight: 500;
-        color: var(--routine-text-dark);
-        margin: 0 0 0.25rem 0;
-    }
-    .result-card-glass__date {
-        font-size: 0.85rem;
-        color: var(--routine-text-light);
+        font-size: 0.8125rem;
+        color: #1f2937;
     }
     
-    .result-card-glass__actions {
-        display: flex;
-        gap: 0.75rem;
+    .time-badge i {
+        margin-right: 0.375rem;
+        color: #6b7280;
+        font-size: 0.75rem;
     }
     
-    .btn-result-glass {
+    .class-badge {
+        display: inline-block;
+        padding: 0.375rem 0.875rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.8125rem;
+    }
+    
+    .subject-text {
+        font-weight: 600;
+        color: #1f2937;
+    }
+    
+    .teacher-text {
+        color: #6b7280;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        font-size: 0.9rem;
+    }
+    
+    .teacher-text i {
+        margin-right: 0.5rem;
+        color: #9ca3af;
+    }
+    
+    .room-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.375rem 0.75rem;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        color: #166534;
+        border-radius: 6px;
         font-weight: 500;
-        text-decoration: none;
-        padding: 8px 16px;
-        border-radius: 50px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: #e5e7eb;
-        background-color: rgba(255, 255, 255, 0.05);
-        transition: all 0.3s ease;
-        cursor: pointer;
+        font-size: 0.8125rem;
     }
-    .btn-result-glass:hover {
-        background-color: var(--routine-primary);
-        border-color: var(--routine-primary);
-        color: #fff;
+    
+    .room-badge i {
+        margin-right: 0.375rem;
+        font-size: 0.75rem;
     }
-    .btn-result-glass.is-downloading {
-        background-color: rgba(255, 255, 255, 0.1);
-        color: var(--routine-text-light);
-        cursor: not-allowed;
-    }
-
-    .no-routine-alert {
-        background-color: #fff3cd;
-        border: 1px solid #ffeeba;
-        color: #856404;
-        padding: 1.5rem;
-        border-radius: 8px;
+    
+    .empty-state {
         text-align: center;
-        font-size: 1.1rem;
+        padding: 4rem 2rem;
+        color: #9ca3af;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    .empty-state h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        font-size: 0.875rem;
+    }
+    
+    @media (max-width: 768px) {
+        .routine-header {
+            padding: 1.5rem;
+        }
+        
+        .filter-card {
+            padding: 1rem;
+        }
+        
+        .routine-table {
+            font-size: 0.8125rem;
+        }
+        
+        .routine-table th,
+        .routine-table td {
+            padding: 0.75rem 0.5rem;
+        }
+        
+        .filter-btn,
+        .reset-btn {
+            width: 100%;
+            margin-left: 0;
+            margin-top: 0.5rem;
+        }
     }
 </style>
+{% endblock %}
 
-<div class="routine-page-container">
-    <div class="routine-header">
-        <h2>Routine</h2>
-    </div>
+{% block scripts_extra %}
+<script>
+    // Auto-submit form when any filter dropdown changes
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('filterForm');
+        const selects = form.querySelectorAll('.auto-submit');
+        
+        selects.forEach(select => {
+            select.addEventListener('change', function() {
+                form.submit();
+            });
+        });
+    });
+</script>
+{% endblock %}
 
-    {% if items %}
-        <ul class="routine-list">
-            {% for result in items %}
-            <li class="result-card-glass">
-                <div class="result-card-glass__icon">
-                    <i class="fas fa-file-pdf"></i>
-                </div>
-                <div class="result-card-glass__info">
-                    <h5 class="result-card-glass__title">{{ result.title }}</h5>
-                    <p class="result-card-glass__date">
-                        Published: {{ result.timestamp.strftime('%B %d, %Y') }}
-                    </p>
-                </div>
-                <div class="result-card-glass__actions">
-                    {% if result.file_url %}
-                        
-                        <button class="btn-result-glass" 
-                                data-url="{{ result.file_url }}"
-                                data-filename="{{ result.title }}.pdf">
-                            <i class="fas fa-download"></i>
-                            <span>Download</span>
-                        </button>
-                    {% else %}
-                        <span class="text-danger">No file available</span>
-                    {% endif %}
-                </div>
-            </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <div class="no-routine-alert">
-            <i class="fas fa-info-circle"></i> No routine have been published yet. Please check back later.
+{% block content %}
+<!-- Page Header -->
+<div class="routine-header">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold mb-2">Class Routine</h1>
+            <p class="text-blue-100 text-sm">View and filter the school schedule by day, class, teacher, or subject</p>
         </div>
+        <i class="fas fa-calendar-alt text-5xl opacity-20 hidden md:block"></i>
+    </div>
+</div>
+
+<!-- Filter Section -->
+<div class="filter-card">
+    <div class="flex items-center mb-4">
+        <i class="fas fa-filter text-purple-600 mr-2"></i>
+        <h2 class="text-lg font-semibold text-gray-800">Filter Routine</h2>
+    </div>
+    
+    <form method="get" id="filterForm">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            <!-- Day Filter -->
+            <div>
+                <label class="filter-label">
+                    <i class="fas fa-calendar-day mr-1"></i>Day
+                </label>
+                <select name="day" class="filter-select auto-submit">
+                    <option value="all">All Days</option>
+                    {% for day in days %}
+                    <option value="{{ day }}" {% if selected_day == day %}selected{% endif %}>{{ day }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Class Filter -->
+            <div>
+                <label class="filter-label">
+                    <i class="fas fa-graduation-cap mr-1"></i>Class
+                </label>
+                <select name="class_id" class="filter-select auto-submit">
+                    <option value="all">All Classes</option>
+                    {% for cls in classes %}
+                    <option value="{{ cls.id }}" {% if selected_class|int == cls.id %}selected{% endif %}>{{ cls.name }} - {{cls.section}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Teacher Filter -->
+            <div>
+                <label class="filter-label">
+                    <i class="fas fa-chalkboard-teacher mr-1"></i>Teacher
+                </label>
+                <select name="teacher_id" class="filter-select auto-submit">
+                    <option value="all">All Teachers</option>
+                    {% for teacher in teachers %}
+                    <option value="{{ teacher.id }}" {% if selected_teacher|int == teacher.id %}selected{% endif %}>{{ teacher.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Subject Filter -->
+            <div>
+                <label class="filter-label">
+                    <i class="fas fa-book mr-1"></i>Subject
+                </label>
+                <select name="subject_id" class="filter-select auto-submit">
+                    <option value="all">All Subjects</option>
+                    {% for subject in subjects %}
+                    <option value="{{ subject.id }}" {% if selected_subject|int == subject.id %}selected{% endif %}>{{ subject.name }}  -  ({{subject.code}})</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <!-- Reset Button -->
+        <div class="flex justify-end">
+            <a href="{{ url_for('public.routine') }}" class="reset-btn">
+                <i class="fas fa-redo mr-2"></i>Reset Filters
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Routine Table -->
+<div class="routine-table-container">
+    {% if routines %}
+    <div class="overflow-x-auto">
+        <table class="routine-table">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-calendar mr-2"></i>Day</th>
+                    <th><i class="fas fa-clock mr-2"></i>Time</th>
+                    <th><i class="fas fa-graduation-cap mr-2"></i>Class</th>
+                    <th><i class="fas fa-book mr-2"></i>Subject</th>
+                    <th><i class="fas fa-user-tie mr-2"></i>Teacher</th>
+                    <th><i class="fas fa-door-open mr-2"></i>Room</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for routine in routines %}
+                <tr>
+                    <td>
+                        <span class="day-badge day-{{ routine.day.lower() }}">{{ routine.day }}</span>
+                    </td>
+                    <td>
+                        <span class="time-badge">
+                            <i class="fas fa-clock"></i>
+                            {{ routine.start_time.strftime('%H:%M') }} - {{ routine.end_time.strftime('%H:%M') }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="class-badge">{{ routine.subject.class_.name }}</span>
+                    </td>
+                    <td>
+                        <span class="subject-text">{{ routine.subject.name }}</span>
+                    </td>
+                    <td>
+                        <span class="teacher-text">
+                            <i class="fas fa-user-circle"></i>
+                            {{ routine.teacher.name }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if routine.room %}
+                        <span class="room-badge">
+                            <i class="fas fa-map-marker-alt"></i>
+                            {{ routine.room }}
+                        </span>
+                        {% else %}
+                        <span class="text-gray-400 text-sm">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-calendar-times"></i>
+        <h3>No Routines Found. Today is holiday</h3>
+        <p>Try adjusting your filters to see more results</p>
+    </div>
     {% endif %}
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    // --- Card Hover Glow Effect ---
-    document.querySelectorAll('.result-card-glass').forEach(card => {
-        card.addEventListener('mousemove', e => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            card.style.setProperty('--mouse-x', `${x}px`);
-            card.style.setProperty('--mouse-y', `${y}px`);
-        });
-    });
-    
-    // --- Reliable File Download Script ---
-    document.querySelectorAll('.btn-result-glass[data-url]').forEach(button => {
-        button.addEventListener('click', function(event) {
-            event.preventDefault();
-            
-            const fileUrl = this.dataset.url;
-            const fileName = this.dataset.filename;
-            const buttonText = this.querySelector('span');
-            
-            if (this.classList.contains('is-downloading')) return;
-
-            this.classList.add('is-downloading');
-            if (buttonText) buttonText.textContent = 'Downloading...';
-
-            fetch(fileUrl)
-                .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    return response.blob();
-                })
-                .then(blob => {
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.style.display = 'none';
-                    a.href = url;
-                    a.download = fileName;
-                    document.body.appendChild(a);
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                    document.body.removeChild(a);
-
-                    this.classList.remove('is-downloading');
-                    if (buttonText) buttonText.textContent = 'Download';
-                })
-                .catch(error => {
-                    console.error('Download failed:', error);
-                    alert('Could not download the file. Please try again.');
-                    this.classList.remove('is-downloading');
-                    if (buttonText) buttonText.textContent = 'Download';
-                });
-        });
-    });
-});
-</script>
 {% endblock %}

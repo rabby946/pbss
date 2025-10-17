@@ -4,7 +4,7 @@ from flask_mail import Message
 from extensions import  db
 from datetime import datetime
 public_bp = Blueprint("public", __name__)
-
+from utils import admin_required
 @public_bp.context_processor
 def inject_year():
     return {'moment': datetime.now().year} 
@@ -46,7 +46,7 @@ def gallery_detail(id):
 # ---------- Teachers ----------
 @public_bp.route("/teachers")
 def teachers():
-    items = Teacher.query.order_by(Teacher.position.desc()).all()
+    items = Teacher.query.filter(Teacher.position != "0").order_by(Teacher.position.asc()).all()
     return render_template("public/entity.html",entity_items=items,entity_name="Teachers",detail_endpoint="public.teacher_detail")
 
 @public_bp.route("/teacher/<int:id>")
@@ -90,10 +90,54 @@ def results():
     items = Result.query.order_by(Result.id.desc()).all()
     return render_template("public/results.html", items=items)
 # ---------- Routine ----------
-@public_bp.route("/routine")
+
+from models import Routine, Subject, Teacher, SchoolClass
+
+@public_bp.route("/routine", methods=["GET"])
 def routine():
-    items = Routine.query.order_by(Routine.id.desc()).all()
-    return render_template("public/routine.html",items=items)
+    # Get filters from query parameters
+    selected_day = request.args.get("day", "all")
+    selected_class = request.args.get("class_id", "all")
+    selected_teacher = request.args.get("teacher_id", "all")
+    selected_subject = request.args.get("subject_id", "all")
+
+    # Base query with joins for optimization
+    query = db.session.query(Routine)\
+        .join(Subject, Routine.subject_id == Subject.id)\
+        .join(Teacher, Routine.teacher_id == Teacher.id)\
+        .join(SchoolClass, Subject.class_id == SchoolClass.id)
+
+    # Apply filters
+    if selected_day != "all":
+        query = query.filter(Routine.day == selected_day)
+    if selected_class != "all":
+        query = query.filter(SchoolClass.id == int(selected_class))
+    if selected_teacher != "all":
+        query = query.filter(Teacher.id == int(selected_teacher))
+    if selected_subject != "all":
+        query = query.filter(Subject.id == int(selected_subject))
+
+    routines = query.order_by(Routine.day, Routine.start_time).all()
+
+    # Dropdown data
+    days = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+    classes = SchoolClass.query.order_by(SchoolClass.id).all()
+    teachers = Teacher.query.order_by(Teacher.position).all()
+    subjects = Subject.query.order_by(Subject.class_id).all()
+
+    return render_template(
+        "public/routine.html",
+        routines=routines,
+        days=days,
+        classes=classes,
+        teachers=teachers,
+        subjects=subjects,
+        selected_day=selected_day,
+        selected_class=selected_class,
+        selected_teacher=selected_teacher,
+        selected_subject=selected_subject
+    )
+
 # ---------- Contact ----------
 @public_bp.route("/contact", methods=["GET", "POST"])
 def contact():
@@ -119,11 +163,8 @@ def login():
 @public_bp.route("/forgot_password")
 def forgot_password():
     return render_template("public/forgot_password.html")
-
+from datetime import datetime, time
 @public_bp.route("/fix")
-def f():
-    users_without_email = User.query.filter(User.email.is_(None)).all()
-    for user in users_without_email:
-        user.email = 'palashbariasecondaryschool@gmail.com'
-    db.session.commit()
-    print(f"Updated {len(users_without_email)} users with default email.")
+@admin_required
+def fix_subjects():
+    return f"✅ Deleted invalid subjects (with NULL class_id or teacher_id)"

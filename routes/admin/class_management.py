@@ -3,25 +3,44 @@ from flask import render_template, request, redirect, url_for, flash
 from . import admin_bp
 from models import SchoolClass, Teacher, db
 from utils import admin_required
-@admin_bp.route("/classes")
+from datetime import datetime
+
+@admin_bp.route("/classes", methods=["GET", "POST"])
 @admin_required
 def list_classes():
-    classes = SchoolClass.query.all()
-    return render_template("admin/classes/list.html", classes=classes)
-
-@admin_bp.route("/classes/add", methods=["GET", "POST"])
-@admin_required
-def add_class():
     if request.method == "POST":
-        name = request.form["name"]
-        section = request.form["section"]
+        action = request.form.get("action")
+        name = request.form.get("name")
+        section = request.form.get("section")
         teacher_id = request.form.get("teacher_id")
+        class_id = request.form.get("class_id")
 
-        school_class = SchoolClass(name=name, section=section, teacher_id=teacher_id)
-        db.session.add(school_class)
+        if action == "add":
+            new_class = SchoolClass(
+                name=name,
+                section=section,
+                teacher_id=teacher_id
+            )
+            db.session.add(new_class)
+            db.session.commit()
+            flash("Class created successfully!", "success")
+        else:
+            flash("Invalid action.", "danger")
+
+    # GET request
+    classes = SchoolClass.query.order_by(SchoolClass.id.asc()).all()
+    teachers = Teacher.query.filter(Teacher.position != "0").order_by(Teacher.position.asc()).all()
+    return render_template("admin/classes.html", classes=classes, teachers=teachers)
+
+
+@admin_bp.route("/classes/delete/<int:class_id>")
+@admin_required
+def delete_class(class_id):
+    school_class = SchoolClass.query.get(class_id)
+    if school_class:
+        db.session.delete(school_class)
         db.session.commit()
-        flash("Class created successfully!", "success")
-        return redirect(url_for("admin_bp.list_classes"))
-
-    teachers = Teacher.query.all()
-    return render_template("admin/classes/add.html", teachers=teachers)
+        flash("Class deleted successfully.", "success")
+    else:
+        flash("Class not found.", "danger")
+    return redirect(url_for("admin_bp.list_classes"))

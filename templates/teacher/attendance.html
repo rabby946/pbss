@@ -3,83 +3,170 @@
 {% block title %}Mark Attendance{% endblock %}
 {% block page_title %}Mark Attendance{% endblock %}
 
-{% block teacher_content %}
-<div class="container mt-4 mb-5">
-  <div class="card shadow-lg border-0 rounded-4">
-    <div class="card-header text-white" style="background: linear-gradient(90deg, #007bfeb9, #00bbd4ab);">
-      <h4 class="mb-0"><i class="bi bi-check2-square me-2"></i>Mark Attendance</h4>
-    </div>
-
-    <div class="card-body p-4">
-
-      <form method="GET" action="{{ url_for('teacher_bp.attendance') }}" class="mb-4 d-flex align-items-center gap-2 flex-wrap">
-        <label for="date" class="form-label fw-bold mb-0">Select Date:</label>
-        <input type="date" class="form-control w-auto" name="date" id="date" value="{{ selected_date.strftime('%Y-%m-%d') }}" max="{{ today.strftime('%Y-%m-%d') }}">
-        <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>View</button>
-      </form>
-
-      {% if students|length == 0 %}
-        <div class="text-center py-5 text-muted">
-          <i class="bi bi-inbox display-5"></i>
-          <p class="mt-3 mb-0">No students found for this class.</p>
-        </div>
-      {% else %}
-        {% if selected_date < today %}
-          <div class="alert alert-info">
-            Attendance for {{ selected_date.strftime('%d %b %Y') }} (Read-only)
-          </div>
-        {% endif %}
-
-        {% if selected_date == today %}
-          <form method="POST" action="{{ url_for('teacher_bp.mark_attendance') }}">
-            <input type="hidden" name="class_id" value="{{ class_id }}">
-        {% endif %}
-
-        <table class="table table-hover table-striped align-middle">
-          <thead class="table-dark">
-            <tr>
-              <th>Roll</th>
-              <th>Name</th>
-              <th>Present</th>
-              <th>Absent</th>
-              {% if selected_date != today %}
-              <th>Late</th>
-              {%endif%}
-            </tr>
-          </thead>
-          <tbody>
-            {% for student in students %}
-            <tr>
-              <td>{{ student.roll or 'N/A' }}</td>
-              <td>{{ student.name }}</td>
-              {% set status = attendance_dict.get(student.id) %}
-              {% if selected_date == today %}
-              <td><input type="radio" name="student_{{ student.id }}" value="present" {% if status == 'present' %}checked{% endif %}></td>
-              <td><input type="radio" name="student_{{ student.id }}" value="absent" {% if status == 'absent' %}checked{% endif %}></td>
-              {% else %}
-              <td>{{ '✔️' if status == 'present' else '' }}</td>
-              <td>{{ '❌' if status == 'absent' else '' }}</td>
-              <td>{{ '⏰' if status == 'late' else '' }}</td>
-              {% endif %}
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-
-        {% if selected_date == today %}
-          <div class="d-flex justify-content-end mt-3">
-            <button type="submit" class="btn btn-success"><i class="bi bi-check-circle me-1"></i>Submit Attendance</button>
-          </div>
-          </form>
-        {% endif %}
-      {% endif %}
-    </div>
-  </div>
-</div>
-
+{% block head_extra %}
 <style>
-.table td, .table th { vertical-align: middle; }
-.table-hover tbody tr:hover { background-color: #f1f7ff; transition: background-color 0.2s ease; }
-@media (max-width: 768px) { h4 { font-size: 1.1rem; } table { font-size: 0.9rem; } }
+    /* New, simplified, and bug-free professional styles */
+    .content-card {
+        background-color: var(--teacher-sidebar-bg);
+        border: 1px solid var(--teacher-border);
+        border-radius: 1rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+    .card-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--teacher-border);
+    }
+    .attendance-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .attendance-table thead th {
+        text-align: left;
+        padding: 1rem 1.5rem;
+        font-weight: 500;
+        color: var(--teacher-text-light);
+        background-color: var(--teacher-bg);
+        text-transform: uppercase;
+        font-size: 0.8rem;
+    }
+    .attendance-table tbody td {
+        padding: 1rem 1.5rem;
+        vertical-align: middle;
+        border-top: 1px solid var(--teacher-border);
+    }
+    .attendance-table tbody tr:hover { background-color: #f8fafc; }
+
+    /* Modern radio button group */
+    .attendance-toggle { display: inline-flex; border-radius: 8px; overflow: hidden; }
+    .attendance-toggle input[type="radio"] { display: none; }
+    .attendance-toggle label {
+        padding: 0.375rem 1rem;
+        cursor: pointer;
+        background-color: var(--teacher-bg);
+        color: var(--teacher-text-light);
+        font-weight: 500;
+        transition: all 0.2s ease;
+        border: 1px solid var(--teacher-border);
+    }
+    .attendance-toggle label:not(:last-child) { border-right: none; }
+    .attendance-toggle input[type="radio"]:checked + label {
+        background-color: var(--teacher-primary);
+        color: #fff;
+        border-color: var(--teacher-primary);
+        z-index: 1;
+    }
+    
+    /* Professional Status Badges for read-only view */
+    .status-badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4em 0.8em; font-weight: 500; border-radius: 50px; text-transform: capitalize; }
+    .status-present { background-color: var(--bs-success-bg-subtle); color: var(--bs-success-text-emphasis); }
+    .status-absent { background-color: var(--bs-danger-bg-subtle); color: var(--bs-danger-text-emphasis); }
+    .status-late { background-color: var(--bs-warning-bg-subtle); color: var(--bs-warning-text-emphasis); }
+
+    /* --- Flawless Responsive Design --- */
+    @media (max-width: 992px) {
+        .attendance-table thead { display: none; }
+        .attendance-table tbody, .attendance-table tr, .attendance-table td { display: block; width: 100%; }
+        .attendance-table tr { margin-bottom: 1rem; border: 1px solid var(--teacher-border); border-radius: 1rem; padding: 1rem; }
+        .attendance-table tbody { padding: 1rem 0; }
+        .content-card { background: transparent; border: none; box-shadow: none; padding: 0;}
+        .attendance-table td { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border: none; }
+        .attendance-table td:not(:last-child) { border-bottom: 1px solid var(--teacher-border); }
+        .attendance-table td::before { content: attr(data-label); font-weight: 600; color: var(--teacher-text-dark); margin-right: 1rem; }
+    }
 </style>
+{% endblock %}
+
+{% block teacher_content %}
+<div class="container-fluid">
+    <div class="content-card">
+        <div class="card-header">
+            <form method="GET" action="{{ url_for('teacher_bp.attendance') }}" class="d-flex align-items-center gap-2 flex-wrap">
+                <label for="date" class="form-label fw-bold mb-0">Select Date:</label>
+                <input type="date" class="form-control" style="width: auto;" name="date" id="date" value="{{ selected_date.strftime('%Y-%m-%d') }}" max="{{ today.strftime('%Y-%m-%d') }}">
+                <button type="submit" class="btn btn-primary btn-sm">View</button>
+            </form>
+        </div>
+        <div class="card-body p-0">
+            {% if students|length == 0 %}
+            <div class="text-center p-5 text-muted">
+                <p class="fs-5 mb-0">No students found for this class.</p>
+            </div>
+            {% else %}
+                {% if selected_date < today %}
+                <div class="alert alert-info rounded-0 m-0 border-0 border-bottom">
+                    Showing read-only attendance for {{ selected_date.strftime('%d %b %Y') }}.
+                </div>
+                {% endif %}
+                
+                <form method="POST" action="{{ url_for('teacher_bp.mark_attendance') }}" id="attendance-form">
+                    {% if selected_date == today %}
+                    <input type="hidden" name="class_id" value="{{ class_id }}">
+                    {% endif %}
+                    <div class="table-responsive">
+                        <table class="table attendance-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Roll</th><th>Name</th><th class="text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in students %}
+                                <tr>
+                                    <td data-label="Roll">{{ student.roll or 'N/A' }}</td>
+                                    <td data-label="Name"><strong>{{ student.name }}</strong></td>
+                                    <td data-label="Status" class="text-center">
+                                        {% set status = attendance_dict.get(student.id) %}
+                                        {% if selected_date == today %}
+                                        <div class="attendance-toggle">
+                                            <input type="radio" name="student_{{ student.id }}" id="present_{{ student.id }}" value="present" {% if status == 'present' or not status %}checked{% endif %}>
+                                            <label for="present_{{ student.id }}">P</label>
+                                            <input type="radio" name="student_{{ student.id }}" id="absent_{{ student.id }}" value="absent" {% if status == 'absent' %}checked{% endif %}>
+                                            <label for="absent_{{ student.id }}">A</label>
+                                            <input type="radio" name="student_{{ student.id }}" id="late_{{ student.id }}" value="late" {% if status == 'late' %}checked{% endif %}>
+                                            <label for="late_{{ student.id }}">L</label>
+                                        </div>
+                                        {% else %}
+                                            {% if status %}
+                                                <span class="status-badge status-{{ status }}">{{ status }}</span>
+                                            {% else %}
+                                                <span class="text-muted">N/A</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if selected_date == today %}
+                    <div class="card-footer text-end">
+                        <button type="submit" class="btn btn-success" id="submit-btn">
+                            <i class="fa-solid fa-check-circle me-2"></i>Submit Attendance
+                        </button>
+                    </div>
+                    {% endif %}
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Prevent Duplicate Submissions
+    const form = document.getElementById('attendance-form');
+    if (form) {
+        form.addEventListener('submit', function() {
+            const submitBtn = form.querySelector('#submit-btn');
+            if(submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...`;
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

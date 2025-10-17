@@ -4,68 +4,109 @@
 {% block page_title %}Teacher Profile{% endblock %}
 
 {% block teacher_content %}
-<div class="container mt-4">
-    <div class="card shadow-lg border-0 rounded-4 p-4">
-        <div class="row align-items-center">
-            <div class="col-md-3 text-center">
-                <img src="{{ teacher.image_url or url_for('static', filename='images/default-avatar.png') }}" 
-                     class="rounded-circle shadow" width="150" height="150" alt="Teacher Avatar">
+<div class="container-fluid mt-3">
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="row g-0 flex-column flex-lg-row">
+
+            <!-- Left Profile Summary -->
+            <div class="col-12 col-lg-4 bg-light p-4 d-flex flex-column align-items-center justify-content-center text-center">
+                <div class="position-relative mb-3">
+                    <img src="{{ teacher.image_url or url_for('static', filename='images/default-avatar.png') }}" 
+                         class="rounded-circle shadow-sm border border-3 border-white img-fluid"
+                         style="width: 150px; height: 150px; object-fit: cover;" 
+                         alt="Teacher Avatar">
+                </div>
+                <h4 class="text-primary fw-semibold mb-1">{{ teacher.name }}</h4>
+                <p class="text-muted mb-2">{{ teacher.designation or "N/A" }}</p>
+                <div class="d-flex flex-column align-items-start small text-secondary">
+                    <p class="mb-1"><strong>Email:</strong> {{ teacher.user.email }}</p>
+                    <p class="mb-1"><strong>Phone:</strong> {{ teacher.phone or "N/A" }}</p>
+                    <p class="mb-1"><strong>Qualification:</strong> {{ teacher.qualification or "N/A" }}</p>
+                    <p class="mb-1"><strong>Address:</strong> {{ teacher.address or "N/A" }}</p>
+                    <p class="mb-0"><strong>ID:</strong> {{ teacher.id or "N/A" }}</p>
+                </div>
             </div>
-            <div class="col-md-9">
-                <h3 class="text-primary">{{ teacher.name }}</h3>
-                <p><strong>Email:</strong> {{ teacher.user.email }}</p>
-                <p><strong>Designation:</strong> {{ teacher.designation or "N/A" }}</p>
-                <p><strong>Position:</strong> {{ teacher.position or "N/A" }}</p>
-                <p><strong>Qualification:</strong> {{ teacher.qualification or "N/A" }}</p>
-                <p><strong>Phone:</strong> {{ teacher.phone or "N/A" }}</p>
-                <p><strong>Address:</strong> {{ teacher.address or "N/A" }}</p>
+
+            <!-- Right Update Form -->
+            <div class="col-12 col-lg-8 p-4">
+                <h5 class="fw-bold mb-3 text-primary"><i class="fa-solid fa-pen-to-square me-2"></i>Update Profile</h5>
+                <form method="POST" enctype="multipart/form-data" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="name" class="form-label fw-semibold">Full Name</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ teacher.name }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="designation" class="form-label fw-semibold">Designation</label>
+                        <input type="text" class="form-control" id="designation" name="designation" value="{{ teacher.designation }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="qualification" class="form-label fw-semibold">Qualification</label>
+                        <input type="text" class="form-control" id="qualification" name="qualification" value="{{ teacher.qualification }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="phone" class="form-label fw-semibold">Phone</label>
+                        <input type="text" class="form-control" id="phone" name="phone" value="{{ teacher.phone }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="address" class="form-label fw-semibold">Address</label>
+                        <input type="text" class="form-control" id="address" name="address" value="{{ teacher.address }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="image" class="form-label fw-semibold">Profile Picture</label>
+                        <input class="form-control" type="file" id="image" name="image">
+                    </div>
+
+                    <div class="col-12 d-flex flex-column flex-lg-row justify-content-lg-end mt-3 gap-2">
+                        <button type="submit" class="btn btn-primary px-4 py-2 rounded-3 shadow-sm">
+                            <i class="fa-solid fa-save me-1"></i> Update Profile
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
-
-        <hr class="my-4">
-
-        <!-- Profile Update Form -->
-        <h5 class="mb-3">Update Profile</h5>
-        <form method="POST" enctype="multipart/form-data" class="row g-3">
-            <div class="col-md-6">
-                <label for="name" class="form-label">Full Name</label>
-                <input type="text" class="form-control" id="name" name="name" value="{{ teacher.name }}" required>
-            </div>
-            <div class="col-md-6">
-                <label for="designation" class="form-label">Designation</label>
-                <input type="text" class="form-control" id="designation" name="designation" value="{{ teacher.designation }}">
-            </div>
-            <div class="col-md-6">
-                <label for="position" class="form-label">Position</label>
-                <input type="text" class="form-control" id="position" name="position" value="{{ teacher.position }}">
-            </div>
-            <div class="col-md-6">
-                <label for="qualification" class="form-label">Qualification</label>
-                <input type="text" class="form-control" id="qualification" name="qualification" value="{{ teacher.qualification }}">
-            </div>
-            <div class="col-md-6">
-                <label for="phone" class="form-label">Phone</label>
-                <input type="text" class="form-control" id="phone" name="phone" value="{{ teacher.phone }}">
-            </div>
-            <div class="col-md-6">
-                <label for="address" class="form-label">Address</label>
-                <input type="text" class="form-control" id="address" name="address" value="{{ teacher.address }}">
-            </div>
-            <div class="col-md-6">
-                <label for="image" class="form-label">Profile Picture</label>
-                <input class="form-control" type="file" id="image" name="image">
-            </div>
-
-            <div class="col-12">
-                <button type="submit" class="btn btn-primary">Update Profile</button>
-            </div>
-        </form>
     </div>
 </div>
 
 <style>
     .form-control:focus {
-        box-shadow: 0 0 5px rgba(0,123,255,.5);
+        border-color: var(--teacher-primary);
+        box-shadow: 0 0 6px rgba(13, 110, 253, 0.4);
+    }
+
+    .card {
+        background-color: #fff;
+    }
+
+    /* Divider between left and right on desktop */
+    @media (min-width: 992px) {
+        .col-lg-4 {
+            border-right: 1px solid #e9ecef;
+        }
+    }
+
+    /* Divider for mobile stacked layout */
+    @media (max-width: 991.98px) {
+        .col-lg-4 {
+            border-bottom: 1px solid #e9ecef;
+            margin-bottom: 1rem;
+        }
+
+        .d-flex.flex-column.flex-lg-row .col-12 + .col-12 {
+            margin-top: 1rem;
+        }
+    }
+
+    /* Adjust profile text and spacing for small devices */
+    @media (max-width: 576px) {
+        .card h4 {
+            font-size: 1.25rem;
+        }
+        .form-label {
+            font-size: 0.9rem;
+        }
+        .btn {
+            width: 100%;
+        }
     }
 </style>
 {% endblock %}

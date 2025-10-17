@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 from utils import upload_image  , admin_required
 @admin_bp.route('/teachers')
 def list_teachers():
-    teachers = Teacher.query.filter(Teacher.position != "0").order_by(Teacher.id.desc()).all()
+    teachers = Teacher.query.filter(Teacher.position != "0").order_by(Teacher.position.asc()).all()
     return render_template('admin/teachers.html', teachers=teachers)
 
 @admin_bp.route('/teachers/add', methods=['GET', 'POST'])
@@ -161,12 +161,12 @@ def teacher_courses(teacher_id):
             joinedload(AssignedSubject.subject),
             joinedload(AssignedSubject.class_)
         )
-        .filter_by(teacher_id=teacher.id, status='active')
+        .filter_by(teacher_id=teacher.id, status='active').order_by(AssignedSubject.class_id.asc())
         .all()
     )
-
+    # courses = courses.sort()
     # Get all available subjects for dropdown
-    subjects = Subject.query.order_by(Subject.class_id.desc()).all()
+    subjects = Subject.query.order_by(Subject.name.asc()).all()
 
     return render_template(
         'admin/assigned_courses.html',

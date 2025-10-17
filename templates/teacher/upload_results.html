@@ -3,7 +3,7 @@
 
 {% block teacher_content %}
 <div class="container mt-4">
-  <h3 class="text-center mb-4">Upload Results for {{ subject.name }}</h3>
+  <h3 class="text-center mb-4">Upload Results for {{ subject.name }} - ({{subject.code}})</h3>
 
   {% if registrations %}
   <form method="POST" action="{{ url_for('teacher_bp.submit_results', subject_id=subject.id) }}">

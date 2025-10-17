@@ -11,17 +11,6 @@
     </a>
   </div>
 
-  {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, msg in messages %}
-    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-      {{ msg }}
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    {% endfor %}
-  {% endif %}
-  {% endwith %}
-
   <div class="row g-4">
     {% for n in news_list %}
     <div class="col-md-6 col-lg-4">
@@ -38,7 +27,7 @@
         </div>
         <div class="card-footer bg-white border-top-0 text-end">
           <form action="{{ url_for('teacher_bp.delete_news', news_id=n.id) }}" method="POST" onsubmit="return confirm('Delete this news?');">
-            <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
+            <button type="submit" class="btn btn-outline-danger btn-sm">delete<i class="bi bi-trash"></i></button>
           </form>
         </div>
       </div>

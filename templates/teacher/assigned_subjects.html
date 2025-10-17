@@ -1,46 +1,150 @@
 {% extends "teacher/base.html" %}
+
 {% block title %}Assigned Subjects{% endblock %}
+{% block page_title %}My Assigned Subjects{% endblock %}
+
+{% block head_extra %}
+<style>
+    /* New, simplified, and bug-free professional styles */
+    .content-card {
+        background-color: var(--teacher-sidebar-bg);
+        border: 1px solid var(--teacher-border);
+        border-radius: 1rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+
+    .subject-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .subject-table thead th {
+        text-align: left;
+        padding: 1rem 1.5rem;
+        font-weight: 500;
+        color: var(--teacher-text-light);
+        background-color: var(--teacher-bg);
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+    }
+    .subject-table tbody td {
+        padding: 1rem 1.5rem;
+        vertical-align: middle;
+        border-top: 1px solid var(--teacher-border);
+    }
+    .subject-table tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+    /* Professional Status Badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.4em 0.8em;
+        font-weight: 500;
+        border-radius: 50px;
+        text-transform: capitalize;
+    }
+    .status-badge-active {
+        background-color: var(--bs-success-bg-subtle);
+        color: var(--bs-success-text-emphasis);
+    }
+    .status-badge-inactive {
+        background-color: var(--bs-secondary-bg-subtle);
+        color: var(--bs-secondary-text-emphasis);
+    }
+
+    /* --- Flawless Responsive Design --- */
+    @media (max-width: 992px) {
+        .subject-table thead { display: none; }
+        .subject-table tbody, .subject-table tr, .subject-table td {
+            display: block;
+            width: 100%;
+        }
+        .subject-table tr {
+            margin-bottom: 1rem;
+            border: 1px solid var(--teacher-border);
+            border-radius: 1rem;
+            padding: 1rem;
+        }
+        .subject-table tbody {
+            padding: 1rem;
+            background-color: var(--teacher-bg);
+        }
+        .content-card {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+        .subject-table td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border: none;
+        }
+        .subject-table td:not(:last-child) {
+            border-bottom: 1px solid var(--teacher-border);
+        }
+        .subject-table td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: var(--teacher-text-dark);
+            margin-right: 1rem;
+        }
+        .subject-table .text-center {
+            justify-content: flex-end; /* Align action button to the right */
+        }
+    }
+</style>
+{% endblock %}
 
 {% block teacher_content %}
-<div class="container mt-4">
-  <h3 class="text-center mb-4">Assigned Subjects</h3>
-
-  {% if assignments %}
-  <table class="table table-striped table-bordered shadow-sm align-middle">
-    <thead class="table-light">
-      <tr>
-        <th>#</th>
-        <th>Subject</th>
-        <th>Class</th>
-        <th>Section</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for assign in assignments %}
-      <tr>
-        <td>{{ loop.index }}</td>
-        <td>{{ assign.subject.name }}</td>
-        <td>{{ assign.class_.name }}</td>
-        <td>{{ assign.class_.section or '-' }}</td>
-        <td>
-          <span class="badge bg-{{ 'success' if assign.status == 'active' else 'secondary' }}">
-            {{ assign.status }}
-          </span>
-        </td>
-        <td>
-          <a href="{{ url_for('teacher_bp.upload_results', subject_id=assign.subject.id) }}"
-             class="btn btn-sm btn-primary">
-            ➕ Add Result
-          </a>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% else %}
-    <p class="text-center text-muted">No subjects assigned yet.</p>
-  {% endif %}
+<div class="container-fluid">
+    {% if assignments %}
+    <div class="content-card">
+        <div class="table-responsive">
+            <table class="table subject-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Class</th>
+                        <th>Section</th>
+                        <th>Status</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for assign in assignments %}
+                    <tr>
+                        <td data-label="Subject"><strong>{{ assign.subject.name }}</strong></td>
+                        <td data-label="Class">{{ assign.class_.name }}</td>
+                        <td data-label="Section">{{ assign.class_.section or '-' }}</td>
+                        <td data-label="Status">
+                            <span class="status-badge status-badge-{{ 'active' if assign.status == 'active' else 'inactive' }}">
+                                {{ assign.status }}
+                            </span>
+                        </td>
+                        <td data-label="Action" class="text-center">
+                            <a href="{{ url_for('teacher_bp.upload_results', subject_id=assign.subject.id) }}" class="btn btn-sm btn-primary px-3">
+                                <i class="fa-solid fa-plus me-1"></i> Add Result
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+        <div class="text-center p-5 bg-light rounded-3">
+            <p class="text-muted fs-5 mb-0">No subjects have been assigned to you yet.</p>
+        </div>
+    {% endif %}
 </div>
+{% endblock %}
+
+{% block scripts_extra %}
 {% endblock %}

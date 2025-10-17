@@ -1,52 +1,219 @@
 {% extends "admin/base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block head_extra %}
+<style>
+    /* New, professional styles for the Admin Command Center */
+
+    /* The main welcome banner */
+    .welcome-card {
+        background: linear-gradient(135deg, var(--admin-brand), var(--admin-brand-dark));
+        color: #fff;
+        border: none;
+    }
+    .welcome-card h3 { font-weight: 600; }
+
+    /* "At a Glance" Stat Cards */
+    .stat-card {
+        background-color: var(--admin-card-bg);
+        border: 1px solid var(--admin-border);
+        border-radius: var(--admin-radius, 1rem);
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--admin-shadow);
+        border-color: var(--admin-brand);
+    }
+    .stat-card__icon {
+        font-size: 1.8rem;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .stat-card__info .value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--admin-text);
+    }
+    .stat-card__info .label {
+        font-size: 0.9rem;
+        color: var(--admin-text-muted);
+    }
+    
+    /* Unique icon colors for each stat card */
+    .icon-teachers { background-color: var(--bs-blue-100); color: var(--bs-blue-600); }
+    .icon-students { background-color: var(--bs-green-100); color: var(--bs-green-600); }
+    .icon-classes { background-color: var(--bs-purple-100); color: var(--bs-purple-600); }
+    .icon-subjects { background-color: var(--bs-orange-100); color: var(--bs-orange-600); }
+
+
+    /* General Content Cards */
+    .content-card {
+        background-color: var(--admin-card-bg);
+        border: 1px solid var(--admin-border);
+        border-radius: var(--admin-radius, 1rem);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        height: 100%;
+    }
+    .content-card__header {
+        font-size: 1.2rem;
+        font-weight: 600;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--admin-border);
+    }
+
+    /* Quick Action Links */
+    .quick-action-list a {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.85rem 1.5rem;
+        color: var(--admin-text);
+        text-decoration: none;
+        font-weight: 500;
+        border-bottom: 1px solid var(--admin-border);
+        transition: background-color 0.2s ease;
+    }
+    .quick-action-list a:last-child { border-bottom: none; }
+    .quick-action-list a:hover { background-color: #f8fafc; }
+    .quick-action-list .icon {
+        width: 20px;
+        text-align: center;
+        color: var(--admin-text-muted);
+    }
+
+    /* Animation */
+    .animate-in {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+    @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-  <h3 class="mb-4">Admin Dashboard</h3>
-  <div class="row">
-    <div class="col-md-3">
-      <a href="{{ url_for('admin_bp.list_teachers') }}" class="card text-center">
+<div class="container-fluid">
+
+    <div class="welcome-card card border-0 shadow-lg rounded-4 text-white p-4 mb-4 animate-in">
         <div class="card-body">
-          <h5>{{ teacher_count }}</h5>
-          <p>Teachers</p>
+            <h3 class="mb-2">Welcome, Admin! 👋</h3>
+            <p class="mb-0 opacity-75">Here's a snapshot of your school's activity. Manage teachers, students, and content with ease.</p>
         </div>
-      </a>
     </div>
-    <div class="col-md-3">
-      <a href="{{ url_for('admin_bp.list_students') }}" class="card text-center">
-        <div class="card-body">
-          <h5>{{ student_count }}</h5>
-          <p>Students</p>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-3 col-md-6 animate-in" style="animation-delay: 0.1s;">
+            <a href="{{ url_for('admin_bp.list_teachers') }}" class="text-decoration-none">
+                <div class="stat-card">
+                    <div class="stat-card__icon icon-teachers"><i class="fa-solid fa-chalkboard-user"></i></div>
+                    <div class="stat-card__info">
+                        <div class="value">{{ teacher_count }}</div>
+                        <div class="label">Teachers</div>
+                    </div>
+                </div>
+            </a>
         </div>
-      </a>
-    </div>
-    <div class="col-md-3">
-      <a href="{{ url_for('admin_bp.list_classes') }}" class="card text-center">
-        <div class="card-body">
-          <h5>{{ class_count }}</h5>
-          <p>Classes</p>
+        <div class="col-lg-3 col-md-6 animate-in" style="animation-delay: 0.2s;">
+            <a href="{{ url_for('admin_bp.list_students') }}" class="text-decoration-none">
+                <div class="stat-card">
+                    <div class="stat-card__icon icon-students"><i class="fa-solid fa-user-graduate"></i></div>
+                    <div class="stat-card__info">
+                        <div class="value">{{ student_count }}</div>
+                        <div class="label">Students</div>
+                    </div>
+                </div>
+            </a>
         </div>
-      </a>
-    </div>
-    <div class="col-md-3">
-      <a href="{{ url_for('admin_bp.dashboard') }}" class="card text-center">
-        <div class="card-body">
-          <h5>{{ subject_count }}</h5>
-          <p>Subjects</p>
+        <div class="col-lg-3 col-md-6 animate-in" style="animation-delay: 0.3s;">
+            <a href="{{ url_for('admin_bp.list_classes') }}" class="text-decoration-none">
+                <div class="stat-card">
+                    <div class="stat-card__icon icon-classes"><i class="fa-solid fa-school"></i></div>
+                    <div class="stat-card__info">
+                        <div class="value">{{ class_count }}</div>
+                        <div class="label">Classes</div>
+                    </div>
+                </div>
+            </a>
         </div>
-      </a>
-    </div>
-    <div class="col-md-3">
-      <a href="{{ url_for('admin_bp.gallery') }}" class="card text-center">
-        <div class="card-body">
-          <h5>77</h5>
-          <p>Gallery</p>
+        <div class="col-lg-3 col-md-6 animate-in" style="animation-delay: 0.4s;">
+            <a href="{{ url_for('admin_bp.manage_subjects') }}" class="text-decoration-none">
+                <div class="stat-card">
+                    <div class="stat-card__icon icon-subjects"><i class="fa-solid fa-book"></i></div>
+                    <div class="stat-card__info">
+                        <div class="value">{{ subject_count }}</div>
+                        <div class="label">Subjects</div>
+                    </div>
+                </div>
+            </a>
         </div>
-      </a>
     </div>
-  </div>
+
+    <div class="row g-4">
+        <div class="col-xl-8">
+            <div class="content-card mb-4 animate-in" style="animation-delay: 0.5s;">
+                <div class="content-card__header">Student Enrollment Overview</div>
+                <div class="p-3"><canvas id="enrollmentChart"></canvas></div>
+            </div>
+            
+            
+        </div>
+
+        <div class="col-xl-4">
+            <div class="content-card animate-in" style="animation-delay: 0.7s;">
+                <div class="content-card__header">Quick Actions</div>
+                <div class="p-3">
+                    <a href="{{ url_for('admin_bp.add_gallery') }}" class="btn btn-primary w-100 mb-3"><i class="fa-solid fa-images me-2"></i> Add Gallery Item</a>
+                </div>
+                <div class="quick-action-list list-group-flush">
+                    <a href="{{ url_for('admin_bp.add_teacher') }}" ><i class="icon fa-solid fa-user-plus"></i> Add a New Teacher</a>
+                    <a href="{{ url_for('admin_bp.add_student') }}"><i class="icon fa-solid fa-user-graduate"></i> Enroll a New Student</a>
+                    <a href="{{ url_for('teacher_bp.add_news') }}"><i class="icon fa-solid fa-bullhorn"></i> Post an Announcement</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<br>
-<div style="align-items: baseline;">
-  <p>Sir, PLease Don't go any route. Only go to gallery to upload new gallery items</p>
-</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Chart.js - Student Enrollment Chart
+    const ctx = document.getElementById('enrollmentChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10'],
+                datasets: [{
+                    label: 'Number of Students',
+                    data: [55, 52, 60, 48, 45], // Example data
+                    backgroundColor: 'rgba(13, 110, 253, 0.6)',
+                    borderColor: 'rgba(13, 110, 253, 1)',
+                    borderWidth: 1,
+                    borderRadius: 5,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } },
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

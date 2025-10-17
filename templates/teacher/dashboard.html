@@ -11,7 +11,10 @@
         color: #fff;
         border: none;
     }
-    .welcome-card h3 { font-weight: 600; }
+
+    .welcome-card h3 {
+        font-weight: 600;
+    }
 
     .stat-card {
         background-color: var(--teacher-sidebar-bg);
@@ -24,10 +27,12 @@
         transition: all 0.3s ease;
         height: 100%;
     }
+
     .stat-card:hover {
         transform: translateY(-5px);
         box-shadow: var(--teacher-shadow);
     }
+
     .stat-card__icon {
         font-size: 1.5rem;
         width: 50px;
@@ -40,6 +45,7 @@
         color: var(--teacher-primary);
         flex-shrink: 0;
     }
+
     .stat-card__info .value {
         font-size: 1.75rem;
         font-weight: 600;
@@ -48,6 +54,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+
     .stat-card__info .label {
         font-size: 0.9rem;
         color: var(--teacher-text-light);
@@ -57,9 +64,10 @@
         background-color: var(--teacher-sidebar-bg);
         border: 1px solid var(--teacher-border);
         border-radius: 1rem;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         height: 100%;
     }
+
     .content-card__header {
         font-size: 1.2rem;
         font-weight: 600;
@@ -72,6 +80,7 @@
         color: var(--teacher-text-light);
         font-weight: 500;
     }
+
     .schedule-tabs .nav-link.active {
         color: var(--teacher-primary);
         border-color: var(--teacher-primary) !important;
@@ -89,8 +98,15 @@
         border-bottom: 1px solid var(--teacher-border);
         transition: background-color 0.2s ease;
     }
-    .quick-action-list a:last-child { border-bottom: none; }
-    .quick-action-list a:hover { background-color: #f8fafc; }
+
+    .quick-action-list a:last-child {
+        border-bottom: none;
+    }
+
+    .quick-action-list a:hover {
+        background-color: #f8fafc;
+    }
+
     .quick-action-list .icon {
         width: 20px;
         text-align: center;
@@ -102,7 +118,13 @@
         transform: translateY(20px);
         animation: fadeInUp 0.6s ease-out forwards;
     }
-    @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 </style>
 {% endblock %}
 
@@ -151,53 +173,61 @@
             <div class="content-card animate-in" style="animation-delay: 0.4s;">
                 <ul class="nav nav-tabs schedule-tabs px-4 pt-2" id="scheduleTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="today-tab" data-bs-toggle="tab" data-bs-target="#today-pane" type="button">Today's Schedule</button>
+                        <button class="nav-link active" id="today-tab" data-bs-toggle="tab" data-bs-target="#today-pane"
+                            type="button">Today's Schedule</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="all-classes-tab" data-bs-toggle="tab" data-bs-target="#all-classes-pane" type="button">All My Classes</button>
+                        <button class="nav-link" id="all-classes-tab" data-bs-toggle="tab"
+                            data-bs-target="#all-classes-pane" type="button">All My Classes</button>
                     </li>
                 </ul>
                 <div class="tab-content" id="scheduleTabContent">
                     <div class="tab-pane fade show active" id="today-pane" role="tabpanel">
                         <div class="list-group list-group-flush">
-                            {% for routine, subject in routines %}
-                                <div class="list-group-item d-flex justify-content-between align-items-center p-3">
-                                    <div>
-                                        <div class="fw-bold">{{ routine.class_rel.name }} - {{ subject.name }}</div>
-                                        <small class="text-muted">
-                                            <i class="fa-regular fa-clock me-1"></i>
-                                            {{ routine.start_time.strftime('%I:%M %p') }} - {{ routine.end_time.strftime('%I:%M %p') }}
-                                        </small>
+                            {% for routine in routines %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                <div>
+                                    <div class="fw-bold">
+                                        {{ routine.subject.class_.name }} - {{ routine.subject.name }}
                                     </div>
-                                    {% set now = now_time %}
-                                    {% if routine.start_time <= now and now <= routine.end_time %}
-                                        <span class="badge bg-danger-subtle text-danger-emphasis rounded-pill">Live</span>
+                                    <small class="text-muted">
+                                        <i class="fa-regular fa-clock me-1"></i>
+                                        {{ routine.start_time.strftime('%I:%M %p') }} - {{
+                                        routine.end_time.strftime('%I:%M %p') }}
+                                    </small>
+                                </div>
+                                {% set now = now_time %}
+                                {% if routine.start_time <= now and now <=routine.end_time %} <span
+                                    class="badge bg-danger-subtle text-danger-emphasis rounded-pill">Live</span>
                                     {% elif now > routine.end_time %}
-                                        <span class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill">Finished</span>
+                                    <span
+                                        class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill">Finished</span>
                                     {% else %}
-                                        <span class="badge bg-primary-subtle text-primary-emphasis rounded-pill">Upcoming</span>
+                                    <span
+                                        class="badge bg-primary-subtle text-primary-emphasis rounded-pill">Upcoming</span>
                                     {% endif %}
-                                </div>
+                            </div>
                             {% else %}
-                                <div class="list-group-item text-center p-4">
-                                    <p class="text-muted mb-0">No classes scheduled for today. Enjoy your day!</p>
-                                </div>
+                            <div class="list-group-item text-center p-4">
+                                <p class="text-muted mb-0">No classes scheduled for today. Enjoy your day!</p>
+                            </div>
                             {% endfor %}
                         </div>
                     </div>
                     <div class="tab-pane fade" id="all-classes-pane" role="tabpanel">
                         <div class="list-group list-group-flush">
-                             {% for class in classes %}
-                                <div class="list-group-item d-flex justify-content-between align-items-center p-3">
-                                    <div>
-                                        <div class="fw-bold">{{ class.subject.name }}</div>
-                                        <small class="text-muted">Class: {{ class.class_.name }} ({{ class.class_.section }})</small>
-                                    </div>
+                            {% for class in classes %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                <div>
+                                    <div class="fw-bold">{{ class.subject.name }}</div>
+                                    <small class="text-muted">Class: {{ class.class_.name }} ({{ class.class_.section
+                                        }})</small>
                                 </div>
+                            </div>
                             {% else %}
-                                <div class="list-group-item text-center p-4">
-                                    <p class="text-muted mb-0">No classes have been assigned to you yet.</p>
-                                </div>
+                            <div class="list-group-item text-center p-4">
+                                <p class="text-muted mb-0">No classes have been assigned to you yet.</p>
+                            </div>
                             {% endfor %}
                         </div>
                     </div>
@@ -209,12 +239,18 @@
             <div class="content-card animate-in" style="animation-delay: 0.5s;">
                 <div class="content-card__header">Quick Actions</div>
                 <div class="quick-action-list list-group-flush">
-                    <a href="{{ url_for('teacher_bp.routine') }}"><i class="icon fa-solid fa-calendar-week"></i> Class Routine</a>
-                    <a href="{{ url_for('teacher_bp.attendance', class_id=1) }}"><i class="icon fa-solid fa-user-check"></i> Take Attendance</a>
-                    <a href="{{ url_for('teacher_bp.assigned_subjects', class_id=1) }}"><i class="icon fa-solid fa-book"></i> Enter Results</a>
-                    <a href="{{ url_for('teacher_bp.students_list') }}"><i class="icon fa-solid fa-users"></i> View Students</a>
-                    <a href="{{ url_for('teacher_bp.view_news') }}"><i class="icon fa-solid fa-bullhorn"></i> Announcements</a>
-                    <a href="{{ url_for('teacher_bp.profile') }}"><i class="icon fa-solid fa-user-circle"></i> My Profile</a>
+                    <a href="{{ url_for('teacher_bp.routine') }}"><i class="icon fa-solid fa-calendar-week"></i> Class
+                        Routine</a>
+                    <a href="{{ url_for('teacher_bp.attendance', class_id=1) }}"><i
+                            class="icon fa-solid fa-user-check"></i> Take Attendance</a>
+                    <a href="{{ url_for('teacher_bp.assigned_subjects', class_id=1) }}"><i
+                            class="icon fa-solid fa-book"></i> Enter Results</a>
+                    <a href="{{ url_for('teacher_bp.students_list') }}"><i class="icon fa-solid fa-users"></i> View
+                        Students</a>
+                    <a href="{{ url_for('teacher_bp.view_news') }}"><i class="icon fa-solid fa-bullhorn"></i>
+                        Announcements</a>
+                    <a href="{{ url_for('teacher_bp.profile') }}"><i class="icon fa-solid fa-user-circle"></i> My
+                        Profile</a>
                 </div>
             </div>
         </div>

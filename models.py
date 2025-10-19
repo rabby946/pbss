@@ -9,7 +9,7 @@ from extensions import db
 # News
 class News(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(200), nullable=False)
+    title = db.Column(db.Text, nullable=False) 
     description = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.String(500))
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
@@ -17,7 +17,7 @@ class News(db.Model):
 # Gallery (multiple images)
 class Gallery(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(200), nullable=False)
+    title = db.Column(db.Text, nullable=False) 
     description = db.Column(db.Text, nullable=False)
     images = db.Column(db.JSON)  # list of image URLs
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)

@@ -1,12 +1,13 @@
 from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for, flash
-from datetime import datetime
+from datetime import datetime, time
 from werkzeug.security import check_password_hash
 from models import db, Student, User, ExamResult, Attendance, RegisteredSubject, Subject, Transaction, Routine, News, Teacher
 from extensions import db
 from utils import student_required, upload_image
 from calendar import monthrange
-    
+from decimal import Decimal 
 student_bp = Blueprint('student_bp', __name__, url_prefix='/student')
+import time
 
 
 @student_bp.route('/login', methods=['GET', 'POST'])
@@ -66,35 +67,6 @@ def profile():
         return redirect(url_for('student_bp.profile'))
     return render_template('student/profile.html', student=student, user=user)
 
-@student_bp.route('/results', methods=['GET'])
-@student_required
-def results():
-    student_id = session['student_id']
-    subject_filter = request.args.get('subject')
-    query = ExamResult.query.filter_by(student_id=student_id)
-    if subject_filter:
-        query = query.join(Subject).filter(Subject.name.ilike(f"%{subject_filter}%"))
-    results = query.join(Subject, ExamResult.subject_id == Subject.id) \
-                   .add_columns(Subject.name.label('subject_name'), ExamResult.exam_type,
-                                ExamResult.marks, ExamResult.grade, ExamResult.exam_date) \
-                   .order_by(ExamResult.created_at.desc()).all()
-    return render_template('student/results.html', results=results, subject_filter=subject_filter)
-
-@student_bp.route('/payments', methods=['GET', 'POST'])
-@student_required
-def payments():
-    student_id = session['student_id']
-    if request.method == 'POST':
-        amount = request.form.get('amount')
-        payment_method = request.form.get('payment_method')
-        txn = Transaction(student_id=student_id, amount=amount, payment_method=payment_method, status='pending')
-        db.session.add(txn)
-        Student.query(id=student_id).due_amount -= amount
-        db.session.commit()
-        flash("Payment request submitted.", "success")
-        return redirect(url_for('student_bp.payments'))
-    transactions = Transaction.query.filter_by(student_id=student_id).order_by(Transaction.created_at.desc()).all()
-    return render_template('student/payments.html', transactions=transactions)
 
 
 @student_bp.route('/routines', methods=['GET'])
@@ -149,3 +121,96 @@ def attendance():
     stats["percentage"] = round(((stats["present"] + stats["late"]) / num_days) * 100, 1)
 
     return render_template('student/attendance.html',year=year,month=month,days=days,stats=stats)
+
+@student_bp.route('/results', methods=['GET'])
+@student_required
+def results():
+    student_id = session['student_id']
+    subject_filter = request.args.get('subject')
+    query = ExamResult.query.filter_by(student_id=student_id)
+    if subject_filter:
+        query = query.join(Subject).filter(Subject.name.ilike(f"%{subject_filter}%"))
+    results = query.join(Subject, ExamResult.subject_id == Subject.id) \
+                   .add_columns(Subject.name.label('subject_name'), ExamResult.exam_type,
+                                ExamResult.marks, ExamResult.grade, ExamResult.exam_date) \
+                   .order_by(ExamResult.created_at.desc()).all()
+    return render_template('student/results.html', results=results, subject_filter=subject_filter)
+
+@student_bp.route('/payments', methods=['GET'])
+@student_required
+def payments():
+    student_id = session['student_id']
+    student = Student.query.get_or_404(student_id)
+    transactions = Transaction.query.filter_by(student_id=student_id).order_by(Transaction.created_at.desc()).all()
+    return render_template('student/payments.html', student=student, transactions=transactions)
+
+import requests
+from flask import jsonify
+
+@student_bp.route('/initiate-bkash-payment', methods=['POST'])
+@student_required
+def initiate_bkash_payment():
+    from decimal import Decimal
+    student_id = session['student_id']
+    amount = Decimal(request.form.get('amount'))
+    student = Student.query.get_or_404(student_id)
+
+    # Step 1: get access token
+    headers = {
+        "username": "your_bkash_username",
+        "password": "your_bkash_password",
+    }
+    data = {
+        "app_key": "your_app_key",
+        "app_secret": "your_app_secret"
+    }
+    token_res = requests.post("https://tokenized.sandbox.bka.sh/v1.2.0-beta/token/grant", headers=headers, data=data).json()
+    id_token = token_res.get('id_token')
+
+    # Step 2: Create payment
+    payment_headers = {
+        "authorization": id_token,
+        "x-app-key": "your_app_key",
+        "Content-Type": "application/json"
+    }
+    payment_data = {
+        "mode": "0011",
+        "payerReference": str(student.id),
+        "callbackURL": "https://your-domain.com/student/payment-success",
+        "amount": str(amount),
+        "currency": "BDT",
+        "intent": "sale",
+        "merchantInvoiceNumber": f"INV-{student.id}-{int(time.time())}"
+    }
+
+    response = requests.post("https://tokenized.sandbox.bka.sh/v1.2.0-beta/payment/create", 
+                             headers=payment_headers, json=payment_data)
+    res_json = response.json()
+
+    if 'bkashURL' in res_json:
+        return redirect(res_json['bkashURL'])  # redirect to bKash payment page
+    else:
+        flash("Error connecting to bKash.", "danger")
+        return redirect(url_for('student_bp.payments'))
+@student_bp.route('/payment-success', methods=['POST'])
+def payment_success():
+    data = request.get_json()
+    student_id = data.get('payerReference')
+    amount = Decimal(data.get('amount'))
+    txn_id = data.get('paymentID')
+
+    txn = Transaction(
+        student_id=student_id,
+        amount=amount,
+        payment_method='bKash',
+        status='completed',
+        transaction_id=txn_id
+    )
+    db.session.add(txn)
+
+    # Update student's due amount
+    student = Student.query.get(student_id)
+    student.due_amount -= amount
+    db.session.commit()
+
+    return jsonify({"message": "Payment success recorded"}), 200

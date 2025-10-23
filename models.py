@@ -2,10 +2,6 @@
 from datetime import datetime
 from extensions import db
 
-# -----------------------
-# Existing models (kept as-is)
-# -----------------------
-
 # News
 class News(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -76,20 +72,8 @@ class User(db.Model):
     last_login = db.Column(db.DateTime)
 
     # One-to-one relationships to teacher/student (if present)
-    teacher = db.relationship(
-        'Teacher',
-        back_populates='user',
-        uselist=False,
-        cascade='all, delete-orphan',
-        passive_deletes=True
-    )
-    student = db.relationship(
-        'Student',
-        back_populates='user',
-        uselist=False,
-        cascade='all, delete-orphan',
-        passive_deletes=True
-    )
+    teacher = db.relationship('Teacher',back_populates='user',uselist=False,cascade='all, delete-orphan',passive_deletes=True)
+    student = db.relationship('Student',back_populates='user',uselist=False,cascade='all, delete-orphan',passive_deletes=True)
 
     def __repr__(self):
         return f"<User id={self.id} type={self.user_type}>"

@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
-from models import News, Gallery, Teacher, Student, Committee, MPO, Result, Routine, Report, User
+from models import News, Gallery, Teacher, Student, Committee, MPO, Result, Routine, Report, SchoolClass
 from flask_mail import Message
 from extensions import  db
 from datetime import datetime
@@ -47,24 +47,30 @@ def gallery_detail(id):
 @public_bp.route("/teachers")
 def teachers():
     items = Teacher.query.filter(Teacher.position != "0").order_by(Teacher.position.asc()).all()
-    return render_template("public/entity.html",entity_items=items,entity_name="Teachers",detail_endpoint="public.teacher_detail")
+    return render_template("public/teachers.html",items=items)
 
 @public_bp.route("/teacher/<int:id>")
 def teacher_detail(id):
     item = Teacher.query.get_or_404(id)
-    return render_template("public/entity_detail.html",item=item,description=item.position, endpoint="public.teachers")
+    return render_template("public/teacher_detail.html",item=item)
 
 
 # ---------- Students ----------
 @public_bp.route("/students")
 def students():
-    items = Student.query.order_by(Student.id.desc()).all()
-    return render_template("public/entity.html",entity_items=items,entity_name="Students",detail_endpoint="public.student_detail")
+    selected_class = request.args.get("class_id", "all")
+    query = Student.query.order_by(Student.id.desc())
+    if selected_class != "all":
+        query = query.filter(Student.class_id == int(selected_class))
+    items = query.all()  # Execute after filtering
+    classes = SchoolClass.query.order_by(SchoolClass.id.asc()).all()
+    return render_template("public/students.html", items=items, classes=classes)
 
 @public_bp.route("/student/<int:id>")
 def student_detail(id):
     item = Student.query.get_or_404(id)
-    return render_template("public/entity_detail.html",item=item,description=item.roll, endpoint="public.students")
+    return render_template("public/student_detail.html",item=item)
+
 # ---------- Committee ----------
 @public_bp.route("/committees")
 def committees():
@@ -125,18 +131,7 @@ def routine():
     teachers = Teacher.query.order_by(Teacher.position).all()
     subjects = Subject.query.order_by(Subject.class_id).all()
 
-    return render_template(
-        "public/routine.html",
-        routines=routines,
-        days=days,
-        classes=classes,
-        teachers=teachers,
-        subjects=subjects,
-        selected_day=selected_day,
-        selected_class=selected_class,
-        selected_teacher=selected_teacher,
-        selected_subject=selected_subject
-    )
+    return render_template("public/routine.html",routines=routines,days=days,classes=classes,teachers=teachers,subjects=subjects,selected_day=selected_day,selected_class=selected_class,selected_teacher=selected_teacher,selected_subject=selected_subject)
 
 # ---------- Contact ----------
 @public_bp.route("/contact", methods=["GET", "POST"])

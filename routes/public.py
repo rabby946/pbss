@@ -16,7 +16,6 @@ def home():
     headline = headline_item.title if headline_item else "No news yet"
     headline2 = headline_item.description if headline_item else ""
     notice = notice = News.query.order_by(News.id.desc()).limit(3)
-
     return render_template("public/home.html", text=headline, text2=headline2, notice=notice)
 
 # ---------- News ----------
@@ -155,9 +154,17 @@ def contact():
 def login():
     return render_template("public/login.html")
 
-@public_bp.route("/forgot_password")
+@public_bp.route("/forgot_password", methods = ["GET", "POST"])
 def forgot_password():
+    if request.method == "POST":
+        user_type = request.form.get("userType")
+        if user_type == "student":
+            studentID = request.form.get("studentID")
+            student = Student.query.get(studentID=studentID).first()
+            # sending sms OTP to reset password link to student.phone
+            
     return render_template("public/forgot_password.html")
+
 from datetime import datetime, time
 @public_bp.route("/fix")
 @admin_required

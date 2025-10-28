@@ -173,6 +173,8 @@ class Transaction(db.Model):
     amount = db.Column(db.Numeric(10, 2), nullable=False, default=0.00)
     reference = db.Column(db.String(255))
     status = db.Column(db.Enum('pending', 'paid', 'failed', name='transaction_status'), nullable=False, default='pending')
+    payment_id = db.Column(db.String(100), nullable=True) 
+    merchant_invoice_number = db.Column(db.String(100), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # relationships

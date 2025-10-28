@@ -9,8 +9,6 @@ from routes.public import public_bp
 from routes.admin import admin_bp
 from routes.student import student_bp
 
-
-
 from routes.teacher import teacher_bp    
 
 # Load environment variables
@@ -23,7 +21,7 @@ app.secret_key = app.config['FLASK_SECRET_KEY']
 cloudinary.config(cloud_name=app.config["CLOUDINARY_CLOUD_NAME"],api_key=app.config["CLOUDINARY_API_KEY"],api_secret=app.config["CLOUDINARY_API_SECRET"])
 # Initialize extensions
 db.init_app(app)
-migrate = Migrate(app, db)
+migrate = Migrate(app, db)  
 
 # -----------------------
 # Create tables safely (optional when using migrations)
@@ -38,4 +36,4 @@ app.register_blueprint(teacher_bp, url_prefix="/teacher")
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, debug=True)

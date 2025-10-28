@@ -1,11 +1,12 @@
 # teacher.py
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import check_password_hash
-from models import Teacher, Routine, Subject, Student, Attendance, ExamResult, SchoolClass, RegisteredSubject, AssignedSubject, Transaction, News
+from models import Teacher, Routine, Subject, Student, Attendance, ExamResult, SchoolClass, RegisteredSubject, AssignedSubject, Transaction, News, ExamResult
 from utils import teacher_required, upload_image
 from extensions import db
 from datetime import datetime, timedelta
 from datetime import date 
+from sqlalchemy.orm import joinedload
 
 teacher_bp = Blueprint('teacher_bp', __name__, url_prefix='/teacher')
 
@@ -32,8 +33,22 @@ def teacher_logout():
     flash('Logged out successfully.', 'info')
     return redirect(url_for('teacher_bp.login'))
 
-from datetime import date
-from sqlalchemy.orm import joinedload
+@teacher_bp.route('/change-password', methods=["GET", "POST"])
+@teacher_required
+def changePassword():
+    if request.method == "POST":
+        old_pass = request.form.get('old-pass', '').strip()
+        new_pass = request.form.get('new-pass', '').strip()
+        student = Teacher.query.get_or_404(session['teacher_id'])
+        user = student.user
+        if user and user.password == old_pass:
+            user.password = new_pass
+            db.session.commit()
+            flash(f'password updated successfully', 'success')
+        else:
+            flash(f'wrong password', 'error')
+        return redirect(request.url)
+    return render_template("teacher/changepassword.html")
 
 @teacher_bp.route('/dashboard')
 @teacher_required
@@ -145,7 +160,7 @@ def upload_results(subject_id):
     registrations = (RegisteredSubject.query.filter_by(subject_id=subject_id, status='active').join(RegisteredSubject.student).order_by(Student.id.desc()).all())
     return render_template("teacher/upload_results.html",subject=subject,registrations=registrations)
 
-from models import ExamResult, db
+
 
 @teacher_bp.route("/submit-results/<int:subject_id>", methods=["POST"])
 @teacher_required

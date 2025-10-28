@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="description" content="Official website of Palashbaria High School, offering academic programs, results, news, and activities.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
     <title>{% block title %}Student Dashboard{% endblock %}</title>
@@ -396,6 +397,7 @@
         }
     </style>
 </head>
+{% block head_extra %} {%endblock%}
 <body>
 
 <!-- Top Navigation -->
@@ -404,18 +406,18 @@
         <i class="fas fa-bars"></i>
     </button>
     
-    <a href="{{ url_for('student_bp.dashboard') }}" class="navbar-brand">
+    <a href="{{ url_for('public.home') }}" class="navbar-brand">
         <div class="brand-logo">
             <i class="fas fa-graduation-cap"></i>
         </div>
-        <span>Palashbaria Secondary</span>
+        <span>Palashbaria School</span>
     </a>
 
     <div class="navbar-right">
         <div class="user-profile">
-            <div class="user-avatar">
+            <a href="{{ url_for('student_bp.dashboard') }}" class="user-avatar">
                 {{ session.get('student_name', 'ST')[0:2].upper() }}
-            </div>
+            </a>
             <div class="user-info">
                 <div class="user-name">{{ session.get('student_name', 'Student') }}</div>
                 <div class="user-role">Student</div>
@@ -440,6 +442,12 @@
             </div>
             <div class="nav-item">
                 <a href="{{ url_for('student_bp.profile') }}" class="nav-link {% if request.endpoint == 'student_bp.profile' %}active{% endif %}">
+                    <i class="fas fa-user"></i>
+                    <span>My Profile</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{{ url_for('student_bp.changePassword') }}" class="nav-link {% if request.endpoint == 'student_bp.changePassword' %}active{% endif %}">
                     <i class="fas fa-user"></i>
                     <span>My Profile</span>
                 </a>
@@ -576,7 +584,7 @@
         }
     });
 </script>
-
+{% block scripts_extra %} {%endblock%}
 </body>
 </html>
 {% endblock student_html_structure %}

@@ -4,28 +4,38 @@
 {% block student_content %}
 <div class="container my-5">
     <h3 class="mb-3">Payment Information</h3>
-    <div class="card mb-4 p-3">
-        <p><strong>Student ID:</strong> {{ student.id }}</p>
-        <p><strong>Name:</strong> {{ student.name }}</p>
-        
-        <p><strong>Roll:</strong> {{ student.roll }}</p>
-        <p><strong>Due Amount:</strong> {{ student.due_amount }} BDT</p>
-        {% if student.due_amount > 0 %}
-            <form action="{{ url_for('student_bp.initiate_bkash_payment') }}" method="POST">
-                <input type="hidden" name="amount" value="{{ student.due_amount }}">
-                <button type="submit" class="btn btn-primary">Pay Now with bKash</button>
-            </form>
-        {% else %}
-            <div class="alert alert-success">No due payment!</div>
-        {% endif %}
+    <div class="card mb-4 p-3 shadow-sm">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Student ID:</strong> {{ student.id }}</p>
+                <p><strong>Name:</strong> {{ student.name }}</p>
+                <p><strong>Roll:</strong> {{ student.roll }}</p>
+                <p><strong>Due Amount:</strong> {{ student.due_amount }} BDT</p>
+            </div>
+            <div class="col-md-6 d-flex align-items-center justify-content-end">
+                {% if student.due_amount > 0 %}
+                <form action="{{ url_for('student_bp.initiate_bkash_payment') }}" method="POST" class="d-flex">
+                    <input type="number" name="amount" min="10" max="{{ student.due_amount }}" step="1"
+                           class="form-control me-2" placeholder="Enter amount (BDT)" required>
+                    <button type="submit" class="btn btn-danger">
+                        <img src="https://download.logo.wine/logo/BKash/BKash-Logo.wine.png" 
+                             alt="bKash" width="60">
+                        Pay Now
+                    </button>
+                </form>
+                {% else %}
+                <div class="alert alert-success mb-0">No due payment!</div>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
     <h4 class="mt-4">Transaction History</h4>
-    <table class="table table-bordered">
+    <table class="table table-bordered table-striped">
         <thead class="table-dark">
             <tr>
                 <th>Date</th>
-                <th>Amount</th>
+                <th>Amount (BDT)</th>
                 <th>Payment Method</th>
                 <th>Status</th>
             </tr>
@@ -36,10 +46,18 @@
                 <td>{{ txn.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                 <td>{{ txn.amount }}</td>
                 <td>{{ txn.payment_method }}</td>
-                <td>{{ txn.status }}</td>
+                <td>
+                    {% if txn.status == 'completed' %}
+                        <span class="badge bg-success">{{ txn.status }}</span>
+                    {% elif txn.status == 'pending' %}
+                        <span class="badge bg-warning text-dark">{{ txn.status }}</span>
+                    {% else %}
+                        <span class="badge bg-danger">{{ txn.status }}</span>
+                    {% endif %}
+                </td>
             </tr>
             {% else %}
-            <tr><td colspan="4" class="text-center">No transactions found.</td></tr>
+            <tr><td colspan="4" class="text-center text-muted">No transactions found.</td></tr>
             {% endfor %}
         </tbody>
     </table>

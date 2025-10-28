@@ -200,6 +200,11 @@
                         <i class="icon fa-solid fa-user-circle"></i> <span class="link-text">Profile</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('teacher_bp.changePassword') }}" class="nav-link {% if request.endpoint == 'teacher_bp.changePassword' %}active{% endif %}">
+                        <i class="icon fa-solid fa-user-circle"></i> <span class="link-text">Change Password</span>
+                    </a>
+                </li>
             </ul>
         </nav>
     </aside>

@@ -470,7 +470,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     return nameA.localeCompare(nameB);
                 });
             }
-            
+            else{
+                teacherCards.sort((a, b) => {
+                    const nameA = a.querySelector('.teacher-position').textContent;
+                    const nameB = b.querySelector('.teacher-position').textContent;
+                    return nameA.localeCompare(nameB);
+                });
+            }
             // Re-append sorted cards
             teacherCards.forEach(card => teachersGrid.appendChild(card));
         });

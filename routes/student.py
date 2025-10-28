@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for, flash
-from datetime import datetime, time
+from datetime import datetime, time, date
 from werkzeug.security import check_password_hash
 from models import db, Student, User, ExamResult, Attendance, RegisteredSubject, Subject, Transaction, Routine, News, Teacher
 from extensions import db
@@ -7,8 +7,8 @@ from utils import student_required, upload_image
 from calendar import monthrange
 from decimal import Decimal 
 student_bp = Blueprint('student_bp', __name__, url_prefix='/student')
-import time
-
+import time, json, requests
+from config import Config
 
 @student_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -30,12 +30,30 @@ def login():
 
 
 @student_bp.route('/logout')
+@student_required
 def student_logout():
     session.pop('student_id', None)
     session.pop('student_name', None)
     flash("Logged out successfully.", "success")
     return redirect(url_for('public.login'))
 
+@student_bp.route('/change-password', methods=["GET", "POST"])
+@student_required
+def changePassword():
+    if request.method == "POST":
+        old_pass = request.form.get('old-pass', '').strip()
+        new_pass = request.form.get('new-pass', '').strip()
+        student = Student.query.get_or_404(session['student_id'])
+        user = student.user
+        if user and user.password == old_pass:
+            user.password = new_pass
+            db.session.commit()
+            flash(f'password updated successfully', 'success')
+        else:
+            flash(f'wrong password', 'error')
+        return redirect(request.url)
+    return render_template("student/changepassword.html")
+        
 
 @student_bp.route('/dashboard')
 @student_required
@@ -67,8 +85,7 @@ def profile():
         return redirect(url_for('student_bp.profile'))
     return render_template('student/profile.html', student=student, user=user)
 
-
-
+from sqlalchemy.orm import aliased
 @student_bp.route('/routines', methods=['GET'])
 @student_required
 def routines():
@@ -76,8 +93,9 @@ def routines():
     selected_day = request.args.get('day', 'Monday')
     if not student.class_id:
         flash("You are not assigned to any class yet.", "warning")
-        return render_template('student/routine.html', routines=[], selected_day=selected_day, student=student)
-    routines = (Routine.query.join(Subject).join(Teacher).filter(Routine.day == selected_day).filter(Subject.class_id == student.class_id).order_by(Routine.start_time.asc()).add_entity(Subject).add_entity(Teacher).all())
+        return render_template('student/routines.html',routines=[],selected_day=selected_day,student=student)
+    reg_sub = aliased(RegisteredSubject)
+    routines = (Routine.query.join(Subject, Routine.subject_id == Subject.id).join(Teacher, Routine.teacher_id == Teacher.id).join(reg_sub, reg_sub.subject_id == Subject.id).filter(Routine.day == selected_day).filter(reg_sub.student_id == student.id).filter(reg_sub.status == 'active').order_by(Routine.start_time.asc()).add_entity(Subject).add_entity(Teacher).all())
     return render_template('student/routines.html',routines=routines,selected_day=selected_day,student=student)
 
 @student_bp.route('/notices')
@@ -86,55 +104,52 @@ def notices():
     news = News.query.order_by(News.timestamp.desc()).all()
     return render_template('student/notices.html', news=news)
 
-@student_bp.route('/attendance', methods=['GET', 'POST'])
+@student_bp.route('/attendance', methods=['GET'])
 @student_required
 def attendance():
-    student_id = session['student_id']
-    records = Attendance.query.filter_by(student_id=student_id).all()
-
-    year = request.args.get('year', datetime.now().year, type=int)
-    month = request.args.get('month', datetime.now().month, type=int)
-    attendance_map = {}
-    for rec in records:
-        if rec.created_at.year == year and rec.created_at.month == month:
-            day = rec.created_at.day
-            attendance_map[day] = {
-                'status': rec.status,
-                'check_in_at': rec.check_in_at.strftime("%I:%M %p") if rec.check_in_at else "-",
-                'check_out_at': rec.check_out_at.strftime("%I:%M %p") if rec.check_out_at else "-"
-            }
-
-    # Generate all days in the month
-    num_days = monthrange(year, month)[1]
-    days = []
-    for day in range(1, num_days + 1):
-        date_obj = datetime(year, month, day)
-        weekday_name = date_obj.strftime("%a")  # Mon, Tue, etc.
-        rec = attendance_map.get(day, None)
-        days.append({'day': day,'weekday': weekday_name,'status': rec['status'] if rec else 'none','check_in_at': rec['check_in_at'] if rec else '-','check_out_at': rec['check_out_at'] if rec else '-'})
-
-    stats = {
-        "present": sum(1 for d in days if d['status'] == "present"),
-        "absent": sum(1 for d in days if d['status'] == "absent"),
-        "late": sum(1 for d in days if d['status'] == "late"),
-    }
-    stats["percentage"] = round(((stats["present"] + stats["late"]) / num_days) * 100, 1)
-
-    return render_template('student/attendance.html',year=year,month=month,days=days,stats=stats)
-
+    student_id = session["student_id"]
+    date_str = request.args.get('date')
+    try:
+        selected_date = datetime.strptime(date_str, "%Y-%m-%d").date() if date_str else date.today()
+    except ValueError:
+        flash("Invalid date format.", "danger")
+        return redirect(url_for('admin_bp.attendance', student_id=student_id))
+    if selected_date > date.today():
+        flash("You can't view attendance for future dates.", "warning")
+        return redirect(url_for('admin_bp.attendance', student_id=student_id))
+    student = Student.query.get_or_404(student_id)
+    attendance_record = (Attendance.query.filter_by(student_id=student_id).filter(db.func.date(Attendance.created_at) == selected_date).first())
+    attendance_dict = {student.id: attendance_record.status} if attendance_record else {}
+    return render_template('student/attendance.html',student=student,attendance_dict=attendance_dict,selected_date=selected_date,today=date.today(), 
+        all_attendance_records=[{
+        'date': a.created_at.strftime('%Y-%m-%d'),
+        'status': a.status
+        } for a in Attendance.query.filter_by(student_id=student.id).all()]
+    )
 @student_bp.route('/results', methods=['GET'])
 @student_required
 def results():
-    student_id = session['student_id']
-    subject_filter = request.args.get('subject')
-    query = ExamResult.query.filter_by(student_id=student_id)
-    if subject_filter:
-        query = query.join(Subject).filter(Subject.name.ilike(f"%{subject_filter}%"))
-    results = query.join(Subject, ExamResult.subject_id == Subject.id) \
-                   .add_columns(Subject.name.label('subject_name'), ExamResult.exam_type,
-                                ExamResult.marks, ExamResult.grade, ExamResult.exam_date) \
-                   .order_by(ExamResult.created_at.desc()).all()
-    return render_template('student/results.html', results=results, subject_filter=subject_filter)
+    student = Student.query.get_or_404(session['student_id'])
+    selected_subject_id = request.args.get('subject', 'all')
+    selected_exam_type = request.args.get('exam_type', 'all')
+    active_subjects = (Subject.query.join(RegisteredSubject, RegisteredSubject.subject_id == Subject.id).filter(RegisteredSubject.student_id == student.id, RegisteredSubject.status == 'active').order_by(Subject.name.asc()).all())
+    results = []
+    if selected_subject_id != 'all' or selected_exam_type != 'all':
+        subj_alias = aliased(Subject)
+        query = ExamResult.query.filter(ExamResult.student_id == student.id)
+        if selected_subject_id != 'all':
+            query = query.filter(ExamResult.subject_id == int(selected_subject_id))
+        else:
+            query = query.filter(ExamResult.subject_id.in_([s.id for s in active_subjects]))
+        if selected_exam_type != 'all':
+            query = query.filter(ExamResult.exam_type == selected_exam_type)
+        results = (query
+            .join(subj_alias, ExamResult.subject_id == subj_alias.id)
+            .add_columns(subj_alias.name.label('subject_name'),ExamResult.exam_type,ExamResult.marks,ExamResult.grade,ExamResult.exam_date)
+            .order_by(ExamResult.exam_date.desc(), ExamResult.created_at.desc()).all()
+        )
+    exam_types = ['midterm', 'final', 'quiz', 'class_test']
+    return render_template('student/results.html',student=student,active_subjects=active_subjects,exam_types=exam_types,results=results,selected_subject_id=selected_subject_id,selected_exam_type=selected_exam_type)
 
 @student_bp.route('/payments', methods=['GET'])
 @student_required
@@ -143,74 +158,177 @@ def payments():
     student = Student.query.get_or_404(student_id)
     transactions = Transaction.query.filter_by(student_id=student_id).order_by(Transaction.created_at.desc()).all()
     return render_template('student/payments.html', student=student, transactions=transactions)
-
+# --- imports ---
+import time
 import requests
-from flask import jsonify
+from decimal import Decimal
+from flask import request, session, redirect, url_for, flash, jsonify, current_app
+from config import Config
 
+# --- simple token cache ---
+_bkash_token_cache = {"token": None, "expires_at": 0}
+
+def get_bkash_token(force_refresh: bool = False):
+    if not force_refresh and _bkash_token_cache["token"] and _bkash_token_cache["expires_at"] > time.time():
+        return _bkash_token_cache["token"]
+
+    token_url = f"{Config.BKASH_BASE_URL}{Config.BKASH_GRANT_TOKEN_URL}"
+    headers = {"Content-Type": "application/json"}
+    payload = {"app_key": Config.BKASH_APP_KEY, "app_secret": Config.BKASH_APP_SECRET}
+
+    try:
+        resp = requests.post(token_url, headers=headers, json=payload, timeout=10)
+        token_json = resp.json()
+    except Exception as e:
+        current_app.logger.error("bKash token request failed: %s", e)
+        return None
+
+    id_token = token_json.get("id_token") or token_json.get("idToken")
+    expires_in = token_json.get("expires_in", 3600)
+
+    if not id_token:
+        current_app.logger.error("Failed to obtain bKash token: %s", token_json)
+        return None
+
+    _bkash_token_cache["token"] = id_token
+    _bkash_token_cache["expires_at"] = time.time() + int(expires_in) - 10
+    return id_token
+
+# --- initiate payment ---
 @student_bp.route('/initiate-bkash-payment', methods=['POST'])
 @student_required
 def initiate_bkash_payment():
-    from decimal import Decimal
-    student_id = session['student_id']
-    amount = Decimal(request.form.get('amount'))
-    student = Student.query.get_or_404(student_id)
+    student = Student.query.get_or_404(session['student_id'])
 
-    # Step 1: get access token
+    try:
+        amount = Decimal(request.form.get('amount', '0').strip())
+    except Exception:
+        flash("Invalid amount entered.", "danger")
+        return redirect(url_for('student_bp.payments'))
+
+    if amount <= 0 or amount > student.due_amount:
+        flash("Amount must be positive and within your due balance.", "warning")
+        return redirect(url_for('student_bp.payments'))
+
+    id_token = get_bkash_token()
+    if not id_token:
+        flash("bKash authentication failed. Try again later.", "danger")
+        return redirect(url_for('student_bp.payments'))
+
+    create_url = f"{Config.BKASH_BASE_URL}{Config.BKASH_CREATE_PAYMENT_URL}"
     headers = {
-        "username": "your_bkash_username",
-        "password": "your_bkash_password",
-    }
-    data = {
-        "app_key": "your_app_key",
-        "app_secret": "your_app_secret"
-    }
-    token_res = requests.post("https://tokenized.sandbox.bka.sh/v1.2.0-beta/token/grant", headers=headers, data=data).json()
-    id_token = token_res.get('id_token')
-
-    # Step 2: Create payment
-    payment_headers = {
+        "Content-Type": "application/json",
         "authorization": id_token,
-        "x-app-key": "your_app_key",
-        "Content-Type": "application/json"
+        "x-app-key": Config.BKASH_APP_KEY
     }
-    payment_data = {
+
+    merchant_invoice = f"INV-{student.id}-{int(time.time())}"
+    callback_url = url_for('student_bp.bkash_execute_callback', _external=True)
+    payload = {
         "mode": "0011",
         "payerReference": str(student.id),
-        "callbackURL": "https://your-domain.com/student/payment-success",
+        "callbackURL": callback_url,
         "amount": str(amount),
         "currency": "BDT",
         "intent": "sale",
-        "merchantInvoiceNumber": f"INV-{student.id}-{int(time.time())}"
+        "merchantInvoiceNumber": merchant_invoice
     }
 
-    response = requests.post("https://tokenized.sandbox.bka.sh/v1.2.0-beta/payment/create", 
-                             headers=payment_headers, json=payment_data)
-    res_json = response.json()
-
-    if 'bkashURL' in res_json:
-        return redirect(res_json['bkashURL'])  # redirect to bKash payment page
-    else:
-        flash("Error connecting to bKash.", "danger")
+    try:
+        resp = requests.post(create_url, headers=headers, json=payload, timeout=10)
+        result = resp.json()
+    except Exception as e:
+        current_app.logger.error("bKash create payment failed: %s", e)
+        flash("Failed to connect to bKash. Try again.", "danger")
         return redirect(url_for('student_bp.payments'))
-@student_bp.route('/payment-success', methods=['POST'])
-def payment_success():
-    data = request.get_json()
-    student_id = data.get('payerReference')
-    amount = Decimal(data.get('amount'))
-    txn_id = data.get('paymentID')
 
+    bkash_url = result.get("bkashURL") or result.get("checkoutURL")
+    payment_id = result.get("paymentID") or result.get("paymentId")
+
+    if not bkash_url:
+        msg = result.get("message") or "Unknown bKash error"
+        flash(f"bKash Error: {msg}", "danger")
+        return redirect(url_for('student_bp.payments'))
+
+    # save pending transaction
     txn = Transaction(
-        student_id=student_id,
+        student_id=student.id,
         amount=amount,
-        payment_method='bKash',
-        status='completed',
-        transaction_id=txn_id
+        payment_method="bKash",
+        status="pending",
+        payment_id=payment_id,
+        merchant_invoice_number=merchant_invoice
     )
     db.session.add(txn)
-
-    # Update student's due amount
-    student = Student.query.get(student_id)
-    student.due_amount -= amount
     db.session.commit()
 
-    return jsonify({"message": "Payment success recorded"}), 200
+    return redirect(bkash_url)
+
+# --- callback after student completes payment ---
+@student_bp.route('/bkash/execute-callback', methods=['GET'])
+def bkash_execute_callback():
+    payment_id = request.args.get('paymentID') or request.args.get('paymentId')
+    if not payment_id:
+        flash("Invalid payment response from bKash.", "danger")
+        return redirect(url_for('student_bp.payments'))
+
+    id_token = get_bkash_token()
+    if not id_token:
+        flash("bKash authentication failed.", "danger")
+        return redirect(url_for('student_bp.payments'))
+
+    execute_url = f"{Config.BKASH_BASE_URL}{Config.BKASH_EXECUTE_PAYMENT_URL}"
+    headers = {
+        "Content-Type": "application/json",
+        "authorization": id_token,
+        "x-app-key": Config.BKASH_APP_KEY
+    }
+    payload = {"paymentID": payment_id}
+
+    try:
+        resp = requests.post(execute_url, headers=headers, json=payload, timeout=10)
+        result = resp.json()
+    except Exception as e:
+        current_app.logger.error("bKash execute payment failed: %s", e)
+        flash("Payment verification failed. Contact admin.", "danger")
+        return redirect(url_for('student_bp.payments'))
+
+    status = result.get("transactionStatus") or result.get("status") or "failed"
+    amount = result.get("amount") or result.get("paidAmount")
+    merchant_invoice = result.get("merchantInvoiceNumber")
+
+    try:
+        amount_decimal = Decimal(str(amount)) if amount else Decimal("0")
+    except Exception:
+        amount_decimal = Decimal("0")
+
+    # find transaction
+    txn = Transaction.query.filter(
+        (Transaction.payment_id == payment_id) |
+        (Transaction.merchant_invoice_number == merchant_invoice)
+    ).first()
+
+    if not txn:
+        txn = Transaction(
+            student_id=session.get('student_id'),
+            amount=amount_decimal,
+            payment_method="bKash",
+            status=status,
+            payment_id=payment_id,
+            merchant_invoice_number=merchant_invoice
+        )
+        db.session.add(txn)
+
+    else:
+        txn.status = "paid" if status.lower() == "completed" else "failed"
+        txn.amount = amount_decimal
+
+    # update student due
+    if txn.status == "paid":
+        student = Student.query.get(txn.student_id)
+        if student:
+            student.due_amount -= amount_decimal
+
+    db.session.commit()
+    flash("Payment processed successfully." if txn.status == "paid" else "Payment failed.", "success" if txn.status=="paid" else "warning")
+    return redirect(url_for('student_bp.payments'))

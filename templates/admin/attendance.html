@@ -1,0 +1,784 @@
+{% extends 'admin/base.html' %}
+{% block title %}Attendance - {{ student.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+  <!-- Header Card -->
+  <div class="student-header-card mb-4">
+    <div class="d-flex align-items-center gap-3">
+      <div class="student-avatar">
+        <span>{{ student.name[0] }}</span>
+      </div>
+      <div>
+        <h4 class="mb-1">{{ student.name }}</h4>
+        <p class="text-muted mb-0">Student ID: {{ student.id }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Left Column: Date Selector & Attendance Form -->
+    <div class="col-lg-5">
+      <div class="attendance-card">
+        <div class="card-header-custom">
+          <h5 class="mb-0">📅 Daily Attendance</h5>
+        </div>
+        <div class="card-body-custom">
+          <!-- Date Selector -->
+          <form method="GET" action="{{ url_for('admin_bp.attendance', student_id=student.id) }}" class="mb-4">
+            <label for="date" class="form-label fw-semibold">Select Date</label>
+            <div class="input-group">
+              <input type="date" id="date" name="date" class="form-control"
+                     value="{{ selected_date.strftime('%Y-%m-%d') }}">
+              <button type="submit" class="btn btn-primary">
+                <span>View</span>
+              </button>
+            </div>
+          </form>
+
+          <div class="selected-date-display mb-4">
+            <div class="date-badge">
+              {{ selected_date.strftime('%A, %d %B %Y') }}
+            </div>
+          </div>
+
+          {% if selected_date == today %}
+            <!-- TODAY MODE (Editable) -->
+            <form method="POST" action="{{ url_for('admin_bp.mark_attendance', student_id=student.id) }}">
+              <div class="attendance-options mb-4">
+                {% set current_status = attendance_dict.get(student.id) if attendance_dict else None %}
+
+                <label class="attendance-option" for="present">
+                  <input type="radio" name="status" id="present" value="present"
+                    {% if current_status == 'present' %}checked{% endif %}>
+                  <div class="option-content present-option">
+                    <div class="option-icon">✓</div>
+                    <div class="option-text">Present</div>
+                  </div>
+                </label>
+
+                <label class="attendance-option" for="absent">
+                  <input type="radio" name="status" id="absent" value="absent"
+                    {% if current_status == 'absent' %}checked{% endif %}>
+                  <div class="option-content absent-option">
+                    <div class="option-icon">✕</div>
+                    <div class="option-text">Absent</div>
+                  </div>
+                </label>
+
+                <label class="attendance-option" for="late">
+                  <input type="radio" name="status" id="late" value="late"
+                    {% if current_status == 'late' %}checked{% endif %}>
+                  <div class="option-content late-option">
+                    <div class="option-icon">⏰</div>
+                    <div class="option-text">Late</div>
+                  </div>
+                </label>
+              </div>
+
+              <button type="submit" class="btn btn-success w-100 btn-lg">
+                💾 Save Attendance
+              </button>
+            </form>
+
+          {% else %}
+            <!-- PAST MODE (View Only) -->
+            {% set record = attendance_dict.get(student.id) if attendance_dict else None %}
+            {% if record %}
+              <div class="status-display status-{{ record.lower() }}">
+                <div class="status-icon">
+                  {% if record == 'present' %}✓
+                  {% elif record == 'absent' %}✕
+                  {% else %}⏰{% endif %}
+                </div>
+                <div class="status-text">{{ record }}</div>
+              </div>
+            {% else %}
+              <div class="alert alert-light border text-center">
+                <p class="mb-0 text-muted">No attendance record found for this date.</p>
+              </div>
+            {% endif %}
+          {% endif %}
+
+          <div class="text-center mt-4">
+            <a href="{{ url_for('admin_bp.dashboard') }}" class="btn btn-outline-secondary">
+              ← Back to Dashboard
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Monthly Calendar View -->
+    <div class="col-lg-7">
+      <!-- Analytics Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <div class="stats-card month-stats">
+            <div class="stats-header">
+              <div class="stats-icon">📅</div>
+              <div class="stats-title">This Month</div>
+            </div>
+            <div class="stats-grid">
+              <div class="stat-item present-stat">
+                <div class="stat-number" id="monthPresent">0</div>
+                <div class="stat-label">Present</div>
+                <div class="stat-percentage" id="monthPresentPercent">0%</div>
+              </div>
+              <div class="stat-item absent-stat">
+                <div class="stat-number" id="monthAbsent">0</div>
+                <div class="stat-label">Absent</div>
+                <div class="stat-percentage" id="monthAbsentPercent">0%</div>
+              </div>
+              <div class="stat-item late-stat">
+                <div class="stat-number" id="monthLate">0</div>
+                <div class="stat-label">Late</div>
+                <div class="stat-percentage" id="monthLatePercent">0%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="stats-card year-stats">
+            <div class="stats-header">
+              <div class="stats-icon">📊</div>
+              <div class="stats-title">This Year</div>
+            </div>
+            <div class="stats-grid">
+              <div class="stat-item present-stat">
+                <div class="stat-number" id="yearPresent">0</div>
+                <div class="stat-label">Present</div>
+                <div class="stat-percentage" id="yearPresentPercent">0%</div>
+              </div>
+              <div class="stat-item absent-stat">
+                <div class="stat-number" id="yearAbsent">0</div>
+                <div class="stat-label">Absent</div>
+                <div class="stat-percentage" id="yearAbsentPercent">0%</div>
+              </div>
+              <div class="stat-item late-stat">
+                <div class="stat-number" id="yearLate">0</div>
+                <div class="stat-label">Late</div>
+                <div class="stat-percentage" id="yearLatePercent">0%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="attendance-card">
+        <div class="card-header-custom d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">📊 Monthly Overview</h5>
+          <div class="calendar-controls">
+            <button id="prevMonth" class="btn btn-sm btn-outline-primary">←</button>
+            <span id="currentMonth" class="mx-3 fw-semibold"></span>
+            <button id="nextMonth" class="btn btn-sm btn-outline-primary">→</button>
+          </div>
+        </div>
+        <div class="card-body-custom">
+          <div id="calendar" class="attendance-calendar"></div>
+          
+          <div class="legend mt-4">
+            <div class="legend-item">
+              <span class="legend-color present-color"></span> Present
+            </div>
+            <div class="legend-item">
+              <span class="legend-color absent-color"></span> Absent
+            </div>
+            <div class="legend-item">
+              <span class="legend-color late-color"></span> Late
+            </div>
+            <div class="legend-item">
+              <span class="legend-color no-data-color"></span> No Data
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  :root {
+    --primary: #4f46e5;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --light: #f8fafc;
+    --dark: #1e293b;
+  }
+
+  .student-header-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1.5rem;
+    border-radius: 16px;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .student-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .attendance-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+  }
+
+  .card-header-custom {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .card-body-custom {
+    padding: 1.5rem;
+  }
+
+  .selected-date-display {
+    text-align: center;
+  }
+
+  .date-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .attendance-options {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .attendance-option {
+    cursor: pointer;
+    margin: 0;
+  }
+
+  .attendance-option input[type="radio"] {
+    display: none;
+  }
+
+  .option-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+  }
+
+  .option-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .option-text {
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  .present-option {
+    background: #f0fdf4;
+  }
+
+  .present-option .option-icon {
+    background: #10b981;
+    color: white;
+  }
+
+  .absent-option {
+    background: #fef2f2;
+  }
+
+  .absent-option .option-icon {
+    background: #ef4444;
+    color: white;
+  }
+
+  .late-option {
+    background: #fffbeb;
+  }
+
+  .late-option .option-icon {
+    background: #f59e0b;
+    color: white;
+  }
+
+  .attendance-option input:checked + .option-content {
+    border-width: 3px;
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .attendance-option input:checked + .present-option {
+    border-color: #10b981;
+  }
+
+  .attendance-option input:checked + .absent-option {
+    border-color: #ef4444;
+  }
+
+  .attendance-option input:checked + .late-option {
+    border-color: #f59e0b;
+  }
+
+  .status-display {
+    text-align: center;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .status-display .status-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+  }
+
+  .status-display .status-text {
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .status-present {
+    background: #f0fdf4;
+    color: #10b981;
+  }
+
+  .status-absent {
+    background: #fef2f2;
+    color: #ef4444;
+  }
+
+  .status-late {
+    background: #fffbeb;
+    color: #f59e0b;
+  }
+
+  .attendance-calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+  }
+
+  .calendar-day-header {
+    text-align: center;
+    font-weight: 600;
+    color: #64748b;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .calendar-day {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+  }
+
+  .calendar-day:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .calendar-day.empty {
+    background: transparent;
+    cursor: default;
+  }
+
+  .calendar-day.empty:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .calendar-day.present {
+    background: #d1fae5;
+    border-color: #10b981;
+    color: #065f46;
+  }
+
+  .calendar-day.absent {
+    background: #fee2e2;
+    border-color: #ef4444;
+    color: #991b1b;
+  }
+
+  .calendar-day.late {
+    background: #fed7aa;
+    border-color: #f59e0b;
+    color: #92400e;
+  }
+
+  .calendar-day.no-data {
+    background: #f1f5f9;
+    color: #94a3b8;
+  }
+
+  .calendar-day.today {
+    border: 2px solid #4f46e5;
+    font-weight: 700;
+  }
+
+  .day-number {
+    font-size: 1rem;
+  }
+
+  .day-status {
+    font-size: 0.7rem;
+    margin-top: 2px;
+  }
+
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+  }
+
+  .present-color {
+    background: #d1fae5;
+    border: 2px solid #10b981;
+  }
+
+  .absent-color {
+    background: #fee2e2;
+    border: 2px solid #ef4444;
+  }
+
+  .late-color {
+    background: #fed7aa;
+    border: 2px solid #f59e0b;
+  }
+
+  .no-data-color {
+    background: #f1f5f9;
+    border: 2px solid #cbd5e1;
+  }
+
+  .calendar-controls {
+    display: flex;
+    align-items: center;
+  }
+
+  .stats-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    height: 100%;
+  }
+
+  .month-stats {
+    border-left: 4px solid #667eea;
+  }
+
+  .year-stats {
+    border-left: 4px solid #f093fb;
+  }
+
+  .stats-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #f1f5f9;
+  }
+
+  .stats-icon {
+    font-size: 1.5rem;
+  }
+
+  .stats-title {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #334155;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .stat-item {
+    text-align: center;
+    padding: 0.75rem;
+    border-radius: 8px;
+    transition: transform 0.2s ease;
+  }
+
+  .stat-item:hover {
+    transform: translateY(-2px);
+  }
+
+  .present-stat {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  }
+
+  .absent-stat {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  }
+
+  .late-stat {
+    background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+  }
+
+  .stat-number {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-percentage {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #475569;
+  }
+
+  @media (max-width: 991px) {
+    .col-lg-5, .col-lg-7 {
+      max-width: 100%;
+    }
+    
+    .stats-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+    }
+    
+    .stat-number {
+      font-size: 1.5rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .calendar-day {
+      font-size: 0.75rem;
+    }
+    
+    .day-status {
+      display: none;
+    }
+
+    .student-header-card {
+      padding: 1rem;
+    }
+
+    .student-avatar {
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
+    }
+    
+    .stats-grid {
+      gap: 0.5rem;
+    }
+    
+    .stat-item {
+      padding: 0.5rem;
+    }
+    
+    .stat-number {
+      font-size: 1.25rem;
+    }
+    
+    .stat-label {
+      font-size: 0.65rem;
+    }
+    
+    .stat-percentage {
+      font-size: 0.75rem;
+    }
+  }
+</style>
+
+<script>
+  // Convert Flask attendance list to JS dictionary
+  const attendanceData = {{ all_attendance_records | tojson | safe }};
+  const attendanceDict = {};
+  attendanceData.forEach(record => {
+    attendanceDict[record.date] = record.status;
+  });
+
+  let currentDate = new Date();
+
+  function renderCalendar() {
+    const calendar = document.getElementById('calendar');
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    // Update month display
+    document.getElementById('currentMonth').textContent =
+      currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+    // Clear calendar
+    calendar.innerHTML = '';
+
+    // Day headers
+    const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    dayHeaders.forEach(day => {
+      const header = document.createElement('div');
+      header.className = 'calendar-day-header';
+      header.textContent = day;
+      calendar.appendChild(header);
+    });
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    // Empty cells before month starts
+    for (let i = 0; i < firstDay; i++) {
+      const emptyDay = document.createElement('div');
+      emptyDay.className = 'calendar-day empty';
+      calendar.appendChild(emptyDay);
+    }
+
+    const today = new Date();
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      const dayCell = document.createElement('div');
+      dayCell.className = 'calendar-day';
+
+      if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
+        dayCell.classList.add('today');
+      }
+
+      const status = attendanceDict[dateStr]; // USE attendanceDict here
+      if (status) {
+        dayCell.classList.add(status.toLowerCase());
+        dayCell.innerHTML = `<div class="day-number">${day}</div><div class="day-status">${status[0]}</div>`;
+      } else {
+        dayCell.classList.add('no-data');
+        dayCell.innerHTML = `<div class="day-number">${day}</div>`;
+      }
+
+      dayCell.addEventListener('click', () => {
+        document.getElementById('date').value = dateStr;
+        document.querySelector('form[method="GET"]').submit();
+      });
+
+      calendar.appendChild(dayCell);
+    }
+
+    // Update analytics
+    updateMonthlyStats(year, month);
+    updateYearlyStats(year);
+  }
+
+  function updateMonthlyStats(year, month) {
+    let present = 0, absent = 0, late = 0, total = 0;
+
+    Object.keys(attendanceDict).forEach(dateStr => {
+      const [y, m] = dateStr.split('-').map(Number);
+      if (y === year && m === month + 1) { // month +1 because JS Date month is 0-based
+        total++;
+        const status = attendanceDict[dateStr];
+        if (status === 'present') present++;
+        else if (status === 'absent') absent++;
+        else if (status === 'late') late++;
+      }
+    });
+
+    const presentPercent = total ? Math.round((present / total) * 100) : 0;
+    const absentPercent = total ? Math.round((absent / total) * 100) : 0;
+    const latePercent = total ? Math.round((late / total) * 100) : 0;
+
+    document.getElementById('monthPresent').textContent = present;
+    document.getElementById('monthAbsent').textContent = absent;
+    document.getElementById('monthLate').textContent = late;
+    document.getElementById('monthPresentPercent').textContent = presentPercent + '%';
+    document.getElementById('monthAbsentPercent').textContent = absentPercent + '%';
+    document.getElementById('monthLatePercent').textContent = latePercent + '%';
+  }
+
+  function updateYearlyStats(year) {
+    let present = 0, absent = 0, late = 0, total = 0;
+
+    Object.keys(attendanceDict).forEach(dateStr => {
+      const y = Number(dateStr.split('-')[0]);
+      if (y === year) {
+        total++;
+        const status = attendanceDict[dateStr];
+        if (status === 'present') present++;
+        else if (status === 'absent') absent++;
+        else if (status === 'late') late++;
+      }
+    });
+
+    const presentPercent = total ? Math.round((present / total) * 100) : 0;
+    const absentPercent = total ? Math.round((absent / total) * 100) : 0;
+    const latePercent = total ? Math.round((late / total) * 100) : 0;
+
+    document.getElementById('yearPresent').textContent = present;
+    document.getElementById('yearAbsent').textContent = absent;
+    document.getElementById('yearLate').textContent = late;
+    document.getElementById('yearPresentPercent').textContent = presentPercent + '%';
+    document.getElementById('yearAbsentPercent').textContent = absentPercent + '%';
+    document.getElementById('yearLatePercent').textContent = latePercent + '%';
+  }
+
+  document.getElementById('prevMonth').addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    renderCalendar();
+  });
+  document.getElementById('nextMonth').addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    renderCalendar();
+  });
+
+  renderCalendar();
+</script>
+
+
+{% endblock %}

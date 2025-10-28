@@ -1,52 +1,596 @@
 {% extends "student/base.html" %}
+
 {% block title %}My Profile{% endblock %}
+
+{% block head_extra %}
+<style>
+    /* Modern Profile Page Styles */
+    
+    .profile-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    /* Profile Header Card */
+    .profile-header-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        color: white;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-header-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .profile-header-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .avatar-section {
+        position: relative;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        background: white;
+    }
+
+    .avatar-badge {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .avatar-badge i {
+        color: white;
+        font-size: 0.875rem;
+    }
+
+    .profile-info {
+        flex: 1;
+        min-width: 250px;
+    }
+
+    .profile-name {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-email {
+        font-size: 0.9375rem;
+        opacity: 0.9;
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .profile-meta {
+        font-size: 0.8125rem;
+        opacity: 0.8;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Main Content Grid */
+    .profile-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    /* Content Cards */
+    .content-card {
+        background: var(--bg-primary);
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid var(--border-light);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--border-light);
+    }
+
+    .card-header h5 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin: 0;
+        color: var(--text-primary);
+    }
+
+    .card-header i {
+        font-size: 1.25rem;
+        color: var(--primary-blue);
+    }
+
+    /* Form Styling */
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border-medium);
+        border-radius: 8px;
+        font-size: 0.9375rem;
+        color: var(--text-primary);
+        background: var(--bg-secondary);
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        background: white;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    .file-input-wrapper {
+        position: relative;
+    }
+
+    .file-input-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: var(--bg-secondary);
+        border: 2px dashed var(--border-medium);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+    }
+
+    .file-input-label:hover {
+        border-color: var(--primary-blue);
+        background: var(--bg-tertiary);
+    }
+
+    .file-input-label i {
+        color: var(--primary-blue);
+        font-size: 1.25rem;
+    }
+
+    .file-input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .file-name {
+        font-size: 0.8125rem;
+        color: var(--text-muted);
+        margin-top: 0.5rem;
+    }
+
+    /* Info Grid */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .info-item {
+        padding: 1rem;
+        background: var(--bg-secondary);
+        border-radius: 8px;
+        border-left: 3px solid var(--primary-blue);
+    }
+
+    .info-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.375rem;
+    }
+
+    .info-value {
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    /* Button Styling */
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-blue), var(--accent-indigo));
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9375rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-primary:active {
+        transform: translateY(0);
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: center;
+        margin-top: 1.5rem;
+    }
+
+    /* Responsive Design */
+    @media (min-width: 768px) {
+        .profile-grid {
+            grid-template-columns: 2fr 1fr;
+        }
+
+        .profile-avatar {
+            width: 140px;
+            height: 140px;
+        }
+
+        .avatar-badge {
+            width: 36px;
+            height: 36px;
+        }
+
+        .avatar-badge i {
+            font-size: 1rem;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .profile-header-card {
+            padding: 1.5rem;
+        }
+
+        .profile-header-content {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+
+        .profile-info {
+            width: 100%;
+        }
+
+        .profile-email,
+        .profile-meta {
+            justify-content: center;
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+        }
+
+        .content-card {
+            padding: 1.25rem;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+        }
+
+        .profile-name {
+            font-size: 1.25rem;
+        }
+
+        .card-header h5 {
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    /* Form Row */
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+
+    /* Loading State */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    .loading-overlay.active {
+        display: flex;
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
 {% block student_content %}
-<div class="container mt-5">
-  <div class="card shadow-sm border-0 p-4">
-    <div class="text-center mb-4">
-      <img src="{{ student.image_url or url_for('static', filename='images/default-avatar.png') }}" 
-           class="rounded-circle shadow-sm" width="140" height="140" style="object-fit: cover;">
-      <h4 class="mt-3 text-primary">{{ student.name }}</h4>
-      <p class="mb-1 text-muted">{{ user.email }}</p>
-      <p class="small text-secondary">Last Updated: {{ student.updated_at.strftime('%Y-%m-%d %H:%M') if student.updated_at else 'N/A' }}</p>
+
+<div class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header-card">
+        <div class="profile-header-content">
+            <div class="avatar-section">
+                <img src="{{ student.image_url or url_for('static', filename='images/default-avatar.png') }}" 
+                     alt="Profile Picture"
+                     class="profile-avatar"
+                     id="profileAvatar">
+                <div class="avatar-badge">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+            </div>
+            <div class="profile-info">
+                <h2 class="profile-name">{{ student.name }}</h2>
+                <div class="profile-email">
+                    <i class="fas fa-envelope"></i>
+                    {{ user.email }}
+                </div>
+                <div class="profile-meta">
+                    <i class="fas fa-clock"></i>
+                    Last Updated: {{ student.updated_at.strftime('%d %b %Y, %I:%M %p') if student.updated_at else 'N/A' }}
+                </div>
+            </div>
+        </div>
     </div>
 
-    <form method="POST" enctype="multipart/form-data">
-      <div class="row">
-        <div class="col-md-6 mb-3">
-          <label class="form-label">Full Name</label>
-          <input type="text" name="name" class="form-control" value="{{ student.name }}" required>
+    <!-- Main Content Grid -->
+    <div class="profile-grid">
+        <!-- Edit Profile Form -->
+        <div class="content-card">
+            <div class="card-header">
+                <i class="fas fa-user-edit"></i>
+                <h5>Edit Profile</h5>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data" id="profileForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" 
+                               name="name" 
+                               class="form-control" 
+                               value="{{ student.name }}" 
+                               required
+                               placeholder="Enter your full name">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Blood Group</label>
+                        <input type="text" 
+                               name="blood_group" 
+                               class="form-control" 
+                               value="{{ student.blood_group or '' }}"
+                               placeholder="e.g., A+, B-, O+">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Address</label>
+                    <textarea name="address" 
+                              class="form-control" 
+                              placeholder="Enter your complete address">{{ student.address or '' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Profile Image</label>
+                    <div class="file-input-wrapper">
+                        <label for="imageInput" class="file-input-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Choose Image or Drop Here</span>
+                        </label>
+                        <input type="file" 
+                               name="image" 
+                               id="imageInput"
+                               class="file-input"
+                               accept="image/*">
+                        <div class="file-name" id="fileName"></div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i>
+                        Update Profile
+                    </button>
+                </div>
+            </form>
         </div>
 
-        <div class="col-md-6 mb-3">
-          <label class="form-label">Blood Group</label>
-          <input type="text" name="blood_group" class="form-control" value="{{ student.blood_group or '' }}">
+        <!-- Student Information -->
+        <div class="content-card">
+            <div class="card-header">
+                <i class="fas fa-id-card"></i>
+                <h5>Student Information</h5>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Student ID</div>
+                    <div class="info-value">{{ student.studentID }}</div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-label">Class</div>
+                    <div class="info-value">{{ student.class_.name if student.class_ else 'N/A' }}</div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-label">Roll Number</div>
+                    <div class="info-value">{{ student.roll or 'N/A' }}</div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-label">Batch</div>
+                    <div class="info-value">{{ student.batch or 'N/A' }}</div>
+                </div>
+            </div>
         </div>
-
-        <div class="col-md-12 mb-3">
-          <label class="form-label">Address</label>
-          <textarea name="address" class="form-control" rows="2">{{ student.address or '' }}</textarea>
-        </div>
-
-        <div class="col-md-12 mb-3">
-          <label class="form-label">Profile Image</label>
-          <input type="file" name="image" class="form-control">
-        </div>
-      </div>
-
-      <div class="text-center mt-3">
-        <button type="submit" class="btn btn-primary px-4">Update Profile</button>
-      </div>
-    </form>
-
-    <hr class="my-4">
-    <div>
-      <h6>Student Information</h6>
-      <p><strong>Student ID:</strong> {{ student.studentID }}</p>
-      <p><strong>Class:</strong> {{ student.class_.name if student.class_ else 'N/A' }}</p>
-      <p><strong>Roll:</strong> {{ student.roll or 'N/A' }}</p>
-      <p><strong>Batch:</strong> {{ student.batch or 'N/A' }}</p>
     </div>
-  </div>
 </div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+</div>
+
+<script>
+    // File Input Preview
+    const fileInput = document.getElementById('imageInput');
+    const fileName = document.getElementById('fileName');
+    const profileAvatar = document.getElementById('profileAvatar');
+
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            fileName.textContent = file.name;
+            
+            // Preview image
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                profileAvatar.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            fileName.textContent = '';
+        }
+    });
+
+    // Drag and drop support
+    const fileLabel = document.querySelector('.file-input-label');
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        fileLabel.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        fileLabel.addEventListener(eventName, () => {
+            fileLabel.style.borderColor = 'var(--primary-blue)';
+            fileLabel.style.background = 'var(--bg-tertiary)';
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        fileLabel.addEventListener(eventName, () => {
+            fileLabel.style.borderColor = 'var(--border-medium)';
+            fileLabel.style.background = 'var(--bg-secondary)';
+        });
+    });
+
+    fileLabel.addEventListener('drop', function(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        if (files.length) {
+            fileInput.files = files;
+            const event = new Event('change');
+            fileInput.dispatchEvent(event);
+        }
+    });
+
+    // Form submission with loading state
+    const profileForm = document.getElementById('profileForm');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+
+    profileForm.addEventListener('submit', function() {
+        loadingOverlay.classList.add('active');
+    });
+</script>
+
 {% endblock %}

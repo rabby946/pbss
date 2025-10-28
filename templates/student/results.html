@@ -3,8 +3,34 @@
 {% block student_content %}
 <div class="container mt-4">
   <h4 class="mb-3 text-primary">Exam Results</h4>
-  <table class="table table-striped">
-    <thead class="table-light">
+  <form method="get" class="row g-3 mb-4">
+    <div class="col-md-6">
+      <label>Subject</label>
+      <select name="subject" class="form-select">
+        <option value="all">All Subjects</option>
+        {% for subject in active_subjects %}
+        <option value="{{ subject.id }}" {% if selected_subject_id|int==subject.id %}selected{% endif %}>{{ subject.name
+          }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-6">
+      <label>Exam Type</label>
+      <select name="exam_type" class="form-select">
+        <option value="all">All Exam Types</option>
+        {% for etype in exam_types %}
+        <option value="{{ etype }}" {% if selected_exam_type==etype %}selected{% endif %}>{{ etype|capitalize }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-12">
+      <button type="submit" class="btn btn-primary">Show Results</button>
+    </div>
+  </form>
+
+  <table class="table table-bordered">
+    <thead>
       <tr>
         <th>Subject</th>
         <th>Exam Type</th>
@@ -14,18 +40,23 @@
       </tr>
     </thead>
     <tbody>
-      {% for r in results %}
+      {% if results %}
+      {% for r, subject_name, exam_type, marks, grade, exam_date in results %}
       <tr>
-        <td>{{ r.subject.name }}</td>
-        <td>{{ r.exam_type }}</td>
-        <td>{{ r.marks }}</td>
-        <td>{{ r.grade }}</td>
-        <td>{{ r.exam_date.strftime('%d %b %Y') if r.exam_date else 'N/A' }}</td>
+        <td>{{ subject_name }}</td>
+        <td>{{ exam_type|capitalize }}</td>
+        <td>{{ marks }}</td>
+        <td>{{ grade }}</td>
+        <td>{{ exam_date.strftime('%d-%m-%Y') if exam_date else '-' }}</td>
       </tr>
-      {% else %}
-      <tr><td colspan="5" class="text-muted text-center">No results found.</td></tr>
       {% endfor %}
+      {% else %}
+      <tr>
+        <td colspan="5" class="text-center">No results to display.</td>
+      </tr>
+      {% endif %}
     </tbody>
   </table>
+
 </div>
 {% endblock %}

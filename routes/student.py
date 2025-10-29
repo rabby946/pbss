@@ -167,32 +167,41 @@ from config import Config
 
 # --- simple token cache ---
 _bkash_token_cache = {"token": None, "expires_at": 0}
-
 def get_bkash_token(force_refresh: bool = False):
+    # use cached token if still valid
     if not force_refresh and _bkash_token_cache["token"] and _bkash_token_cache["expires_at"] > time.time():
         return _bkash_token_cache["token"]
 
-    token_url = f"{Config.BKASH_BASE_URL}{Config.BKASH_GRANT_TOKEN_URL}"
-    headers = {"Content-Type": "application/json"}
-    payload = {"app_key": Config.BKASH_APP_KEY, "app_secret": Config.BKASH_APP_SECRET}
+    token_url = f"{Config.BKASH_BASE_URL}/tokenized/checkout/token/grant"
+    headers = {
+        "Content-Type": "application/json",
+        "username": Config.BKASH_USERNAME,
+        "password": Config.BKASH_PASSWORD
+    }
+    payload = {
+        "app_key": Config.BKASH_APP_KEY,
+        "app_secret": Config.BKASH_APP_SECRET
+    }
 
     try:
-        resp = requests.post(token_url, headers=headers, json=payload, timeout=10)
+        resp = requests.post(token_url, headers=headers, json=payload, timeout=15)
         token_json = resp.json()
+        current_app.logger.info(f"bKash token response: {token_json}")
     except Exception as e:
-        current_app.logger.error("bKash token request failed: %s", e)
+        current_app.logger.error(f"bKash token request failed: {e}")
         return None
 
     id_token = token_json.get("id_token") or token_json.get("idToken")
     expires_in = token_json.get("expires_in", 3600)
 
     if not id_token:
-        current_app.logger.error("Failed to obtain bKash token: %s", token_json)
+        current_app.logger.error(f"Failed to obtain bKash token: {token_json}")
         return None
 
     _bkash_token_cache["token"] = id_token
     _bkash_token_cache["expires_at"] = time.time() + int(expires_in) - 10
     return id_token
+
 
 # --- initiate payment ---
 @student_bp.route('/initiate-bkash-payment', methods=['POST'])

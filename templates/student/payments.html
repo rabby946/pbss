@@ -2,64 +2,135 @@
 {% block title %}Payments{% endblock %}
 
 {% block student_content %}
+<style>
+    /* Custom styles for a professional and modern look */
+    :root {
+        --primary-color: #3f51b5; /* Indigo/Navy for professional feel */
+        --secondary-color: #f8f9fa; /* Light gray for subtle background */
+        --success-badge: #28a745;
+        --warning-badge: #ffc107;
+        --danger-badge: #dc3545;
+        --bkash-color: #e2136e; /* bKash signature color */
+    }
+
+    .payment-card-header {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.25rem 0.25rem 0 0;
+    }
+
+    .payment-card-body {
+        border: 1px solid #dee2e6; /* Light border */
+        border-top: none;
+        padding: 1.5rem;
+        border-radius: 0 0 0.25rem 0.25rem;
+    }
+
+    .info-item strong {
+        color: #495057; /* Darker text for labels */
+    }
+
+    .btn-bkash {
+        background-color: var(--bkash-color);
+        border-color: var(--bkash-color);
+        color: white;
+        font-weight: bold;
+        transition: background-color 0.3s, border-color 0.3s;
+        display: flex;
+        align-items: center;
+    }
+    .btn-bkash:hover {
+        background-color: #c80d5d; /* Darker bKash on hover */
+        border-color: #c80d5d;
+        color: white;
+    }
+    .bkash-logo-img {
+        /* Cropping and resizing the logo for a cleaner look */
+        width: 40px; 
+        height: auto;
+        margin-right: 0.5rem;
+        border-radius: 3px;
+        filter: grayscale(0%); /* Ensure logo color remains vibrant */
+    }
+
+    .table-custom-header {
+        background-color: var(--primary-color);
+        color: white;
+    }
+</style>
+
 <div class="container my-5">
-    <h3 class="mb-3">Payment Information</h3>
-    <div class="card mb-4 p-3 shadow-sm">
-        <div class="row">
-            <div class="col-md-6">
-                <p><strong>Student ID:</strong> {{ student.id }}</p>
-                <p><strong>Name:</strong> {{ student.name }}</p>
-                <p><strong>Roll:</strong> {{ student.roll }}</p>
-                <p><strong>Due Amount:</strong> {{ student.due_amount }} BDT</p>
-            </div>
-            <div class="col-md-6 d-flex align-items-center justify-content-end">
-                {% if student.due_amount > 0 %}
-                <form action="{{ url_for('student_bp.initiate_bkash_payment') }}" method="POST" class="d-flex">
-                    <input type="number" name="amount" min="10" max="{{ student.due_amount }}" step="1"
-                           class="form-control me-2" placeholder="Enter amount (BDT)" required>
-                    <button type="submit" class="btn btn-danger">
-                        <img src="https://download.logo.wine/logo/BKash/BKash-Logo.wine.png" 
-                             alt="bKash" width="60">
-                        Pay Now
-                    </button>
-                </form>
-                {% else %}
-                <div class="alert alert-success mb-0">No due payment!</div>
-                {% endif %}
+    <div class="card shadow-lg mb-5 border-0">
+        <div class="payment-card-header">
+            <h3 class="mb-0">💳 Payment & Student Information</h3>
+        </div>
+        <div class="payment-card-body">
+            <div class="row align-items-center">
+                <div class="col-md-6 border-end">
+                    <div class="p-3">
+                        <p class="info-item"><strong>Student ID:</strong> {{ student.id }}</p>
+                        <p class="info-item"><strong>Name:</strong> {{ student.name }}</p>
+                        <p class="info-item"><strong>Roll:</strong> {{ student.roll }}</p>
+                        <h4 class="mt-4 text-danger"><strong>Due Amount:</strong> {{ student.due_amount }} BDT</h4>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 d-flex align-items-center justify-content-center p-4">
+                    {% if student.due_amount > 0 %}
+                    <form action="{{ url_for('student_bp.initiate_bkash_payment') }}" method="POST" class="w-100 d-flex flex-column flex-lg-row align-items-lg-center">
+                        <input type="number" name="amount" min="10" step="1"
+                               class="form-control me-lg-2 mb-2 mb-lg-0" placeholder="Enter amount (BDT)" required
+                               value="{{ student.due_amount }}"> <button type="submit" class="btn btn-bkash flex-shrink-0">
+                            <img src="https://download.logo.wine/logo/BKash/BKash-Logo.wine.png" 
+                                 alt="bKash Logo" class="bkash-logo-img">
+                            Pay Now
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="alert alert-success p-3 mb-0 w-100 text-center" role="alert">
+                        🎉 **All clear!** No due payment at this time.
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
 
-    <h4 class="mt-4">Transaction History</h4>
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>Date</th>
-                <th>Amount (BDT)</th>
-                <th>Payment Method</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for txn in transactions %}
-            <tr>
-                <td>{{ txn.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                <td>{{ txn.amount }}</td>
-                <td>{{ txn.payment_method }}</td>
-                <td>
-                    {% if txn.status == 'completed' %}
-                        <span class="badge bg-success">{{ txn.status }}</span>
-                    {% elif txn.status == 'pending' %}
-                        <span class="badge bg-warning text-dark">{{ txn.status }}</span>
-                    {% else %}
-                        <span class="badge bg-danger">{{ txn.status }}</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% else %}
-            <tr><td colspan="4" class="text-center text-muted">No transactions found.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <h4 class="mt-5 mb-3">🕒 Transaction History</h4>
+    <div class="table-responsive shadow-sm">
+        <table class="table table-bordered table-hover">
+            <thead class="table-custom-header">
+                <tr>
+                    <th>Date/Time</th>
+                    <th>Amount (BDT)</th>
+                    <th>Payment Method</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for txn in transactions %}
+                <tr>
+                    <td>{{ txn.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ txn.amount }}</td>
+                    <td>{{ txn.payment_method }}</td>
+                    <td>
+                        {% if txn.status == 'completed' %}
+                            <span class="badge rounded-pill bg-success">{{ txn.status | capitalize }}</span>
+                        {% elif txn.status == 'pending' %}
+                            <span class="badge rounded-pill bg-warning text-dark">{{ txn.status | capitalize }}</span>
+                        {% elif txn.status == 'failed' or txn.status == 'cancelled' %}
+                            <span class="badge rounded-pill bg-danger">{{ txn.status | capitalize }}</span>
+                        {% else %}
+                            <span class="badge rounded-pill bg-secondary">{{ txn.status | capitalize }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="text-center text-muted py-3">No transactions found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

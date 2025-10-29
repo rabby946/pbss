@@ -23,18 +23,21 @@
         padding-bottom: 1.5rem;
         border-bottom: 1px solid var(--border-color);
     }
+
     .page-header h1 {
         font-size: 2.2rem;
         font-weight: 700;
         color: var(--text-dark);
         margin: 0;
     }
+
     .page-header .btn {
         font-weight: 600;
         padding: 0.75rem 1.5rem;
         border-radius: 8px;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
+
     .page-header .btn:hover {
         transform: translateY(-2px);
         box-shadow: var(--shadow);
@@ -59,6 +62,7 @@
         transform: translateY(20px);
         animation: fadeInUp 0.7s ease-out forwards;
     }
+
     .gallery-card:hover {
         transform: translateY(-8px) scale(1.02);
         box-shadow: 0 10px 30px rgba(0, 31, 53, 0.588);
@@ -72,55 +76,78 @@
         border-top-left-radius: var(--radius);
         border-top-right-radius: var(--radius);
     }
+
     .gallery-card__image {
         width: 100%;
         height: 100%;
         object-fit: cover;
     }
+
     .gallery-card__nav {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        background-color: rgba(255,255,255,0.8);
+        background-color: rgba(255, 255, 255, 0.8);
         color: var(--text-dark);
-        border: 1px solid rgba(0,0,0,0.1);
+        border: 1px solid rgba(0, 0, 0, 0.1);
         border-radius: 50%;
-        width: 36px; height: 36px;
+        width: 36px;
+        height: 36px;
         cursor: pointer;
         opacity: 0;
         transition: opacity 0.3s ease, transform 0.2s ease;
         z-index: 10;
     }
-    .gallery-card:hover .gallery-card__nav { opacity: 1; }
-    .gallery-card__nav:hover { transform: translateY(-50%) scale(1.1); }
-    .gallery-card__nav.prev { left: 10px; }
-    .gallery-card__nav.next { right: 10px; }
-    .gallery-card__counter {
-        position: absolute; bottom: 10px; right: 10px;
-        background-color: rgba(15, 23, 42, 0.7); /* slate-900 with alpha */
-        color: white; font-size: 0.8rem;
-        padding: 3px 10px; border-radius: 50px;
+
+    .gallery-card:hover .gallery-card__nav {
+        opacity: 1;
     }
-    
+
+    .gallery-card__nav:hover {
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    .gallery-card__nav.prev {
+        left: 10px;
+    }
+
+    .gallery-card__nav.next {
+        right: 10px;
+    }
+
+    .gallery-card__counter {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background-color: rgba(15, 23, 42, 0.7);
+        /* slate-900 with alpha */
+        color: white;
+        font-size: 0.8rem;
+        padding: 3px 10px;
+        border-radius: 50px;
+    }
+
     .gallery-card__content {
         padding: 1.5rem;
         flex-grow: 1;
         display: flex;
         flex-direction: column;
     }
+
     .gallery-card__title {
         font-size: 1.3rem;
         font-weight: 600;
         color: var(--text-dark);
         margin: 0 0 0.5rem 0;
     }
+
     .gallery-card__description {
         color: var(--text-muted);
         flex-grow: 1;
         margin-bottom: 1.5rem;
         line-height: 1.6;
     }
-    
+
     .gallery-card__footer {
         display: flex;
         justify-content: space-between;
@@ -128,24 +155,65 @@
         border-top: 1px solid var(--border-color);
         padding-top: 1rem;
     }
+
     .gallery-card__date {
         color: var(--text-muted);
         font-weight: 500;
         font-size: 0.875rem;
     }
-    .gallery-card__actions { display: flex; gap: 0.75rem; }
+
+    .gallery-card__actions {
+        display: flex;
+        gap: 0.75rem;
+    }
+
     .action-btn {
-        background: none; border: none; padding: 0; cursor: pointer;
-        color: var(--text-muted); font-size: 1rem;
-        width: 38px; height: 38px; border-radius: 50%;
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        color: var(--text-muted);
+        font-size: 1rem;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
         transition: all 0.2s ease;
     }
-    .action-btn:hover { color: #05009b; transform: scale(1.1); }
-    .action-btn--edit:hover { background-color: var(--brand-primary); }
-    .action-btn--delete:hover { background-color: var(--bs-danger); }
 
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .action-btn:hover {
+        color: #05009b;
+        transform: scale(1.1);
+    }
+
+    .action-btn--edit:hover {
+        background-color: var(--brand-primary);
+    }
+
+    .action-btn--delete:hover {
+        background-color: var(--bs-danger);
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 </style>
 {% endblock %}
 
@@ -167,34 +235,34 @@
         {% if items %}
         <div class="gallery-grid" id="gallery-grid">
             {% for item in items %}
-            <div class="gallery-card" 
-                 data-images="{{ item.images }}" 
-                 data-title="{{ item.title }}"
-                 style="animation-delay: {{ loop.index0 * 10 }}ms;">
+            <div class="gallery-card" data-images="{{ item.images }}" data-title="{{ item.title }}"
+                style="animation-delay: {{10}}ms;">
                 <div class="gallery-card__image-wrapper">
-                    <img src="{{ item.images.split(',')[0] }}" alt="Preview for {{ item.title }}" class="gallery-card__image">
+                    <img src="{{ item.images.split(',')[0] }}" alt="Preview for {{ item.title }}"
+                        class="gallery-card__image">
                     {% set image_list = item.images.split(',') %}
                     {% if image_list|length > 1 %}
-                        <button class="gallery-card__nav prev" aria-label="Previous image">&lt;</button>
-                        <button class="gallery-card__nav next" aria-label="Next image">&gt;</button>
-                        <span class="gallery-card__counter">1 / {{ image_list|length }}</span>
+                    <button class="gallery-card__nav prev" aria-label="Previous image">&lt;</button>
+                    <button class="gallery-card__nav next" aria-label="Next image">&gt;</button>
+                    <span class="gallery-card__counter">1 / {{ image_list|length }}</span>
                     {% endif %}
                 </div>
                 <div class="gallery-card__content">
                     <h3 class="gallery-card__title">{{ item.title }}</h3>
-                    <p class="gallery-card__description">{{ item.description[:120] }}{% if item.description|length > 120 %}...{% endif %}</p>
+                    <p class="gallery-card__description">{{ item.description[:120] }}{% if item.description|length > 120
+                        %}...{% endif %}</p>
                     <div class="gallery-card__footer">
                         <span class="gallery-card__date">
-                           <i class="fas fa-calendar-alt me-1"></i> {{ item.timestamp.strftime('%d %b %Y') }}
+                            <i class="fas fa-calendar-alt me-1"></i> {{ item.timestamp.strftime('%d %b %Y') }}
                         </span>
                         <div class="gallery-card__actions">
-                            <a href="{{ url_for('admin_bp.edit_gallery', id=item.id) }}" class="action-btn action-btn--edit" title="Edit">
+                            <a href="{{ url_for('admin_bp.edit_gallery', id=item.id) }}"
+                                class="action-btn action-btn--edit" title="Edit">
                                 <i class="fas fa-pencil-alt"></i>
                             </a>
-                            <button class="action-btn action-btn--delete delete-btn" 
-                                    title="Delete"
-                                    data-title="{{ item.title }}"
-                                    data-url="{{ url_for('admin_bp.delete_gallery', id=item.id) }}">
+                            <button class="action-btn action-btn--delete delete-btn" title="Delete"
+                                data-title="{{ item.title }}"
+                                data-url="{{ url_for('admin_bp.delete_gallery', id=item.id) }}">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>
@@ -204,71 +272,71 @@
             {% endfor %}
         </div>
         {% else %}
-            <div class="alert alert-light text-center">No gallery items found! Click "Add New Gallery" to get started.</div>
+        <div class="alert alert-light text-center">No gallery items found! Click "Add New Gallery" to get started.</div>
         {% endif %}
     </main>
 </div>
 {% endblock %}
 
-{% block scripts %}
+{% block scripts_extra %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const galleryGrid = document.getElementById('gallery-grid');
+    document.addEventListener('DOMContentLoaded', function () {
+        const galleryGrid = document.getElementById('gallery-grid');
 
-    // --- 1. Image Cycling Logic ---
-    if (galleryGrid) {
-        galleryGrid.addEventListener('click', function(e) {
-            const navButton = e.target.closest('.gallery-card__nav');
-            if (navButton) {
-                e.stopPropagation();
-                
-                const card = navButton.closest('.gallery-card');
-                const images = card.dataset.images.split(',');
-                if (images.length <= 1) return;
+        // --- 1. Image Cycling Logic ---
+        if (galleryGrid) {
+            galleryGrid.addEventListener('click', function (e) {
+                const navButton = e.target.closest('.gallery-card__nav');
+                if (navButton) {
+                    e.stopPropagation();
 
-                const imageEl = card.querySelector('.gallery-card__image');
-                const counterEl = card.querySelector('.gallery-card__counter');
-                let currentIndex = parseInt(card.dataset.currentIndex || 0);
+                    const card = navButton.closest('.gallery-card');
+                    const images = card.dataset.images.split(',');
+                    if (images.length <= 1) return;
 
-                if (navButton.classList.contains('next')) {
-                    currentIndex = (currentIndex + 1) % images.length;
-                } else {
-                    currentIndex = (currentIndex - 1 + images.length) % images.length;
+                    const imageEl = card.querySelector('.gallery-card__image');
+                    const counterEl = card.querySelector('.gallery-card__counter');
+                    let currentIndex = parseInt(card.dataset.currentIndex || 0);
+
+                    if (navButton.classList.contains('next')) {
+                        currentIndex = (currentIndex + 1) % images.length;
+                    } else {
+                        currentIndex = (currentIndex - 1 + images.length) % images.length;
+                    }
+
+                    card.dataset.currentIndex = currentIndex;
+                    imageEl.src = images[currentIndex];
+                    counterEl.textContent = `${currentIndex + 1} / ${images.length}`;
                 }
-                
-                card.dataset.currentIndex = currentIndex;
-                imageEl.src = images[currentIndex];
-                counterEl.textContent = `${currentIndex + 1} / ${images.length}`;
-            }
-        });
-    }
+            });
+        }
 
-    // --- 2. Delete Confirmation Modal Logic ---
-    const deleteButtons = document.querySelectorAll('.delete-btn');
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', function(event) {
-            event.preventDefault();
-            const title = this.dataset.title;
-            const url = this.dataset.url;
+        // --- 2. Delete Confirmation Modal Logic ---
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                const title = this.dataset.title;
+                const url = this.dataset.url;
 
-            Swal.fire({
-                title: 'Are you sure?',
-                html: `You are about to delete the gallery: <br><strong>${title}</strong>`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // To show feedback, you could disable the button before navigating
-                    this.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`;
-                    this.disabled = true;
-                    window.location.href = url;
-                }
+                Swal.fire({
+                    title: 'Are you sure?',
+                    html: `You are about to delete the gallery: <br><strong>${title}</strong>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // To show feedback, you could disable the button before navigating
+                        this.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`;
+                        this.disabled = true;
+                        window.location.href = url;
+                    }
+                });
             });
         });
     });
-});
 </script>
 {% endblock %}

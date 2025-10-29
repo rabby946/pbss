@@ -129,6 +129,7 @@ def edit_gallery(id):
 @admin_bp.route("/gallery/delete/<int:id>")
 @admin_required
 def delete_gallery(id):
+    print(id)
     gallery = Gallery.query.get_or_404(id)
     db.session.delete(gallery)
     db.session.commit()

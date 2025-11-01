@@ -1,62 +1,543 @@
 {% extends "student/base.html" %}
 {% block title %}Results{% endblock %}
+
+{% block head_extra %}
+<style>
+    /* Grade Colors */
+    .grade-a-plus { 
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+    .grade-a { 
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        color: white;
+    }
+    .grade-a-minus { 
+        background: linear-gradient(135deg, #84cc16 0%, #65a30d 100%);
+        color: white;
+    }
+    .grade-b { 
+        background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
+        color: white;
+    }
+    .grade-c { 
+        background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        color: white;
+    }
+    .grade-d { 
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+    }
+    .grade-f { 
+        background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%);
+        color: white;
+    }
+
+    /* Header Section */
+    .results-header {
+        background: linear-gradient(135deg, var(--primary) 0%, #1557b0 100%);
+        border-radius: 8px;
+        padding: 24px;
+        color: white;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .results-icon {
+        width: 56px;
+        height: 56px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        flex-shrink: 0;
+    }
+
+    .results-header-text h1 {
+        font-size: 22px;
+        font-weight: 500;
+        margin: 0 0 4px 0;
+    }
+
+    .results-header-text p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 13px;
+    }
+
+    /* Filter Card */
+    .filter-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 24px;
+        margin-bottom: 24px;
+    }
+
+    .filter-title {
+        font-size: 15px;
+        font-weight: 500;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-primary);
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .filter-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        margin-bottom: 6px;
+    }
+
+    .filter-group select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 14px;
+        color: var(--text-primary);
+        background: white;
+        transition: all 0.2s;
+    }
+
+    .filter-group select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+    }
+
+    .filter-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .filter-btn:hover {
+        background: var(--primary-hover);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Results Table */
+    .results-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .results-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    .results-table thead {
+        background: var(--bg-secondary);
+    }
+
+    .results-table th {
+        padding: 14px 16px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .results-table tbody tr {
+        border-bottom: 1px solid var(--border);
+        transition: background-color 0.2s;
+    }
+
+    .results-table tbody tr:hover {
+        background: var(--bg-secondary);
+    }
+
+    .results-table tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    .results-table td {
+        padding: 16px;
+        color: var(--text-primary);
+    }
+
+    /* Subject Badge */
+    .subject-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+    }
+
+    .subject-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+    }
+
+    /* Exam Type Badge */
+    .exam-type {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 500;
+        text-transform: capitalize;
+    }
+
+    .exam-type.midterm {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .exam-type.final {
+        background: #fce7f3;
+        color: #9f1239;
+    }
+
+    .exam-type.quiz {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .exam-type.assignment {
+        background: #e0e7ff;
+        color: #3730a3;
+    }
+
+    .exam-type.test {
+        background: #dcfce7;
+        color: #14532d;
+    }
+
+    /* Marks Display */
+    .marks-display {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    /* Grade Badge */
+    .grade-badge {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 700;
+        min-width: 50px;
+        text-align: center;
+        box-shadow: var(--shadow-sm);
+    }
+
+    /* Date Display */
+    .date-display {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--text-secondary);
+        font-size: 13px;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 48px 24px;
+        color: var(--text-secondary);
+    }
+
+    .empty-state-icon {
+        font-size: 64px;
+        color: var(--text-tertiary);
+        margin-bottom: 16px;
+    }
+
+    .empty-state h3 {
+        font-size: 18px;
+        font-weight: 500;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        font-size: 14px;
+        color: var(--text-secondary);
+        margin: 0;
+    }
+
+    /* Stats Summary (Optional) */
+    .stats-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .stat-content h4 {
+        font-size: 24px;
+        font-weight: 600;
+        margin: 0 0 4px 0;
+        color: var(--text-primary);
+    }
+
+    .stat-content p {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .results-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .filter-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .results-table {
+            font-size: 13px;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 12px;
+        }
+
+        .marks-display {
+            font-size: 18px;
+        }
+
+        .grade-badge {
+            font-size: 14px;
+            padding: 6px 12px;
+        }
+
+        .subject-icon {
+            width: 32px;
+            height: 32px;
+            font-size: 14px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .results-header-text h1 {
+            font-size: 18px;
+        }
+
+        .results-table th {
+            font-size: 11px;
+            padding: 10px 8px;
+        }
+
+        .results-table td {
+            padding: 12px 8px;
+        }
+
+        .subject-badge {
+            flex-direction: column;
+            text-align: center;
+            gap: 4px;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block student_content %}
-<div class="container mt-4">
-  <h4 class="mb-3 text-primary">Exam Results</h4>
-  <form method="get" class="row g-3 mb-4">
-    <div class="col-md-6">
-      <label>Subject</label>
-      <select name="subject" class="form-select">
-        <option value="all">All Subjects</option>
-        {% for subject in active_subjects %}
-        <option value="{{ subject.id }}" {% if selected_subject_id|int==subject.id %}selected{% endif %}>{{ subject.name
-          }}</option>
-        {% endfor %}
-      </select>
+<!-- Header -->
+<div class="results-header">
+    <div class="results-icon">
+        <i class="fas fa-chart-line"></i>
     </div>
-    <div class="col-md-6">
-      <label>Exam Type</label>
-      <select name="exam_type" class="form-select">
-        <option value="all">All Exam Types</option>
-        {% for etype in exam_types %}
-        <option value="{{ etype }}" {% if selected_exam_type==etype %}selected{% endif %}>{{ etype|capitalize }}
-        </option>
-        {% endfor %}
-      </select>
+    <div class="results-header-text">
+        <h1>Exam Results & Grades</h1>
+        <p>View your academic performance across all subjects and exams</p>
     </div>
-    <div class="col-12">
-      <button type="submit" class="btn btn-primary">Show Results</button>
-    </div>
-  </form>
+</div>
 
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Subject</th>
-        <th>Exam Type</th>
-        <th>Marks</th>
-        <th>Grade</th>
-        <th>Date</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% if results %}
-      {% for r, subject_name, exam_type, marks, grade, exam_date in results %}
-      <tr>
-        <td>{{ subject_name }}</td>
-        <td>{{ exam_type|capitalize }}</td>
-        <td>{{ marks }}</td>
-        <td>{{ grade }}</td>
-        <td>{{ exam_date.strftime('%d-%m-%Y') if exam_date else '-' }}</td>
-      </tr>
-      {% endfor %}
-      {% else %}
-      <tr>
-        <td colspan="5" class="text-center">No results to display.</td>
-      </tr>
-      {% endif %}
-    </tbody>
-  </table>
+<!-- Filters -->
+<div class="filter-card">
+    <div class="filter-title">
+        <i class="fas fa-filter"></i>
+        Filter Results
+    </div>
+    <form method="get">
+        <div class="filter-grid">
+            <div class="filter-group">
+                <label for="subject">Subject</label>
+                <select name="subject" id="subject" class="form-select">
+                    <option value="all">All Subjects</option>
+                    {% for subject in active_subjects %}
+                    <option value="{{ subject.id }}" {% if selected_subject_id|int==subject.id %}selected{% endif %}>
+                        {{ subject.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
 
+            <div class="filter-group">
+                <label for="exam_type">Exam Type</label>
+                <select name="exam_type" id="exam_type" class="form-select">
+                    <option value="all">All Exam Types</option>
+                    {% for etype in exam_types %}
+                    <option value="{{ etype }}" {% if selected_exam_type==etype %}selected{% endif %}>
+                        {{ etype|capitalize }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <button type="submit" class="filter-btn">
+            <i class="fas fa-search"></i>
+            Show Results
+        </button>
+    </form>
+</div>
+
+<!-- Results Table -->
+<div class="results-card">
+    <div class="table-container">
+        {% if results %}
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Exam Type</th>
+                    <th>Marks</th>
+                    <th>Grade</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r, subject_name, exam_type, marks, grade, exam_date in results %}
+                <tr>
+                    <td>
+                        <div class="subject-badge">
+                            <div class="subject-icon">
+                                {% if 'Mathematics' in subject_name or 'math' in subject_name %}
+                                📐
+                                {% elif 'English' in subject_name or 'English' in subject_name %}
+                                📚
+                                {% elif 'Science' in subject_name or 'science' in subject_name %}
+                                🔬
+                                {% elif 'History' in subject_name or 'history' in subject_name %}
+                                📜
+                                {% elif 'Geography' in subject_name or 'geography' in subject_name %}
+                                🌍
+                                {% elif 'Information' in subject_name or 'computer' in subject_name %}
+                                💻
+                                {% elif 'Physics' in subject_name or 'physics' in subject_name %}
+                                ⚛️
+                                {% elif 'Chemistry' in subject_name or 'chemistry' in subject_name %}
+                                🧪
+                                {% elif 'Biology' in subject_name or 'biology' in subject_name %}
+                                🧬
+                                {% else %}
+                                📖
+                                {% endif %}
+                            </div>
+                            <span>{{ subject_name }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="exam-type {{ exam_type|lower }}">{{ exam_type|capitalize }}</span>
+                    </td>
+                    <td>
+                        <span class="marks-display">{{ marks }}</span>
+                    </td>
+                    <td>
+                        <span class="grade-badge 
+                            {% if grade == '5.00' %}grade-a-plus
+                            {% elif grade >= '4.00' %}grade-a
+                            {% elif grade >= '3.50' %}grade-a-minus
+                            {% elif grade >= '3.00' %}grade-b
+                            {% elif grade >= '2.00' %}grade-c
+                            {% elif grade >= '1.00'%}grade-d
+                            {% else %}grade-f
+                            {% endif %}">
+                            {{ grade }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="date-display">
+                            <i class="fas fa-calendar"></i>
+                            {{ exam_date.strftime('%d %b %Y') if exam_date else '-' }}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-inbox"></i>
+            </div>
+            <h3>Please select at least one subject or any specific exam type</h3>
+            <p>You can not view all subjects results in all exams type</p>
+        </div>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

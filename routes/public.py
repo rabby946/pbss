@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
-from models import News, Gallery, Teacher, Student, Committee, MPO, Result, Routine, Report, SchoolClass
+from models import News, Gallery, Teacher, Student, Committee, MPO, Result, Routine, Report, SchoolClass, User
 from flask_mail import Message
 from extensions import  db
 from datetime import datetime
@@ -154,19 +154,125 @@ def contact():
 def login():
     return render_template("public/login.html")
 
+from utils import send_otp_email
+from flask import session
+
 @public_bp.route("/forgot_password", methods = ["GET", "POST"])
 def forgot_password():
     if request.method == "POST":
         user_type = request.form.get("userType")
         if user_type == "student":
-            studentID = request.form.get("studentID")
-            student = Student.query.get(studentID=studentID).first()
-            # sending sms OTP to reset password link to student.phone
-            
-    return render_template("public/forgot_password.html")
+            student_id = request.form.get("studentID")
+            student = Student.query.get_or_404(student_id)
+            if student and student.user.email:
+                send_otp_email(student.user.email, student.name)
+                session['id'] = student.user.id
+                flash(f"OTP sent to your registered email address : {student.user.email}.", "success")
+                return redirect(url_for("public.verify_otp"))
+            else:
+                flash("Student not found or phone number not added!", "danger")
+        elif user_type == "teacher":
+            teacher_id = request.form.get("teacher_id")
+            teacher = Teacher.get_or_404(teacher_id)
+            if teacher and teacher.user.email:
+                send_otp_email(teacher.user.email, teacher.name)
+                session['id'] = teacher.user.id
+                flash(f"OTP sent to your registered eamil address : {teacher.user.email}.", "success")
+                return redirect(url_for("public.verify_otp"))
+            else:
+                flash(f"Teacher not found or phone number not added", "danger")
+        else:
+            flash("error type selection", "danger")
+    students = Student.query.all()
+    teachers = Teacher.query.all()
+    return render_template("public/forgot_password.html", students = students, teachers = teachers)
 
-from datetime import datetime, time
+
+@public_bp.route("/verify_otp", methods=["GET", "POST"])
+def verify_otp():
+    if request.method == "POST":
+        otp_input = request.form.get("otp")
+        if otp_input == session.get("reset_otp"):
+            session['verified_reset'] = True
+            flash("OTP verified! You can reset your password now.", "success")
+            return redirect(url_for("public.reset_password"))
+        else:
+            flash("Invalid OTP.", "danger")
+    return render_template("public/verify_otp.html")
+
+@public_bp.route("/reset_password", methods=["GET", "POST"])
+def reset_password():
+    if not session.get('verified_reset'):
+        return redirect(url_for("public.forgot_password"))
+    if request.method == "POST":
+        new_pass = request.form.get("new_password") 
+        obj = User.query.filter_by(id=session['id']).first()
+        if obj:
+            obj.password = new_pass  # Ideally hash this later
+            db.session.commit()
+            flash("Password reset successfully!", "success")
+            # Clear session data
+            session.pop('id', None)
+            session.pop('reset_otp', None)   
+            session.pop('reset_email', None)         
+            session.pop('verified_reset', None)
+            return redirect(url_for("public.login"))
+
+    return render_template("public/reset_password.html")
+
+import random
+from datetime import date, timedelta, datetime
+from flask import jsonify
+from models import Teacher, TeacherAttendance
+from extensions import db
+
 @public_bp.route("/fix")
 @admin_required
 def fix_subjects():
-    return f"✅ Deleted invalid subjects (with NULL class_id or teacher_id)"
+    """Generate random attendance data for teachers for testing."""
+    teachers = Teacher.query.all()
+    if not teachers:
+        return jsonify({"message": "No teachers found in the database."}), 404
+
+    # Define how many days to generate (today + last 3 days)
+    days_back = 3
+    today_date = date.today()
+
+    statuses = ["Present", "Absent", "Leave"]
+
+    added = 0
+    for i in range(days_back + 1):  # includes today
+        day = today_date - timedelta(days=i)
+        for teacher in teachers:
+            # Check if already exists to avoid duplicates
+            existing = TeacherAttendance.query.filter(
+                TeacherAttendance.teacher_id == teacher.id,
+                db.func.date(TeacherAttendance.date) == day
+            ).first()
+
+            if not existing:
+                status = random.choice(statuses)
+                remark = ""
+                if status == "Absent":
+                    remark = random.choice(["Sick leave", "Family emergency", "Uninformed absence", ""])
+                elif status == "Leave":
+                    remark = random.choice(["Official leave", "Training", "Personal reason", ""])
+                else:
+                    remark = random.choice(["On time", "Late arrival", ""])
+
+                attendance = TeacherAttendance(
+                    teacher_id=teacher.id,
+                    date=day,
+                    status=status,
+                    remark=remark,
+                    created_at=datetime.combine(day, datetime.now().time())
+                )
+                db.session.add(attendance)
+                added += 1
+
+    db.session.commit()
+    return jsonify({
+        "message": f"✅ Added {added} random attendance records for {len(teachers)} teachers over last {days_back + 1} days.",
+        "dates": [str(today_date - timedelta(days=i)) for i in range(days_back + 1)]
+    })
+

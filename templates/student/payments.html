@@ -79,7 +79,7 @@
                 <div class="col-md-6 d-flex align-items-center justify-content-center p-4">
                     {% if student.due_amount > 0 %}
                     <form action="{{ url_for('student_bp.initiate_bkash_payment') }}" method="POST" class="w-100 d-flex flex-column flex-lg-row align-items-lg-center">
-                        <input type="number" name="amount" min="10" step="1"
+                        <input type="number" name="amount" min="1" step="1"
                                class="form-control me-lg-2 mb-2 mb-lg-0" placeholder="Enter amount (BDT)" required
                                value="{{ student.due_amount }}"> <button type="submit" class="btn btn-bkash flex-shrink-0">
                             <img src="https://download.logo.wine/logo/BKash/BKash-Logo.wine.png" 
@@ -90,6 +90,15 @@
                     {% else %}
                     <div class="alert alert-success p-3 mb-0 w-100 text-center" role="alert">
                         🎉 **All clear!** No due payment at this time.
+                        <form action="{{ url_for('student_bp.initiate_bkash_payment') }}" method="POST" class="w-100 d-flex flex-column flex-lg-row align-items-lg-center">
+                        <input type="number" name="amount" min="1" step="1"
+                               class="form-control me-lg-2 mb-2 mb-lg-0" placeholder="Enter amount (BDT)" required
+                               value="{{ student.due_amount }}"> <button type="submit" class="btn btn-bkash flex-shrink-0">
+                            <img src="https://download.logo.wine/logo/BKash/BKash-Logo.wine.png" 
+                                 alt="bKash Logo" class="bkash-logo-img">
+                            Pay Now
+                        </button>
+                    </form>
                     </div>
                     {% endif %}
                 </div>
@@ -104,6 +113,7 @@
                 <tr>
                     <th>Date/Time</th>
                     <th>Amount (BDT)</th>
+                    <th>Transaction ID</th>
                     <th>Payment Method</th>
                     <th>Status</th>
                 </tr>
@@ -113,12 +123,13 @@
                 <tr>
                     <td>{{ txn.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                     <td>{{ txn.amount }}</td>
+                    <td>{{ txn.trx_id }}</td>
                     <td>{{ txn.payment_method }}</td>
                     <td>
-                        {% if txn.status == 'completed' %}
+                        {% if txn.status == 'paid' %}
                             <span class="badge rounded-pill bg-success">{{ txn.status | capitalize }}</span>
                         {% elif txn.status == 'pending' %}
-                            <span class="badge rounded-pill bg-warning text-dark">{{ txn.status | capitalize }}</span>
+                            <span class="badge rounded-pill bg-warning text-dark">Cancelled</span>
                         {% elif txn.status == 'failed' or txn.status == 'cancelled' %}
                             <span class="badge rounded-pill bg-danger">{{ txn.status | capitalize }}</span>
                         {% else %}

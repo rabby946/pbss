@@ -1,0 +1,65 @@
+{% extends "admin/base.html" %}
+{% block title %}Teacher Attendances{% endblock %}
+
+{% block content %}
+<h2>Teacher Attendance ({{ selected_date.strftime('%d %b %Y') }})</h2>
+
+<form method="GET" class="mb-3">
+  <label>Select Date:</label>
+  <input type="date" name="date" value="{{ selected_date }}" max="{{ today }}">
+  <button type="submit" class="btn btn-primary btn-sm">View</button>
+</form>
+
+<table class="table table-bordered table-striped">
+  <thead>
+    <tr>
+      <th>Teacher Name</th>
+      <th>Status</th>
+      <th>Check In</th>
+      <th>Check Out</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for teacher in teachers %}
+      {% set att = attendance_dict.get(teacher.id) %}
+      <tr>
+        <td>{{ teacher.name }}</td>
+        <td>
+          {% if att %}
+            {{ att.status }}
+          {% else %}
+            <span class="text-muted">Not Marked</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if att and att.check_in_at %}
+            {{ att.check_in_at.strftime('%I:%M %p') }}
+          {% else %}
+            <span class="text-muted">—</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if att and att.check_out_at %}
+            {{ att.check_out_at.strftime('%I:%M %p') }}
+          {% else %}
+            <span class="text-muted">—</span>
+          {% endif %}
+        </td>
+        <td>
+          <a href="{{ url_for('admin_bp.teacher_attendance', teacher_id=teacher.id, date=selected_date) }}" 
+             class="btn btn-sm btn-info">
+            View History
+          </a>
+          <a href="{{ url_for('admin_bp.add_leave', teacher_id=teacher.id, date=selected_date) }}" 
+             class="btn btn-sm btn-info">
+            mark leave
+          </a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<hr>
+{% endblock %}

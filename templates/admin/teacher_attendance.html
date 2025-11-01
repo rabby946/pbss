@@ -1,20 +1,18 @@
 {% extends 'admin/base.html' %}
-{% block title %}Attendance - {{ student.name }}{% endblock %}
+{% block title %}Attendance - {{ teacher.name }}{% endblock %}
 
 {% block content %}
 <div class="container mt-4 mb-5">
   <!-- Header Card -->
-  <div class="student-header-card mb-4">
+  <div class="teacher-header-card mb-4">
     <div class="d-flex align-items-center gap-3">
-      <div class="student-avatar">
-        <span>{{ student.name[0] }}</span>
+      <div class="teacher-avatar">
+        <span>{{ teacher.name[0] }}</span>
       </div>
       <div>
-        <h4 class="mb-1">{{ student.name }}</h4>
-        <p class="text-muted mb-0">Student ID: {{ student.studentID }}</p>
-        <p class="text-muted mb-0">Class: {{ student.class_.name }}</p>
-        <p class="text-muted mb-0">Section: {{ student.class_.section }}</p>
-        <p class="text-muted mb-0">Roll: {{ student.roll }}</p>
+        <h4 class="mb-1">{{ teacher.name }}</h4>
+        <p class="text-muted mb-0">Designation: {{ teacher.designation }}</p>
+        <p class="text-muted mb-0">ID: {{ teacher.id }}</p>
       </div>
     </div>
   </div>
@@ -28,7 +26,7 @@
         </div>
         <div class="card-body-custom">
           <!-- Date Selector -->
-          <form method="GET" action="{{ url_for('admin_bp.attendance', student_id=student.id) }}" class="mb-4">
+          <form method="GET" action="{{ url_for('admin_bp.teacher_attendance', teacher_id=teacher.id) }}" class="mb-4">
             <label for="date" class="form-label fw-semibold">Select Date</label>
             <div class="input-group">
               <input type="date" id="date" name="date" class="form-control"
@@ -45,48 +43,8 @@
             </div>
           </div>
 
-          {% if selected_date == today %}
-            <!-- TODAY MODE (Editable) -->
-            <form method="POST" action="{{ url_for('admin_bp.mark_attendance', student_id=student.id) }}">
-              <div class="attendance-options mb-4">
-                {% set current_status = attendance_dict.get(student.id) if attendance_dict else None %}
-
-                <label class="attendance-option" for="present">
-                  <input type="radio" name="status" id="present" value="present"
-                    {% if current_status == 'present' %}checked{% endif %}>
-                  <div class="option-content present-option">
-                    <div class="option-icon">✓</div>
-                    <div class="option-text">Present</div>
-                  </div>
-                </label>
-
-                <label class="attendance-option" for="absent">
-                  <input type="radio" name="status" id="absent" value="absent"
-                    {% if current_status == 'absent' %}checked{% endif %}>
-                  <div class="option-content absent-option">
-                    <div class="option-icon">✕</div>
-                    <div class="option-text">Absent</div>
-                  </div>
-                </label>
-
-                <label class="attendance-option" for="late">
-                  <input type="radio" name="status" id="late" value="late"
-                    {% if current_status == 'late' %}checked{% endif %}>
-                  <div class="option-content late-option">
-                    <div class="option-icon">⏰</div>
-                    <div class="option-text">Late</div>
-                  </div>
-                </label>
-              </div>
-
-              <button type="submit" class="btn btn-success w-100 btn-lg">
-                💾 Save Attendance
-              </button>
-            </form>
-
-          {% else %}
             <!-- PAST MODE (View Only) -->
-            {% set record = attendance_dict.get(student.id) if attendance_dict else None %}
+            {% set record = attendance_dict.get(teacher.id) if attendance_dict else None %}
             {% if record %}
               <div class="status-display status-{{ record.lower() }}">
                 <div class="status-icon">
@@ -101,7 +59,6 @@
                 <p class="mb-0 text-muted">No attendance record found for this date.</p>
               </div>
             {% endif %}
-          {% endif %}
 
           <div class="text-center mt-4">
             <a href="{{ url_for('admin_bp.dashboard') }}" class="btn btn-outline-secondary">
@@ -210,7 +167,7 @@
     --dark: #1e293b;
   }
 
-  .student-header-card {
+  .teacher-header-card {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     padding: 1.5rem;
     border-radius: 16px;
@@ -218,7 +175,7 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 
-  .student-avatar {
+  .teacher-avatar {
     width: 60px;
     height: 60px;
     border-radius: 50%;
@@ -614,11 +571,11 @@
       display: none;
     }
 
-    .student-header-card {
+    .teacher-header-card {
       padding: 1rem;
     }
 
-    .student-avatar {
+    .teacher-avatar {
       width: 50px;
       height: 50px;
       font-size: 20px;

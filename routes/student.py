@@ -9,6 +9,11 @@ from decimal import Decimal
 student_bp = Blueprint('student_bp', __name__, url_prefix='/student')
 import time, json, requests
 from config import Config
+import time
+import requests
+from decimal import Decimal
+from flask import request, session, redirect, url_for, flash, jsonify, current_app
+from config import Config
 
 @student_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -158,18 +163,13 @@ def payments():
     student = Student.query.get_or_404(student_id)
     transactions = Transaction.query.filter_by(student_id=student_id).order_by(Transaction.created_at.desc()).all()
     return render_template('student/payments.html', student=student, transactions=transactions)
-# --- imports ---
-import time
-import requests
-from decimal import Decimal
-from flask import request, session, redirect, url_for, flash, jsonify, current_app
-from config import Config
 
 # --- simple token cache ---
 _bkash_token_cache = {"token": None, "expires_at": 0}
 def get_bkash_token(force_refresh: bool = False):
     # use cached token if still valid
     if not force_refresh and _bkash_token_cache["token"] and _bkash_token_cache["expires_at"] > time.time():
+        print(_bkash_token_cache["token"])
         return _bkash_token_cache["token"]
 
     token_url = f"{Config.BKASH_BASE_URL}/tokenized/checkout/token/grant"
@@ -215,8 +215,8 @@ def initiate_bkash_payment():
         flash("Invalid amount entered.", "danger")
         return redirect(url_for('student_bp.payments'))
 
-    if amount <= 0 or amount > student.due_amount:
-        flash("Amount must be positive and within your due balance.", "warning")
+    if amount <= 0:
+        flash("Amount must be positive.", "warning")
         return redirect(url_for('student_bp.payments'))
 
     id_token = get_bkash_token()
@@ -305,7 +305,8 @@ def bkash_execute_callback():
     status = result.get("transactionStatus") or result.get("status") or "failed"
     amount = result.get("amount") or result.get("paidAmount")
     merchant_invoice = result.get("merchantInvoiceNumber")
-
+    trx_id = result.get("trxID")
+    
     try:
         amount_decimal = Decimal(str(amount)) if amount else Decimal("0")
     except Exception:
@@ -324,12 +325,14 @@ def bkash_execute_callback():
             payment_method="bKash",
             status=status,
             payment_id=payment_id,
+            trx_id = trx_id,
             merchant_invoice_number=merchant_invoice
         )
         db.session.add(txn)
 
     else:
         txn.status = "paid" if status.lower() == "completed" else "failed"
+        txn.trx_id = trx_id
         txn.amount = amount_decimal
 
     # update student due
@@ -337,7 +340,8 @@ def bkash_execute_callback():
         student = Student.query.get(txn.student_id)
         if student:
             student.due_amount -= amount_decimal
-
+            if student.due_amount < 0:
+                flash(f"You have overpaid by {abs(student.due_amount)} BDT. This overpaid amount will be adjust with your further transactions. Thank you!", "info")
     db.session.commit()
     flash("Payment processed successfully." if txn.status == "paid" else "Payment failed.", "success" if txn.status=="paid" else "warning")
     return redirect(url_for('student_bp.payments'))

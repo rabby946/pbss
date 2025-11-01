@@ -181,10 +181,14 @@ def submit_results(subject_id):
     def calculate_grade(marks):
         marks = float(marks)
         if marks >= 80: return 5.00
+        elif marks >= 75: return 4.50
         elif marks >= 70: return 4.00
+        elif marks >= 65: return 3.50
         elif marks >= 60: return 3.00
+        elif marks >= 55: return 2.50
         elif marks >= 50: return 2.00
-        elif marks >= 40: return 1.00
+        elif marks >= 45: return 1.50
+        elif marks >= 33: return 1.00
         else: return 0.00
 
     for key, value in request.form.items():

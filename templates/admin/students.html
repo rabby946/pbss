@@ -1,76 +1,185 @@
 {% extends "admin/base.html" %}
+
 {% block title %}Manage Students{% endblock %}
 
+{% block head_extra %}
+<style>
+    /* New, professional, and 100% reliable styles */
+    .page-header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .page-title {
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--admin-text);
+        margin-bottom: 0;
+    }
+
+    /* Card for filters and table for a cleaner layout */
+    .content-card {
+        background-color: var(--admin-card-bg);
+        border: 1px solid var(--admin-border);
+        border-radius: var(--admin-radius, 0.75rem);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        margin-bottom: 2rem;
+    }
+    .content-card-header {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--admin-border);
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    .content-card-body {
+        padding: 1.5rem;
+    }
+
+    .student-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .student-table thead th {
+        text-align: left;
+        padding: 1rem 1.5rem;
+        font-weight: 500;
+        color: var(--admin-text-muted);
+        background-color: var(--admin-bg);
+        text-transform: uppercase;
+        font-size: 0.8rem;
+    }
+    .student-table tbody td {
+        padding: 1rem 1.5rem;
+        vertical-align: middle;
+        border-top: 1px solid var(--admin-border);
+    }
+    .student-table tbody tr:hover {
+        background-color: #f8fafc;
+    }
+    .action-buttons a, .action-buttons button {
+        color: var(--admin-text-muted);
+        transition: color 0.2s ease;
+    }
+    .action-buttons a:hover { color: var(--admin-brand); }
+    .action-buttons button:hover { color: var(--bs-danger, #dc3545); }
+    
+    /* --- Flawless Responsive Design --- */
+    @media (max-width: 992px) {
+        .student-table thead { display: none; }
+        .student-table tbody, .student-table tr, .student-table td {
+            display: block;
+            width: 100%;
+        }
+        .student-table tr {
+            margin-bottom: 1rem;
+            border: 1px solid var(--admin-border);
+            border-radius: var(--admin-radius, 0.75rem);
+            padding: 1.25rem;
+        }
+        .student-table tbody {
+            padding: 1rem;
+            background-color: var(--admin-bg);
+        }
+        .table-card { /* Remove card styling from wrapper on mobile */
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+        }
+        .student-table td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border: none;
+        }
+        .student-table td:not(:last-child) {
+            border-bottom: 1px solid var(--admin-border);
+        }
+        .student-table td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: var(--admin-text);
+            margin-right: 1rem;
+        }
+        .student-table .actions-cell {
+            justify-content: flex-end; /* Align buttons to the right */
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="page-header d-flex justify-content-between align-items-center mb-4">
+<div class="page-header">
     <h1 class="page-title">Manage Students</h1>
     <a href="{{ url_for('admin_bp.add_student') }}" class="btn btn-success">
         <i class="fa fa-plus me-2"></i> Add New Student
     </a>
 </div>
 
-<form method="get" class="row g-3 mb-4">
-    <div class="col-md-4">
-        <label class="form-label">Select Class</label>
-        <select name="class_id" class="form-select" onchange="this.form.submit()">
-            <option value="0">All Classes</option>
-            {% for c in classes %}
-            <option value="{{ c.id }}" {% if selected_class_id==c.id %}selected{% endif %}>
-                {{ c.name }} ({{ c.section }})
-            </option>
-            {% endfor %}
-        </select>
+<div class="content-card">
+    <div class="content-card-header">
+        <i class="fas fa-filter me-2"></i> Filter Students
     </div>
-</form>
+    <div class="content-card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Select Class</label>
+                <select name="class_id" class="form-select" onchange="this.form.submit()">
+                    <option value="0">All Classes</option>
+                    {% for c in classes %}
+                    <option value="{{ c.id }}" {% if selected_class_id==c.id %}selected{% endif %}>
+                        {{ c.name }} ({{ c.section }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+    </div>
+</div>
 
-<div class="table-card p-3">
+<div class="table-card">
     <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
+        <table class="table student-table align-middle mb-0">
+            <thead>
                 <tr>
                     <th>Roll</th>
                     <th>Name</th>
                     <th>Student ID</th>
                     <th>Class</th>
-                    <th>Section</th>
-                    <th>Batch</th>
-
-                    <th>Address</th>
+                    <th>Roll</th>
                     <th class="text-end">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for s in students %}
                 <tr>
-                    <td>{{ s.roll or '-' }}</td>
-                    <td>{{ s.name }}</td>
-                    <td>{{ s.studentID }}</td>
-                    <td>{{ s.class_.name if s.class_ else 'N/A' }}</td>
-                    <td>{{ s.class_.section }}</td>
-                    <td>{{ s.batch or '-' }}</td>
-                    <td>{{ s.address or '-' }}</td>
-                    <td class="text-end">
+                    <td data-label="Roll">{{ s.roll or '-' }}</td>
+                    <td data-label="Name"><strong>{{ s.name }}</strong></td>
+                    <td data-label="Student ID">{{ s.studentID }}</td>
+                    <td data-label="Class">{{ s.class_.name if s.class_ else 'N/A' }} ({{ s.class_.section }})</td>
+                    <td data-label="Address">{{ s.roll or '-' }}</td>
+                    <td class="text-end actions-cell">
                         <a href="{{ url_for('admin_bp.edit_student', student_id=s.id) }}"
-                            class="btn btn-sm btn-outline-primary me-2">
-                            <i class="fa fa-edit"></i>
-                        </a>
-                        <a href="{{ url_for('admin_bp.attendance', student_id=s.id) }}"
-                            class="btn btn-sm btn-outline-primary me-2">
-                            <i class="fa fa-checklist"></i>
+                            class="btn btn-sm btn-link p-0 me-3" title="Edit">
+                            <i class="fa fa-edit fs-5"></i>
                         </a>
                         <form method="post" action="{{ url_for('admin_bp.list_students') }}" class="d-inline">
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="student_id" value="{{ s.id }}">
-                            <button type="submit" class="btn btn-sm btn-outline-danger"
-                                onclick="return confirm('Delete {{ s.name }}?')">
-                                <i class="fa fa-trash"></i>
+                            <button typeB="submit" class="btn btn-sm btn-link p-0" title="Delete"
+                                onclick="return confirm('Are you sure you want to delete {{ s.name }}?')">
+                                <i class="fa fa-trash fs-5"></i>
                             </button>
                         </form>
                     </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="8" class="text-center text-muted py-4">No students found.</td>
+                    <td colspan="6" class="text-center text-muted py-5">No students found.</td>
                 </tr>
                 {% endfor %}
             </tbody>

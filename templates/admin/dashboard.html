@@ -12,7 +12,10 @@
         color: #fff;
         border: none;
     }
-    .welcome-card h3 { font-weight: 600; }
+
+    .welcome-card h3 {
+        font-weight: 600;
+    }
 
     /* "At a Glance" Stat Cards */
     .stat-card {
@@ -26,11 +29,13 @@
         transition: all 0.3s ease;
         height: 100%;
     }
+
     .stat-card:hover {
         transform: translateY(-5px);
         box-shadow: var(--admin-shadow);
         border-color: var(--admin-brand);
     }
+
     .stat-card__icon {
         font-size: 1.8rem;
         width: 60px;
@@ -41,21 +46,38 @@
         justify-content: center;
         flex-shrink: 0;
     }
+
     .stat-card__info .value {
         font-size: 2rem;
         font-weight: 700;
         color: var(--admin-text);
     }
+
     .stat-card__info .label {
         font-size: 0.9rem;
         color: var(--admin-text-muted);
     }
-    
+
     /* Unique icon colors for each stat card */
-    .icon-teachers { background-color: var(--bs-blue-100); color: var(--bs-blue-600); }
-    .icon-students { background-color: var(--bs-green-100); color: var(--bs-green-600); }
-    .icon-classes { background-color: var(--bs-purple-100); color: var(--bs-purple-600); }
-    .icon-subjects { background-color: var(--bs-orange-100); color: var(--bs-orange-600); }
+    .icon-teachers {
+        background-color: var(--bs-blue-100);
+        color: var(--bs-blue-600);
+    }
+
+    .icon-students {
+        background-color: var(--bs-green-100);
+        color: var(--bs-green-600);
+    }
+
+    .icon-classes {
+        background-color: var(--bs-purple-100);
+        color: var(--bs-purple-600);
+    }
+
+    .icon-subjects {
+        background-color: var(--bs-orange-100);
+        color: var(--bs-orange-600);
+    }
 
 
     /* General Content Cards */
@@ -63,9 +85,10 @@
         background-color: var(--admin-card-bg);
         border: 1px solid var(--admin-border);
         border-radius: var(--admin-radius, 1rem);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         height: 100%;
     }
+
     .content-card__header {
         font-size: 1.2rem;
         font-weight: 600;
@@ -85,8 +108,15 @@
         border-bottom: 1px solid var(--admin-border);
         transition: background-color 0.2s ease;
     }
-    .quick-action-list a:last-child { border-bottom: none; }
-    .quick-action-list a:hover { background-color: #f8fafc; }
+
+    .quick-action-list a:last-child {
+        border-bottom: none;
+    }
+
+    .quick-action-list a:hover {
+        background-color: #f8fafc;
+    }
+
     .quick-action-list .icon {
         width: 20px;
         text-align: center;
@@ -99,7 +129,13 @@
         transform: translateY(20px);
         animation: fadeInUp 0.6s ease-out forwards;
     }
-    @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 </style>
 {% endblock %}
 
@@ -109,7 +145,8 @@
     <div class="welcome-card card border-0 shadow-lg rounded-4 text-white p-4 mb-4 animate-in">
         <div class="card-body">
             <h3 class="mb-2">Welcome, Admin! 👋</h3>
-            <p class="mb-0 opacity-75">Here's a snapshot of your school's activity. Manage teachers, students, and content with ease.</p>
+            <p class="mb-0 opacity-75">Here's a snapshot of your school's activity. Manage teachers, students, and
+                content with ease.</p>
         </div>
     </div>
 
@@ -162,24 +199,32 @@
 
     <div class="row g-4">
         <div class="col-xl-8">
-            <div class="content-card mb-4 animate-in" style="animation-delay: 0.5s;">
-                <div class="content-card__header">Student Enrollment Overview</div>
-                <div class="p-3"><canvas id="enrollmentChart"></canvas></div>
+
+            <div class="quick-action-list list-group-flush">
+                <a href="{{ url_for('admin_bp.teacher_attendances') }}"><i class="icon fa-solid fa-chalkboard-user"></i>
+                    Teacher Attendances</a>
             </div>
-            
-            
+            <div class="quick-action-list list-group-flush">
+                <a href="{{ url_for('admin_bp.student_attendances') }}"><i class="icon fa-solid fa-user-graduate"></i>
+                    Student Attendances</a>
+            </div>
+
         </div>
 
         <div class="col-xl-4">
             <div class="content-card animate-in" style="animation-delay: 0.7s;">
                 <div class="content-card__header">Quick Actions</div>
                 <div class="p-3">
-                    <a href="{{ url_for('admin_bp.add_gallery') }}" class="btn btn-primary w-100 mb-3"><i class="fa-solid fa-images me-2"></i> Add Gallery Item</a>
+                    <a href="{{ url_for('admin_bp.add_gallery') }}" class="btn btn-primary w-100 mb-3"><i
+                            class="fa-solid fa-images me-2"></i> Add Gallery Item</a>
                 </div>
                 <div class="quick-action-list list-group-flush">
-                    <a href="{{ url_for('admin_bp.add_teacher') }}" ><i class="icon fa-solid fa-user-plus"></i> Add a New Teacher</a>
-                    <a href="{{ url_for('admin_bp.add_student') }}"><i class="icon fa-solid fa-user-graduate"></i> Enroll a New Student</a>
-                    <a href="{{ url_for('teacher_bp.add_news') }}"><i class="icon fa-solid fa-bullhorn"></i> Post an Announcement</a>
+                    <a href="{{ url_for('admin_bp.add_teacher') }}"><i class="icon fa-solid fa-user-plus"></i> Add a New
+                        Teacher</a>
+                    <a href="{{ url_for('admin_bp.add_student') }}"><i class="icon fa-solid fa-user-graduate"></i>
+                        Enroll a New Student</a>
+                    <a href="{{ url_for('teacher_bp.add_news') }}"><i class="icon fa-solid fa-bullhorn"></i> Post an
+                        Announcement</a>
                 </div>
             </div>
         </div>
@@ -190,30 +235,30 @@
 {% block scripts_extra %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    // Chart.js - Student Enrollment Chart
-    const ctx = document.getElementById('enrollmentChart');
-    if (ctx) {
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10'],
-                datasets: [{
-                    label: 'Number of Students',
-                    data: [55, 52, 60, 48, 45], // Example data
-                    backgroundColor: 'rgba(13, 110, 253, 0.6)',
-                    borderColor: 'rgba(13, 110, 253, 1)',
-                    borderWidth: 1,
-                    borderRadius: 5,
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: { y: { beginAtZero: true } },
-                plugins: { legend: { display: false } }
-            }
-        });
-    }
-});
+    document.addEventListener('DOMContentLoaded', () => {
+        // Chart.js - Student Enrollment Chart
+        const ctx = document.getElementById('enrollmentChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10'],
+                    datasets: [{
+                        label: 'Number of Students',
+                        data: [55, 52, 60, 48, 45], // Example data
+                        backgroundColor: 'rgba(13, 110, 253, 0.6)',
+                        borderColor: 'rgba(13, 110, 253, 1)',
+                        borderWidth: 1,
+                        borderRadius: 5,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+    });
 </script>
 {% endblock %}

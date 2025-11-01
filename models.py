@@ -174,6 +174,7 @@ class Transaction(db.Model):
     reference = db.Column(db.String(255))
     status = db.Column(db.Enum('pending', 'paid', 'failed', name='transaction_status'), nullable=False, default='pending')
     payment_id = db.Column(db.String(100), nullable=True) 
+    trx_id = db.Column(db.String(100), nullable=True, comment="bKash executed transaction ID")
     merchant_invoice_number = db.Column(db.String(100), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -200,6 +201,23 @@ class Attendance(db.Model):
 
     def __repr__(self):
         return f"<Attendance id={self.id} student={self.student_id} date={self.created_at.date()} status={self.status}>"
+
+class TeacherAttendance(db.Model):
+    __tablename__ = 'teacher_attendances'
+
+    id = db.Column(db.BigInteger, primary_key=True)
+    teacher_id = db.Column(db.BigInteger, db.ForeignKey('teachers.id', ondelete='CASCADE'), nullable=False)
+    date = db.Column(db.Date, nullable=False, index=True)
+    status = db.Column(db.String(20), nullable=False)  
+    remark = db.Column(db.String(255))
+    check_in_at = db.Column(db.Time) 
+    check_out_at = db.Column(db.Time)
+    # Relationship back to teacher
+    teacher = db.relationship('Teacher', backref=db.backref('attendances', cascade='all, delete-orphan', passive_deletes=True))
+
+    def __repr__(self):
+        return f"<TeacherAttendance teacher_id={self.teacher_id} date={self.date} status={self.status}>"
+
 
 class ExamResult(db.Model):
     __tablename__ = 'results'
@@ -282,6 +300,7 @@ class Student(db.Model):
     studentID = db.Column(db.String(100), unique=True)   # your 'studentID' field
     class_id = db.Column(db.BigInteger, db.ForeignKey('classes.id', ondelete='SET NULL'), nullable=True)
     roll = db.Column(db.String(50))
+    phone = db.Column(db.String(50))
     address = db.Column(db.String(255))
     blood_group = db.Column(db.String(20))
     batch = db.Column(db.BigInteger)

@@ -1,0 +1,342 @@
+{% extends "base.html" %}
+{% block title %}Verify OTP - Palashbaria Secondary School{% endblock %}
+
+{% block head_extra %}
+<style>
+    .otp-container {
+        min-height: calc(100vh - var(--header-height) - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .otp-input {
+        width: 3rem;
+        height: 3.5rem;
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 600;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.5rem;
+        transition: all 0.3s;
+        background: white;
+    }
+    
+    .otp-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        transform: scale(1.05);
+    }
+    
+    .otp-input.filled {
+        border-color: #10b981;
+        background: #f0fdf4;
+    }
+    
+    .otp-input.error {
+        border-color: #ef4444;
+        background: #fef2f2;
+    }
+    
+    .resend-timer {
+        font-variant-numeric: tabular-nums;
+    }
+    
+    .pulse-animation {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.4s ease-in;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .shake {
+        animation: shake 0.5s;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="otp-container">
+    <div class="w-full max-w-md">
+        <!-- Header Section -->
+        <div class="text-center mb-8 fade-in">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+                <i class="fas fa-mobile-alt text-blue-600 text-2xl"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Verify OTP</h2>
+            <p class="text-gray-600">Enter the 6-digit code sent to your registered phone number</p>
+            <div class="mt-3 inline-flex items-center text-sm text-gray-500">
+                <i class="fas fa-shield-alt mr-2"></i>
+                <span>Secure verification</span>
+            </div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8 fade-in">
+            <form method="POST" action="{{ url_for('public.verify_otp') }}" id="otpForm">
+                
+                <!-- OTP Input Boxes -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-4 text-center">Enter OTP Code</label>
+                    <div class="flex justify-center gap-2 sm:gap-3" id="otpInputs">
+                        <input type="text" class="otp-input" maxlength="1" data-index="0" autocomplete="off">
+                        <input type="text" class="otp-input" maxlength="1" data-index="1" autocomplete="off">
+                        <input type="text" class="otp-input" maxlength="1" data-index="2" autocomplete="off">
+                        <input type="text" class="otp-input" maxlength="1" data-index="3" autocomplete="off">
+                        <input type="text" class="otp-input" maxlength="1" data-index="4" autocomplete="off">
+                        <input type="text" class="otp-input" maxlength="1" data-index="5" autocomplete="off">
+                    </div>
+                    <!-- Hidden input for form submission -->
+                    <input type="hidden" name="otp" id="otpValue">
+                </div>
+
+                <!-- Submit Button -->
+                <button 
+                    type="submit" 
+                    id="verifyBtn"
+                    class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center mb-4"
+                    disabled
+                >
+                    <i class="fas fa-check-circle mr-2"></i>
+                    Verify OTP
+                </button>
+
+                <!-- Resend OTP Section -->
+                <div class="text-center">
+                    <div id="resendTimer" class="text-sm text-gray-600 mb-2">
+                        <i class="fas fa-clock mr-1"></i>
+                        Resend OTP in <span class="font-semibold resend-timer" id="timer">60</span>s
+                    </div>
+                    <button 
+                        type="button" 
+                        id="resendBtn"
+                        class="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors disabled:text-gray-400 disabled:cursor-not-allowed"
+                        disabled
+                    >
+                        <i class="fas fa-redo mr-1"></i>
+                        Resend OTP
+                    </button>
+                </div>
+            </form>
+
+            <!-- Divider -->
+            <div class="relative my-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-200"></div>
+                </div>
+            </div>
+
+            <!-- Help Text -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div class="flex">
+                    <i class="fas fa-info-circle text-blue-600 mt-0.5 mr-3"></i>
+                    <div class="text-sm text-gray-700">
+                        <p class="font-medium mb-1">Didn't receive the code?</p>
+                        <ul class="space-y-1 text-gray-600">
+                            <li>• Check your phone's message inbox</li>
+                            <li>• Ensure your phone number is correct</li>
+                            <li>• Wait for the timer to resend</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Back Link -->
+            <div class="text-center mt-6">
+                <a href="{{ url_for('public.forgot_password') }}" class="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Forgot Password
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const otpInputs = document.querySelectorAll('.otp-input');
+    const otpValue = document.getElementById('otpValue');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const resendBtn = document.getElementById('resendBtn');
+    const timerDisplay = document.getElementById('timer');
+    const resendTimer = document.getElementById('resendTimer');
+    
+    let countdown = 60;
+    let timerInterval;
+
+    // Auto-focus first input
+    otpInputs[0].focus();
+
+    // Handle OTP input
+    otpInputs.forEach((input, index) => {
+        input.addEventListener('input', (e) => {
+            const value = e.target.value;
+            
+            // Only allow numbers
+            if (!/^\d*$/.test(value)) {
+                e.target.value = '';
+                return;
+            }
+
+            // Add filled class
+            if (value) {
+                input.classList.add('filled');
+                input.classList.remove('error');
+            } else {
+                input.classList.remove('filled');
+            }
+
+            // Move to next input
+            if (value && index < otpInputs.length - 1) {
+                otpInputs[index + 1].focus();
+            }
+
+            // Update hidden input and button state
+            updateOTPValue();
+        });
+
+        // Handle backspace
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && !input.value && index > 0) {
+                otpInputs[index - 1].focus();
+                otpInputs[index - 1].value = '';
+                otpInputs[index - 1].classList.remove('filled');
+                updateOTPValue();
+            }
+        });
+
+        // Handle paste
+        input.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const pastedData = e.clipboardData.getData('text').slice(0, 6);
+            
+            if (!/^\d+$/.test(pastedData)) return;
+
+            pastedData.split('').forEach((char, i) => {
+                if (otpInputs[i]) {
+                    otpInputs[i].value = char;
+                    otpInputs[i].classList.add('filled');
+                }
+            });
+
+            // Focus last filled input or last input
+            const lastIndex = Math.min(pastedData.length, otpInputs.length) - 1;
+            otpInputs[lastIndex].focus();
+            
+            updateOTPValue();
+        });
+
+        // Select all on focus
+        input.addEventListener('focus', (e) => {
+            e.target.select();
+        });
+    });
+
+    function updateOTPValue() {
+        const otp = Array.from(otpInputs).map(input => input.value).join('');
+        otpValue.value = otp;
+        
+        // Enable/disable verify button
+        if (otp.length === 6) {
+            verifyBtn.disabled = false;
+        } else {
+            verifyBtn.disabled = true;
+        }
+    }
+
+    // Countdown timer
+    function startTimer() {
+        countdown = 60;
+        resendBtn.disabled = true;
+        timerDisplay.textContent = countdown;
+        resendTimer.classList.remove('hidden');
+        
+        timerInterval = setInterval(() => {
+            countdown--;
+            timerDisplay.textContent = countdown;
+            
+            if (countdown <= 0) {
+                clearInterval(timerInterval);
+                resendBtn.disabled = false;
+                resendTimer.classList.add('hidden');
+            }
+        }, 1000);
+    }
+
+    // Start timer on load
+    startTimer();
+
+    // Resend OTP
+    resendBtn.addEventListener('click', () => {
+        // Clear inputs
+        otpInputs.forEach(input => {
+            input.value = '';
+            input.classList.remove('filled', 'error');
+        });
+        otpInputs[0].focus();
+        updateOTPValue();
+        
+        // Show loading state
+        resendBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Sending...';
+        
+        // Simulate API call (replace with actual resend logic)
+        setTimeout(() => {
+            resendBtn.innerHTML = '<i class="fas fa-redo mr-1"></i> Resend OTP';
+            startTimer();
+            
+            // Show success message (you can use your existing flash message system)
+            showToast('OTP resent successfully!', 'success');
+        }, 1500);
+    });
+
+    // Form submission
+    document.getElementById('otpForm').addEventListener('submit', (e) => {
+        const otp = otpValue.value;
+        
+        if (otp.length !== 6) {
+            e.preventDefault();
+            otpInputs.forEach(input => {
+                input.classList.add('error');
+            });
+            document.querySelector('.otp-input').parentElement.classList.add('shake');
+            setTimeout(() => {
+                document.querySelector('.otp-input').parentElement.classList.remove('shake');
+            }, 500);
+            showToast('Please enter a valid 6-digit OTP', 'error');
+        }
+    });
+
+    // Simple toast notification (you can integrate with your existing toast system)
+    function showToast(message, type) {
+        // This would integrate with your existing toast notification system
+        console.log(`Toast: ${type} - ${message}`);
+    }
+</script>
+{% endblock %}

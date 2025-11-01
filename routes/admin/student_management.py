@@ -2,7 +2,7 @@ from flask import (
     render_template, request, redirect, url_for, flash
 )
 from . import admin_bp
-from models import Student, User, db, SchoolClass, Teacher
+from models import Student, User, db, SchoolClass, Teacher, Subject, RegisteredSubject
 from utils import admin_required
 from werkzeug.security import generate_password_hash
 
@@ -37,12 +37,7 @@ def list_students():
     else:
         students = Student.query.order_by(Student.class_id.asc(), Student.roll.asc()).limit(200).all()
     classes = SchoolClass.query.order_by(SchoolClass.id.asc()).all()
-    return render_template(
-        "admin/students.html",
-        students=students,
-        classes=classes,
-        selected_class_id=class_id,
-    )
+    return render_template("admin/students.html",students=students,classes=classes,selected_class_id=class_id,)
 
 @admin_bp.route("/students/add", methods=["GET", "POST"])
 @admin_required
@@ -55,33 +50,45 @@ def add_student():
         email = request.form.get("email", "").strip()
         class_id = request.form.get("class_id", type=int)
         address = request.form.get("address", "").strip()
-        batch = request.form.get("batch", type=int)
+        batch = 22
         roll = request.form.get("roll", "").strip()
+
+        if not (name and email and studentID and class_id):
+            flash("Name, email, batch, and roll are required.", "danger")
+            return render_template("admin/add_student.html", classes=classes)
+        
+        student_class = SchoolClass.query.get(class_id)
+        class_name = student_class.name.upper()
+        if class_name == "SIX":
+            batch = 2030
+        elif class_name == "SEVEN":
+            batch = 2029
+        elif class_name == "EIGHT":
+            batch = 2028
+        elif class_name == "NINE":
+            batch = 2027
+        elif class_name == "TEN":
+            batch = 2026
+            
         if batch and roll:
             studentID = f"{batch}-{roll}"
         else:
             studentID = None
-
-        if not (name and email and studentID):
-            flash("Name, email, batch, and roll are required.", "danger")
-            return render_template("admin/add_student.html", classes=classes)
         if Student.query.filter_by(studentID=studentID).first():
-            flash("A student with this ID already exists.", "warning")
+            flash(f'For student ID {studentID}, A student with this ID already exists. Maybe someone in this batch had the same roll number. Try with different roll number', "warning")
             return render_template("admin/add_student.html", classes=classes)
+        
         hashed = generate_password_hash(studentID)
         user = User(email=email, password=hashed, user_type="student")
         db.session.add(user)
         db.session.flush() 
-        student = Student(
-            name=name,
-            user_id=user.id,
-            class_id=class_id,
-            studentID=studentID,
-            address=address,
-            batch=batch,
-            roll=roll,
-        )
+        student = Student(name=name,user_id=user.id,class_id=class_id,studentID=studentID,address=address,batch=batch,roll=roll,)
         db.session.add(student)
+        db.session.flush() 
+        subjects = Subject.query.filter_by(class_id=class_id).all()
+        for item in subjects:
+            obj = RegisteredSubject(subject_id=item.id, student_id=student.id, status="active",)
+            db.session.add(obj)
         db.session.commit()
 
         flash(f"Student added successfully! (Student ID: {studentID})", "success")

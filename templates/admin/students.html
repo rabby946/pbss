@@ -146,7 +146,6 @@
         <table class="table student-table align-middle mb-0">
             <thead>
                 <tr>
-                    <th>Roll</th>
                     <th>Name</th>
                     <th>Student ID</th>
                     <th>Class</th>
@@ -157,11 +156,10 @@
             <tbody>
                 {% for s in students %}
                 <tr>
-                    <td data-label="Roll">{{ s.roll or '-' }}</td>
                     <td data-label="Name"><strong>{{ s.name }}</strong></td>
                     <td data-label="Student ID">{{ s.studentID }}</td>
                     <td data-label="Class">{{ s.class_.name if s.class_ else 'N/A' }} ({{ s.class_.section }})</td>
-                    <td data-label="Address">{{ s.roll or '-' }}</td>
+                    <td data-label="Roll">{{ s.roll or '-' }}</td>
                     <td class="text-end actions-cell">
                         <a href="{{ url_for('admin_bp.edit_student', student_id=s.id) }}"
                             class="btn btn-sm btn-link p-0 me-3" title="Edit">

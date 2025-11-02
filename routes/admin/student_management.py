@@ -53,7 +53,7 @@ def add_student():
         batch = 22
         roll = request.form.get("roll", "").strip()
 
-        if not (name and email and studentID and class_id):
+        if not (name and email and class_id):
             flash("Name, email, batch, and roll are required.", "danger")
             return render_template("admin/add_student.html", classes=classes)
         

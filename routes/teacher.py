@@ -105,26 +105,55 @@ def mark_attendance():
     teacher_id = session['teacher_id']
     class_id = request.form.get('class_id')
     selected_date = date.today()
+
     assigned_class = SchoolClass.query.filter_by(id=class_id, teacher_id=teacher_id).first()
     if not assigned_class:
         flash("You are not authorized to mark attendance for this class.", "danger")
         return redirect(url_for('teacher_bp.dashboard'))
-    for key, status in request.form.items():
-        if key.startswith('student_'):
-            student_id = int(key.split("_")[1])
-            student = Student.query.filter_by(id=student_id, class_id=class_id).first()
-            if not student:
-                continue
-            attendance = Attendance.query.filter(Attendance.student_id == student_id,db.func.date(Attendance.created_at) == selected_date).first()
-            if attendance:
-                attendance.status = status
-            else:
-                attendance = Attendance(student_id=student_id,status=status,created_at=datetime.combine(selected_date, datetime.now().time()))
-                db.session.add(attendance)
-    db.session.commit()
-    flash("Today's attendance marked successfully!", "success")
-    return redirect(url_for('teacher_bp.attendance'))
 
+    # 1️⃣ Get all students at once
+    student_ids = []
+    for key in request.form.keys():
+        if key.startswith('student_'):
+            student_ids.append(int(key.split("_")[1]))
+    
+    # 2️⃣ Load all existing attendance for the selected date
+    existing_attendance = Attendance.query.filter(
+        Attendance.student_id.in_(student_ids),
+        db.func.date(Attendance.created_at) == selected_date
+    ).all()
+    attendance_dict = {a.student_id: a for a in existing_attendance}
+
+    # 3️⃣ Loop over form data and update/add
+    new_attendance = []
+    for key, status in request.form.items():
+        if not key.startswith('student_'):
+            continue
+        student_id = int(key.split("_")[1])
+        if student_id in attendance_dict:
+            attendance_dict[student_id].status = status
+        else:
+            new_attendance.append(
+                Attendance(
+                    student_id=student_id,
+                    status=status,
+                    created_at=datetime.combine(selected_date, datetime.now().time())
+                )
+            )
+
+    # 4️⃣ Bulk add new records
+    if new_attendance:
+        db.session.add_all(new_attendance)
+
+    # 5️⃣ Commit once
+    try:
+        db.session.commit()
+        flash("Today's attendance marked successfully!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error saving attendance: {str(e)}", "danger")
+
+    return redirect(url_for('teacher_bp.attendance'))
 @teacher_bp.route('/profile', methods=['GET', 'POST'])
 @teacher_required
 def profile():

@@ -259,4 +259,4 @@ def student_attendance(user_id, rfid):
 def teacher_attendance(user_id, rfid):
     teacher = Teacher.query.filter_by(user_id=user_id).first()
     attendance = TeacherAttendance.query.filter_by(teacher_id=teacher.id, date=datetime.utcnow().date()).first()
-    return "updated for {teacher.name}"
+    return f"updated for {teacher.name}"

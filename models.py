@@ -61,14 +61,10 @@ class Report(db.Model):
 class User(db.Model):
     __tablename__ = 'users'
     email = db.Column(db.String(255), nullable=True)
-
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
-    user_type = db.Column(
-        db.Enum('student', 'teacher', 'admin', name='user_types'),
-        nullable=False,
-        default='student'
-    )
+    user_type = db.Column(db.Enum('student', 'teacher', 'admin', name='user_types'),nullable=False,default='student')
     password = db.Column(db.String(255), nullable=False)
+    rfid = db.Column(db.String(100), nullable=True)
     last_login = db.Column(db.DateTime)
 
     # One-to-one relationships to teacher/student (if present)

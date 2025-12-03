@@ -1,10 +1,12 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash
-from models import News, Gallery, Teacher, Student, Committee, MPO, Result, Routine, Report, SchoolClass, User
-from flask_mail import Message
+from flask import Blueprint, render_template, redirect, url_for, request, flash, session, jsonify
+from models import News, Gallery, Teacher, Student, Committee, MPO, Result, Routine, Report, SchoolClass, User, Attendance, TeacherAttendance
 from extensions import  db
 from datetime import datetime
+from utils import send_otp_email
+from config import Config
+
 public_bp = Blueprint("public", __name__)
-from utils import admin_required
+
 @public_bp.context_processor
 def inject_year():
     return {'moment': datetime.now().year} 
@@ -154,8 +156,8 @@ def contact():
 def login():
     return render_template("public/login.html")
 
-from utils import send_otp_email
-from flask import session
+
+# ---------- Reseting forget password ----------
 
 @public_bp.route("/forgot_password", methods = ["GET", "POST"])
 def forgot_password():
@@ -220,59 +222,41 @@ def reset_password():
 
     return render_template("public/reset_password.html")
 
-import random
-from datetime import date, timedelta, datetime
-from flask import jsonify
-from models import Teacher, TeacherAttendance
-from extensions import db
+@public_bp.route("/attendance/<string:secret>/<string:rfid>", methods=["GET", "POST"])
+def attendance(secret, rfid):
+    if secret != Config.ATTENDANCE_LINK_SECRET:
+        return {"success": False, "message": "Unauthorized"}, 401
+    user = User.query.filter_by(rfid=rfid).first()
+    if user:
+        if user.user_type == 'student':
+            return student_attendance(user.id, rfid)
+        return teacher_attendance(user.id, rfid)
+    add_secret = Config.ATTENDANCE_ADD_SECRET
+    print("Add secret:", add_secret)
+    users = User.query.filter_by(rfid=add_secret).all()
+    if users:
+        for u in users:
+            u.rfid = None
+        users[0].rfid = rfid
+        db.session.commit()
+        return jsonify({"success": True, "message": "RFID added successfully"})
+    return {"success": False, "message": "RFID not recognized"}, 404
 
-@public_bp.route("/fix")
-@admin_required
-def fix_subjects():
-    """Generate random attendance data for teachers for testing."""
-    teachers = Teacher.query.all()
-    if not teachers:
-        return jsonify({"message": "No teachers found in the database."}), 404
-
-    # Define how many days to generate (today + last 3 days)
-    days_back = 3
-    today_date = date.today()
-
-    statuses = ["Present", "Absent", "Leave"]
-
-    added = 0
-    for i in range(days_back + 1):  # includes today
-        day = today_date - timedelta(days=i)
-        for teacher in teachers:
-            # Check if already exists to avoid duplicates
-            existing = TeacherAttendance.query.filter(
-                TeacherAttendance.teacher_id == teacher.id,
-                db.func.date(TeacherAttendance.date) == day
-            ).first()
-
-            if not existing:
-                status = random.choice(statuses)
-                remark = ""
-                if status == "Absent":
-                    remark = random.choice(["Sick leave", "Family emergency", "Uninformed absence", ""])
-                elif status == "Leave":
-                    remark = random.choice(["Official leave", "Training", "Personal reason", ""])
-                else:
-                    remark = random.choice(["On time", "Late arrival", ""])
-
-                attendance = TeacherAttendance(
-                    teacher_id=teacher.id,
-                    date=day,
-                    status=status,
-                    remark=remark,
-                    created_at=datetime.combine(day, datetime.now().time())
-                )
-                db.session.add(attendance)
-                added += 1
-
-    db.session.commit()
-    return jsonify({
-        "message": f"✅ Added {added} random attendance records for {len(teachers)} teachers over last {days_back + 1} days.",
-        "dates": [str(today_date - timedelta(days=i)) for i in range(days_back + 1)]
-    })
-
+    
+    
+    
+def student_attendance(user_id, rfid):
+    student = Student.query.filter_by(user_id=user_id).first()
+    attendance = Attendance.query.filter_by(student_id=student.id, date=datetime.utcnow().date()).first()
+    if attendance:
+        # mark present if it's before 10:00 AM eelse if mark Late if after 10:00 AM and before 11:00 AM else Absent
+        current_time = datetime.utcnow().time()
+        if current_time < datetime.strptime("11:00", "%H:%M").time():
+            return f"already marked, {student.name}"
+        attendance.check_out_at = datetime.utcnow()
+        return f"checked out, {student.name}"
+    
+def teacher_attendance(user_id, rfid):
+    teacher = Teacher.query.filter_by(user_id=user_id).first()
+    attendance = TeacherAttendance.query.filter_by(teacher_id=teacher.id, date=datetime.utcnow().date()).first()
+    return "updated for {teacher.name}"

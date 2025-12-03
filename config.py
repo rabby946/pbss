@@ -8,9 +8,14 @@ class Config:
     FLASK_SECRET_KEY = os.getenv("FLASK_SECRET_KEY", "super-secret-key")
 
     DATABASE_URL = os.getenv("DATABASE_URL")
+    
+    BREVO_API_KEY = os.getenv("BREVO_API_KEY")
+    BREVO_SENDER_EMAIL = os.getenv("BREVO_SENDER_EMAIL", "korjehasanahgroup@gmail.com")
+    BREVO_SENDER_NAME = os.getenv("BREVO_SENDER_NAME", "Korje Hasanah Group")
 
     ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "").strip()
-    IMGBB_API_KEY = os.getenv("IMGBB_API_KEY")
+    ATTENDANCE_LINK_SECRET = os.getenv("ATTENDANCE_LINK_SECRET").strip()
+    ATTENDANCE_ADD_SECRET = os.getenv("ATTENDANCE_ADD_SECRET").strip()
     GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
     CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME")
     CLOUDINARY_API_KEY = os.getenv("CLOUDINARY_API_KEY")

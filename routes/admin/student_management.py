@@ -78,7 +78,7 @@ def add_student():
             flash(f'For student ID {studentID}, A student with this ID already exists. Maybe someone in this batch had the same roll number. Try with different roll number', "warning")
             return render_template("admin/add_student.html", classes=classes)
         
-        hashed = generate_password_hash(studentID)
+        hashed = (studentID)
         user = User(email=email, password=hashed, user_type="student")
         db.session.add(user)
         db.session.flush() 

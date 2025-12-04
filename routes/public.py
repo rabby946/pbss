@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, session, jsonify
+from flask import Blueprint, render_template, redirect, url_for, request, flash, session, jsonify, current_app
 from models import News, Gallery, Teacher, Student, Committee, MPO, Result, Routine, Report, SchoolClass, User, Attendance, TeacherAttendance
 from extensions import  db
 from datetime import datetime
@@ -222,17 +222,17 @@ def reset_password():
 
     return render_template("public/reset_password.html")
 
-@public_bp.route("/attendance/<string:secret>/<string:rfid>", methods=["GET", "POST"])
+@public_bp.route("/attendance/<secret>/<string:rfid>", methods=["GET", "POST"])
 def attendance(secret, rfid):
-    if secret != Config.ATTENDANCE_LINK_SECRET:
+    if secret != current_app.config.get("ATTENDANCE_LINK_SECRET"):
         return {"success": False, "message": "Unauthorized"}, 401
     user = User.query.filter_by(rfid=rfid).first()
     if user:
         if user.user_type == 'student':
             return student_attendance(user.id, rfid)
         return teacher_attendance(user.id, rfid)
-    add_secret = Config.ATTENDANCE_ADD_SECRET
-    print("Add secret:", add_secret)
+    add_secret = current_app.config.get("ATTENDANCE_ADD_SECRET")
+    
     users = User.query.filter_by(rfid=add_secret).all()
     if users:
         for u in users:

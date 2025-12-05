@@ -14,8 +14,9 @@ class Config:
     BREVO_SENDER_NAME = os.getenv("BREVO_SENDER_NAME", "Korje Hasanah Group")
 
     ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "").strip()
-    ATTENDANCE_LINK_SECRET = os.getenv("ATTENDANCE_LINK_SECRET")
-    ATTENDANCE_ADD_SECRET = os.getenv("ATTENDANCE_ADD_SECRET")
+    ATTENDANCE_LINK_SECRET = os.getenv("ATTENDANCE_LINK_SECRET", "").strip()
+    ATTENDANCE_ADD_SECRET = os.getenv("ATTENDANCE_ADD_SECRET", "").strip()
+
     GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
     CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME")
     CLOUDINARY_API_KEY = os.getenv("CLOUDINARY_API_KEY")
@@ -24,11 +25,12 @@ class Config:
     SQLALCHEMY_DATABASE_URI = DATABASE_URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
-    BKASH_BASE_URL = os.getenv("BKASH_BASE_URL")
-    BKASH_USERNAME = os.getenv("BKASH_USERNAME")
-    BKASH_PASSWORD = os.getenv("BKASH_PASSWORD")
-    BKASH_APP_KEY = os.getenv("BKASH_APP_KEY")
-    BKASH_APP_SECRET = os.getenv("BKASH_APP_SECRET")
+    BKASH_BASE_URL = os.getenv("BKASH_BASE_URL", "").strip()
+    BKASH_USERNAME = os.getenv("BKASH_USERNAME", "").strip()
+    BKASH_PASSWORD = os.getenv("BKASH_PASSWORD", "").strip()
+    BKASH_APP_KEY = os.getenv("BKASH_APP_KEY", "").strip()
+    BKASH_APP_SECRET = os.getenv("BKASH_APP_SECRET", "").strip()
+
     
         # bKash API Endpoints (for sandbox)
     BKASH_GRANT_TOKEN_URL = "/tokenized/checkout/token/grant"

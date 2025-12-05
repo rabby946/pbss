@@ -1,5 +1,5 @@
 from flask import (
-    render_template, request, redirect, url_for, flash
+    render_template, request, redirect, url_for, flash, current_app
 )
 from . import admin_bp
 from models import Student, User, db, SchoolClass, Teacher, Subject, RegisteredSubject
@@ -119,10 +119,8 @@ def edit_student(student_id):
             flash("Name, email and studentID are required.", "danger")
             return render_template("admin/edit_student.html", student=student, classes=classes)
 
-        # update linked user
         user = User.query.get_or_404(student.user_id)
 
-        # ✅ check if email changed
         if user.email != email:
             if User.query.filter(User.email == email, User.id != user.id).first():
                 flash("Email already in use by another account.", "warning")
@@ -145,3 +143,10 @@ def edit_student(student_id):
         return redirect(url_for("admin_bp.list_students"))
 
     return render_template("admin/edit_student.html", student=student, classes=classes)
+
+@admin_bp.route("/students/add_rfid/<int:student_id>", methods=["POST"])
+@admin_required
+def add_student_rfid(student_id):
+    student = Student.query.get_or_404(student_id)
+    user = User.query.get_or_404(student.user_id)
+    user.rfid = current_app.config.get("ATTENDANCE_ADD_SECRET")

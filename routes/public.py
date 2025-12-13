@@ -240,15 +240,15 @@ def attendance(secret, rfid):
     if user:
         if user.user_type == 'student':
             msg = student_attendance(user.id)
-            name = Student.query.filter_by(user_id=user.id).first().id
+            name = Student.query.filter_by(user_id=user.id).first().name
         else:
             msg = teacher_attendance(user.id)
-            name = Teacher.query.filter_by(user_id=user.id).first().id
+            name = Teacher.query.filter_by(user_id=user.id).first().name
 
         return jsonify({
             "status": "success",
             "received_secret": secret,
-            "name" : name,
+            "name" : msg,
             "received_message": msg
         })
     add_secret = current_app.config.get("ATTENDANCE_ADD_SECRET")
@@ -259,7 +259,7 @@ def attendance(secret, rfid):
             u.rfid = None
         users[0].rfid = rfid
         db.session.commit()
-        name = users[0].student.id if users[0].user_type == 'student' else users[0].teacher.id
+        name = users[0].student.name if users[0].user_type == 'student' else users[0].teacher.name
         return jsonify({
             "status": "success",
             "received_secret": secret,
@@ -283,12 +283,12 @@ def student_attendance(user_id):
     attendance = Attendance.query.filter(Attendance.student_id == student.id,func.date(Attendance.created_at) == bd_date).first()
     if attendance:
         if bd_time < datetime.strptime("11:00", "%H:%M").time():
-            return f"{student.id}"
+            return f"{student.name}"
         if attendance.check_out_at:
-            return f"{student.id}"
+            return f"{student.name}"
         attendance.check_out_at = bd_time
         db.session.commit()
-        return f"{student.id}"
+        return f"{student.name}"
     if bd_time < datetime.strptime("11:00", "%H:%M").time():
         status = "present"
     else:
@@ -296,7 +296,7 @@ def student_attendance(user_id):
     attendance = Attendance(student_id=student.id,status=status,check_in_at=bd_time,created_at=bd_now)
     db.session.add(attendance)
     db.session.commit()
-    return f"{student.id}"
+    return f"{student.name}"
 
 def teacher_attendance(user_id):
     teacher = Teacher.query.filter_by(user_id=user_id).first()
@@ -308,12 +308,12 @@ def teacher_attendance(user_id):
     attendance = TeacherAttendance.query.filter(TeacherAttendance.teacher_id == teacher.id,TeacherAttendance.date == bd_date).first()
     if attendance:
         if bd_time < datetime.strptime("11:00", "%H:%M").time():
-            return f"{teacher.id}"
+            return f"{teacher.name}"
         if attendance.check_out_at:
-            return f"{teacher.id}"
+            return f"{teacher.name}"
         attendance.check_out_at = bd_time
         db.session.commit()
-        return f"{teacher.id}"
+        return f"{teacher.name}"
     if bd_time < datetime.strptime("11:00", "%H:%M").time():
         status = "present"
     else:
@@ -321,4 +321,4 @@ def teacher_attendance(user_id):
     attendance = TeacherAttendance(teacher_id=teacher.id,status=status,check_in_at=bd_time,check_out_at=None,date=bd_date)
     db.session.add(attendance)
     db.session.commit()
-    return f"{teacher.id}"
+    return f"{teacher.name}"

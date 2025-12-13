@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+{% block title %}Edit PDF Document{% endblock %}
+
+{% block content %}
+<style>
+    /* Scoped styles specifically for this PDF edit form */
+    :root {
+        --pdf-form-bg: #f8f9fa;
+        --pdf-card-bg: #ffffff;
+        --pdf-primary: #28a745; /* A professional green for success/update actions */
+        --pdf-primary-light: #e2f5e6;
+        --pdf-border: #dee2e6;
+        --pdf-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+        --pdf-text-dark: #343a40;
+        --pdf-text-light: #6c757d;
+        --pdf-font: 'Poppins', sans-serif;
+    }
+
+    .pdf-form-container {
+        font-family: var(--pdf-font);
+        max-width: 600px;
+        margin: 2rem auto;
+    }
+
+    .pdf-form-card {
+        background-color: var(--pdf-card-bg);
+        padding: 2.5rem;
+        border-radius: 16px;
+        box-shadow: var(--pdf-shadow);
+        border: 1px solid var(--pdf-border);
+    }
+
+    .pdf-form-card h2 {
+        font-size: 1.8rem;
+        font-weight: 600;
+        text-align: center;
+        color: var(--pdf-text-dark);
+        margin-top: 0;
+        margin-bottom: 2rem;
+    }
+
+    .pdf-form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .pdf-form-group label {
+        display: block;
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--pdf-text-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .pdf-form-input {
+        width: 100%;
+        padding: 12px 15px;
+        font-size: 1rem;
+        border: 1px solid var(--pdf-border);
+        border-radius: 8px;
+        background-color: #fff;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .pdf-form-input:focus {
+        outline: none;
+        border-color: var(--pdf-primary);
+        box-shadow: 0 0 0 3px var(--pdf-primary-light);
+    }
+
+    /* --- Custom File Upload Styling --- */
+    .file-upload-wrapper .file-input-native {
+        display: none; /* Hide the ugly default input */
+    }
+
+    .file-upload-wrapper .file-input-custom {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        border: 2px dashed var(--pdf-border);
+        border-radius: 8px;
+        cursor: pointer;
+        text-align: center;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    
+    .file-upload-wrapper.is-dragging .file-input-custom {
+        background-color: var(--pdf-primary-light);
+        border-color: var(--pdf-primary);
+    }
+
+    .file-input-custom .upload-icon {
+        font-size: 2.5rem;
+        color: var(--pdf-primary);
+        margin-bottom: 1rem;
+    }
+
+    .file-input-custom .upload-text {
+        font-weight: 500;
+        color: var(--pdf-text-dark);
+    }
+
+    .file-input-custom .upload-hint,
+    #file-name-display {
+        font-size: 0.9rem;
+        color: var(--pdf-text-light);
+    }
+    
+    #file-name-display {
+        font-weight: 500;
+        color: var(--pdf-primary);
+        margin-top: 0.5rem;
+    }
+
+    /* --- Current File Display --- */
+    .current-file-display {
+        background-color: #e9ecef;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        color: var(--pdf-text-dark);
+        margin-top: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .current-file-display i {
+        color: var(--pdf-text-light);
+    }
+
+    /* --- Form Actions / Button --- */
+    .form-actions {
+        margin-top: 2rem;
+        text-align: right;
+    }
+
+    .btn-update {
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding: 12px 25px;
+        border-radius: 8px;
+        border: none;
+        background-color: var(--pdf-primary);
+        color: #fff;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    
+    .btn-update:hover {
+        background-color: #218838; /* Darker green */
+        transform: translateY(-2px);
+    }
+</style>
+
+<div class="pdf-form-container">
+    <form method="POST" enctype="multipart/form-data" class="pdf-form-card">
+        <h2>Edit PDF Document</h2>
+        
+        <div class="pdf-form-group">
+            <label for="title">Document Name:</label>
+            <input type="text" id="title" name="title" value="{{ item.title }}" class="pdf-form-input" required>
+        </div>
+
+        <div class="pdf-form-group">
+            <label for="file-input">Update PDF File:</label>
+            
+            <div class="file-upload-wrapper" id="file-upload-wrapper">
+                <input type="file" name="file" id="file-input" class="file-input-native" accept=".pdf">
+                
+                <label for="file-input" class="file-input-custom">
+                    <i class="fas fa-file-pdf upload-icon"></i>
+                    <span class="upload-text">Drag & drop a new PDF here</span>
+                    <span class="upload-hint">or click to select a file</span>
+                    <span id="file-name-display"></span>
+                </label>
+            </div>
+            
+            {% if item.filename %}
+            <div class="current-file-display">
+                <i class="fas fa-info-circle"></i>
+                <span>Currently saved file: <strong>{{ item.filename }}</strong></span>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn-update">Update Document</button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const fileUploadWrapper = document.getElementById('file-upload-wrapper');
+    const fileInputNative = document.getElementById('file-input');
+    const fileNameDisplay = document.getElementById('file-name-display');
+
+    if (fileUploadWrapper && fileInputNative && fileNameDisplay) {
+        
+        // Update the display text when a file is selected
+        fileInputNative.addEventListener('change', () => {
+            if (fileInputNative.files.length > 0) {
+                fileNameDisplay.textContent = `Selected: ${fileInputNative.files[0].name}`;
+            } else {
+                fileNameDisplay.textContent = '';
+            }
+        });
+
+        // Add visual feedback for drag-and-drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileUploadWrapper.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            fileUploadWrapper.addEventListener(eventName, () => {
+                fileUploadWrapper.classList.add('is-dragging');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            fileUploadWrapper.addEventListener(eventName, () => {
+                fileUploadWrapper.classList.remove('is-dragging');
+            });
+        });
+
+        // Handle the file drop
+        fileUploadWrapper.addEventListener('drop', (e) => {
+            const droppedFiles = e.dataTransfer.files;
+            if (droppedFiles.length > 0) {
+                // Assign the dropped files to our hidden input
+                fileInputNative.files = droppedFiles;
+                // Manually trigger the 'change' event to update the UI
+                fileInputNative.dispatchEvent(new Event('change'));
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

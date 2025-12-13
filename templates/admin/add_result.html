@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+{% block title %}Add New Result{% endblock %}
+
+{% block content %}
+<style>
+    /* Scoped styles for the Add Result page */
+    :root {
+        --admin-bg: #f8f9fa;
+        --admin-card-bg: #ffffff;
+        --admin-primary: #0d6efd;
+        --admin-border: #dee2e6;
+        --admin-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        --admin-text-dark: #212529;
+        --admin-text-light: #6c757d;
+        --admin-font: 'Poppins', sans-serif;
+    }
+
+    .add-form-container {
+        font-family: var(--admin-font);
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+
+    .add-form-card {
+        background-color: var(--admin-card-bg);
+        padding: 2.5rem;
+        border-radius: 16px;
+        box-shadow: var(--admin-shadow);
+        border: 1px solid var(--admin-border);
+    }
+    
+    .add-form-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+    @media (min-width: 768px) {
+        .add-form-grid {
+            grid-template-columns: 1fr 0.8fr;
+        }
+    }
+
+    .add-form-header {
+        margin-bottom: 2.5rem;
+    }
+    .add-form-header__title {
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: var(--admin-text-dark);
+        margin: 0;
+    }
+    .add-form-header__subtitle {
+        font-size: 1rem;
+        color: var(--admin-text-light);
+        margin-top: 0.25rem;
+    }
+
+    .form-group {
+        margin-bottom: 2rem;
+    }
+    .form-group label {
+        display: block;
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--admin-text-dark);
+        margin-bottom: 0.75rem;
+    }
+    .form-input {
+        width: 100%;
+        padding: 12px 15px;
+        font-size: 1rem;
+        border: 1px solid var(--admin-border);
+        border-radius: 8px;
+        background-color: #fff;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .form-input:focus {
+        outline: none;
+        border-color: var(--admin-primary);
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+    }
+
+    .file-input-native { display: none; }
+    .file-input-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 10px 20px;
+        border-radius: 8px;
+        background-color: #e9ecef;
+        color: var(--admin-text-dark);
+        border: 1px solid var(--admin-border);
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .file-input-button:hover { background-color: #dee2e6; }
+    #file-name-display {
+        margin-top: 1rem;
+        color: var(--admin-text-light);
+        font-style: italic;
+        font-size: 0.9rem;
+    }
+
+    .form-actions { display: flex; gap: 1rem; margin-top: 2.5rem; }
+    .btn { padding: 12px 25px; font-weight: 500; border-radius: 8px; text-decoration: none; border: none; cursor: pointer; transition: all 0.3s ease; }
+    .btn-submit { background-color: var(--admin-primary); color: #fff; }
+    .btn-submit:hover { background-color: #0b5ed7; transform: translateY(-2px); }
+    .btn-cancel { background-color: #e9ecef; color: var(--admin-text-dark); }
+    .btn-cancel:hover { background-color: #dee2e6; }
+
+    /* --- Live Summary Section --- */
+    .summary-card {
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        padding: 2rem;
+        border: 1px solid var(--admin-border);
+        text-align: center;
+        position: sticky; /* Make it stick on the screen while scrolling on desktop */
+        top: 120px;
+    }
+    .summary-card__header {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--admin-text-dark);
+        margin-bottom: 2rem;
+    }
+    .summary-card__icon {
+        font-size: 4rem;
+        color: var(--admin-border);
+        margin-bottom: 1.5rem;
+    }
+    #summary-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--admin-text-dark);
+        min-height: 2.25rem;
+        word-wrap: break-word;
+        margin-bottom: 0.5rem;
+    }
+    #summary-filename {
+        font-size: 0.9rem;
+        color: var(--admin-text-light);
+        min-height: 1.25rem;
+        word-wrap: break-word;
+    }
+</style>
+
+<div class="add-form-container">
+    <div class="add-form-card">
+        <div class="add-form-grid">
+
+            <div class="form-section">
+                <header class="add-form-header">
+                    <h2 class="add-form-header__title">Add New Result</h2>
+                    <p class="add-form-header__subtitle">Fill in the details below to upload a new result file.</p>
+                </header>
+
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="title-input">Result Title</label>
+                        <input type="text" id="title-input" name="title" class="form-input" placeholder="e.g., Class 10 Final Exam 2024" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="file-input">Result File (PDF)</label>
+                        <label for="file-input" class="file-input-button">
+                            <i class="fas fa-upload"></i>
+                            <span>Choose a file...</span>
+                        </label>
+                        <input type="file" id="file-input" name="file" class="file-input-native" accept=".pdf" required>
+                        <div id="file-name-display">No file chosen</div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-submit">Add Result</button>
+                        <a href="{{ url_for('admin_bp.results') }}" class="btn btn-cancel">Cancel</a>
+                    </div>
+                </form>
+            </div>
+
+            <div class="summary-section">
+                <div class="summary-card">
+                    <h3 class="summary-card__header">Live Summary</h3>
+                    <div class="summary-card__icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <h4 id="summary-title">[Result Title]</h4>
+                    <p id="summary-filename">[filename.pdf]</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- ELEMENT SELECTORS ---
+    const titleInput = document.getElementById('title-input');
+    const fileInput = document.getElementById('file-input');
+    const summaryTitle = document.getElementById('summary-title');
+    const summaryFilename = document.getElementById('summary-filename');
+    const fileNameDisplay = document.getElementById('file-name-display');
+
+    // --- 1. LIVE TEXT PREVIEW ---
+    titleInput.addEventListener('keyup', () => {
+        summaryTitle.textContent = titleInput.value.trim() === '' ? '[Result Title]' : titleInput.value;
+    });
+
+    // --- 2. LIVE FILE NAME PREVIEW ---
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            fileNameDisplay.textContent = file.name;
+            summaryFilename.textContent = file.name;
+        } else {
+            fileNameDisplay.textContent = 'No file chosen';
+            summaryFilename.textContent = '[filename.pdf]';
+        }
+    });
+});
+</script>
+
+{% endblock %}

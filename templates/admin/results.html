@@ -1,0 +1,269 @@
+{% extends "admin/base.html" %}
+{% block title %}Manage Results{% endblock %}
+
+{% block head_extra %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+    /* Scoped and corrected styles for the Manage Results page */
+    :root {
+        --admin-bg: #f8f9fa;
+        --admin-card-bg: #ffffff;
+        --admin-primary: #0d6efd;
+        --admin-danger: #dc3545;
+        --admin-edit: #17a2b8; /* A professional teal for edit actions */
+        --admin-border: #e9ecef;
+        --admin-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        --admin-text-dark: #212529;
+        --admin-text-light: #6c757d;
+        --admin-font: 'Poppins', sans-serif;
+    }
+
+    .admin-container {
+        font-family: var(--admin-font);
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+
+    .admin-header {
+        margin-bottom: 2.5rem;
+    }
+    .admin-header__top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--admin-border);
+    }
+    .admin-header__title {
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: var(--admin-text-dark);
+        margin: 0;
+    }
+    .admin-btn--back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        color: var(--admin-text-dark);
+        background-color: #e9ecef;
+        transition: all 0.3s ease;
+        border: 1px solid var(--admin-border);
+    }
+    .admin-btn--back:hover {
+        background-color: #dee2e6;
+        transform: translateY(-2px);
+    }
+    
+    .admin-header__controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end; /* Align buttons to the right */
+        align-items: center;
+        gap: 1.5rem;
+        padding-top: 1.5rem;
+    }
+    .admin-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1rem;
+        font-weight: 500;
+        text-decoration: none;
+        padding: 12px 22px;
+        border-radius: 8px;
+        color: #fff;
+        transition: all 0.3s ease;
+        border: none;
+    }
+    .admin-btn--primary { background-color: var(--admin-primary); }
+    .admin-btn--secondary { background-color: #6c757d; }
+    .admin-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .results-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .result-card {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 1.5rem;
+        background-color: var(--admin-card-bg);
+        border: 1px solid var(--admin-border);
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+    .result-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--admin-shadow);
+    }
+
+    .result-card__icon {
+        font-size: 1.8rem;
+        color: var(--admin-danger);
+        background-color: #f8d7da;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .result-card__info {
+        flex-grow: 1;
+    }
+    .result-card__title {
+        font-size: 1.3rem;
+        font-weight: 500;
+        color: var(--admin-text-dark) !important; /* Force color to prevent override */
+        margin: 0 0 0.5rem 0;
+        position: static !important; /* CRITICAL FIX: Ensures title stays in place */
+    }
+    .result-card__file-link {
+        font-size: 1rem;
+        color: var(--admin-primary);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .result-card__file-link:hover { text-decoration: underline; }
+    .result-card__no-file {
+        font-size: 1rem;
+        color: var(--admin-text-light);
+        font-style: italic;
+    }
+
+    .result-card__actions {
+        display: flex;
+        gap: 0.75rem;
+    }
+    .action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: none;
+        background-color: #f8f9fa;
+        color: var(--admin-text-light);
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    .action-btn--edit:hover {
+        background-color: var(--admin-edit);
+        color: #fff;
+    }
+    .action-btn--delete:hover {
+        background-color: var(--admin-danger);
+        color: #fff;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="admin-container">
+
+    <header class="admin-header">
+        <div class="admin-header__top">
+            <h2 class="admin-header__title">Manage Results</h2>
+            <a href="{{ url_for('admin_bp.dashboard') }}" class="admin-btn--back">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+        <div class="admin-header__controls">
+            <a href="{{ url_for('admin_bp.result_swap') }}" class="admin-btn admin-btn--secondary">
+                <i class="fas fa-exchange-alt"></i> Reorder Results
+            </a>
+            <a href="{{ url_for('admin_bp.add_result') }}" class="admin-btn admin-btn--primary">
+                <i class="fas fa-plus"></i> Add New Result
+            </a>
+        </div>
+    </header>
+
+    <main>
+        {% if items %}
+        <div class="results-grid">
+            {% for r in items %}
+            <div class="result-card">
+                <div class="result-card__icon">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <div class="result-card__info">
+                    <h3 class="result-card__title">{{ r.title }}</h3>
+                    {% if r.file_url %}
+                    <a href="{{ r.file_url }}" target="_blank" class="result-card__file-link">
+                        <i class="fas fa-link"></i> View Attached File
+                    </a>
+                    {% else %}
+                    <p class="result-card__no-file">No file uploaded</p>
+                    {% endif %}
+                </div>
+
+                <div class="result-card__actions">
+                    <a href="{{ url_for('admin_bp.edit_result', id=r.id) }}" class="action-btn action-btn--edit" title="Edit">
+                        <i class="fas fa-pencil-alt"></i>
+                    </a>
+                    <button class="action-btn action-btn--delete" title="Delete"
+                            data-title="{{ r.title }}"
+                            data-url="{{ url_for('admin_bp.delete_result', id=r.id) }}">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+            <div class="alert alert-warning">No result items found! Click "Add New Result" to get started.</div>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const deleteButtons = document.querySelectorAll('.action-btn--delete');
+
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const resultTitle = this.dataset.title;
+            const deleteUrl = this.dataset.url;
+
+            Swal.fire({
+                title: 'Are you sure?',
+                html: `You are about to delete the result: <br><strong>${resultTitle}</strong>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete !'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = deleteUrl;
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

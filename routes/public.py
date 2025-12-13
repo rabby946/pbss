@@ -222,105 +222,103 @@ def reset_password():
 
     return render_template("public/reset_password.html")
 
+
 @public_bp.route("/attendance/<secret>/<string:rfid>", methods=["GET", "POST"])
 def attendance(secret, rfid):
-    if secret != current_app.config.get("ATTENDANCE_LINK_SECRET"):
-        return f"Unauthorized"
+    expected_secret = current_app.config.get("ATTENDANCE_LINK_SECRET")
+
+    if secret != expected_secret:
+        return jsonify({
+            "status": "failed",
+            "received_secret": secret,
+            "name" : "N/A",
+            "received_message": "Unauthorized secret key"
+        })
+
     user = User.query.filter_by(rfid=rfid).first()
+
     if user:
         if user.user_type == 'student':
-            return student_attendance(user.id)
-        return teacher_attendance(user.id)
+            msg = student_attendance(user.id)
+            name = Student.query.filter_by(user_id=user.id).first().name
+        else:
+            msg = teacher_attendance(user.id)
+            name = Teacher.query.filter_by(user_id=user.id).first().name
+
+        return jsonify({
+            "status": "success",
+            "received_secret": secret,
+            "name" : name,
+            "received_message": msg
+        })
     add_secret = current_app.config.get("ATTENDANCE_ADD_SECRET")
-    
     users = User.query.filter_by(rfid=add_secret).all()
+
     if users:
         for u in users:
             u.rfid = None
         users[0].rfid = rfid
         db.session.commit()
-        return f"RFID added successfully"
-    return f"RFID not recognized"
+        name = users[0].student.name if users[0].user_type == 'student' else users[0].teacher.name
+        return jsonify({
+            "status": "success",
+            "received_secret": secret,
+            "name" : name,
+            "received_message": "RFID added successfully"
+        })
+    return jsonify({
+        "status": "failed",
+        "received_secret": secret,
+        "name" : "N/A",
+        "received_message": "RFID not recognized"
+    })
 
-    
 def student_attendance(user_id):
     student = Student.query.filter_by(user_id=user_id).first()
     if not student:
         return "student not found"
-
     bd_now = datetime.utcnow() + timedelta(hours=6)
     bd_time = bd_now.time()
     bd_date = bd_now.date()
-
-    attendance = Attendance.query.filter(
-        Attendance.student_id == student.id,
-        func.date(Attendance.created_at) == bd_date
-    ).first()
-
+    attendance = Attendance.query.filter(Attendance.student_id == student.id,func.date(Attendance.created_at) == bd_date).first()
     if attendance:
         if bd_time < datetime.strptime("11:00", "%H:%M").time():
-            return f"already marked, {student.name}"
-
+            return f"{student.name}"
         if attendance.check_out_at:
-            return f"already checked out, {student.name}"
-
+            return f"{student.name}"
         attendance.check_out_at = bd_time
         db.session.commit()
-        return f"checked out, {student.name}"
-
+        return f"{student.name}"
     if bd_time < datetime.strptime("11:00", "%H:%M").time():
         status = "present"
     else:
         status = "late"
-
-    attendance = Attendance(
-        student_id=student.id,
-        status=status,
-        check_in_at=bd_time,
-        created_at=bd_now     
-    )
-
+    attendance = Attendance(student_id=student.id,status=status,check_in_at=bd_time,created_at=bd_now)
     db.session.add(attendance)
     db.session.commit()
-
-    return f"checked in, {student.name}"
-
+    return f"{student.name}"
 
 def teacher_attendance(user_id):
     teacher = Teacher.query.filter_by(user_id=user_id).first()
     if not teacher:
         return "teacher not found"
-
     bd_now = datetime.utcnow() + timedelta(hours=6)
     bd_time = bd_now.time()
     bd_date = bd_now.date()
-
-    attendance = TeacherAttendance.query.filter(
-        TeacherAttendance.teacher_id == teacher.id,
-        TeacherAttendance.date == bd_date
-    ).first()
-
+    attendance = TeacherAttendance.query.filter(TeacherAttendance.teacher_id == teacher.id,TeacherAttendance.date == bd_date).first()
     if attendance:
         if bd_time < datetime.strptime("11:00", "%H:%M").time():
-            return f"already marked, {teacher.name}"
+            return f"{teacher.name}"
         if attendance.check_out_at:
-            return f"already checked out, {teacher.name}"
+            return f"{teacher.name}"
         attendance.check_out_at = bd_time
         db.session.commit()
-        return f"checked out, {teacher.name}"
+        return f"{teacher.name}"
     if bd_time < datetime.strptime("11:00", "%H:%M").time():
         status = "present"
     else:
         status = "late"
-    attendance = TeacherAttendance(
-        teacher_id=teacher.id,
-        status=status,
-        check_in_at=bd_time,
-        check_out_at=None,
-        date=bd_date
-    )
-
+    attendance = TeacherAttendance(teacher_id=teacher.id,status=status,check_in_at=bd_time,check_out_at=None,date=bd_date)
     db.session.add(attendance)
     db.session.commit()
-
-    return f"checked in, {teacher.name}"
+    return f"{teacher.name}"

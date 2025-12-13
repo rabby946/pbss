@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, current_app
 from . import admin_bp
 from models import Teacher, User, db, AssignedSubject, Subject, Routine
 from datetime import datetime
@@ -26,26 +26,14 @@ def add_teacher():
             email = request.form.get('email')
             password = request.form.get('password')
 
-            # Handle image upload
             image_file = request.files.get('image')
             image_url = upload_image(image_file) if image_file else None
 
-            # Create User
             user = User(email=email, password=password, user_type='teacher')
             db.session.add(user)
             db.session.flush()
 
-            # Create Teacher
-            teacher = Teacher(
-                user_id=user.id,
-                name=name,
-                phone=phone,
-                position=position,
-                designation=designation,
-                qualification=qualification,
-                address=address,
-                image_url=image_url
-            )
+            teacher = Teacher(user_id=user.id,name=name,phone=phone,position=position,designation=designation,qualification=qualification,address=address,image_url=image_url)
 
             db.session.add(teacher)
             db.session.commit()
@@ -142,12 +130,7 @@ def teacher_courses(teacher_id):
                 db.session.commit()
                 flash(f'{subject.name} re-assigned successfully to {teacher.name}.', 'success')
         else:
-            new_assign = AssignedSubject(
-                teacher_id=teacher.id,
-                subject_id=subject.id,
-                class_id=class_id,
-                status='active'
-            )
+            new_assign = AssignedSubject(teacher_id=teacher.id,subject_id=subject.id,class_id=class_id,status='active')
             db.session.add(new_assign)
             db.session.commit()
             flash(f'{subject.name} assigned successfully to {teacher.name}.', 'success')
@@ -197,3 +180,21 @@ def unassign_course(teacher_id, assign_id):
     db.session.commit()
     flash('Course unassigned and routines removed successfully.', 'success')
     return redirect(url_for('admin_bp.teacher_courses', teacher_id=teacher_id))
+
+
+@admin_bp.route("/teachers/add_rfid/<int:teacher_id>", methods=["POST", "GET"])
+@admin_required
+def add_teacher_rfid(teacher_id):
+    teacher = Teacher.query.get_or_404(teacher_id)
+    user = User.query.get_or_404(teacher.user_id)
+    secret = current_app.config.get("ATTENDANCE_ADD_SECRET")
+    items = User.query.filter_by(rfid=secret).all()
+    for item in items:
+        item.rfid = None
+    user.rfid = secret
+    db.session.commit()
+    flash(f"RFID added successfully to teacher '{teacher.name}'.", "success")
+    print(secret)
+    us = user.rfid
+    print(us)
+    return redirect(url_for("admin_bp.list_teachers"))

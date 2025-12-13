@@ -149,4 +149,9 @@ def edit_student(student_id):
 def add_student_rfid(student_id):
     student = Student.query.get_or_404(student_id)
     user = User.query.get_or_404(student.user_id)
-    user.rfid = current_app.config.get("ATTENDANCE_ADD_SECRET")
+    secret = current_app.config.get("ATTENDANCE_ADD_SECRET")
+    items = User.query.filter_by(rfid=secret).all()
+    for item in items:
+        item.rfid = None
+    user.rfid = secret
+    return redirect(url_for("admin_bp.list_students"))

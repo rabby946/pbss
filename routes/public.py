@@ -240,15 +240,15 @@ def attendance(secret, rfid):
     if user:
         if user.user_type == 'student':
             msg = student_attendance(user.id)
-            name = Student.query.filter_by(user_id=user.id).first().name
+            name = Student.query.filter_by(user_id=user.id).first().k_name
         else:
             msg = teacher_attendance(user.id)
-            name = Teacher.query.filter_by(user_id=user.id).first().name
+            name = Teacher.query.filter_by(user_id=user.id).first().k_name
 
         return jsonify({
             "status": "success",
             "received_secret": secret,
-            "name" : msg,
+            "name" : name,
             "received_message": msg
         })
     add_secret = current_app.config.get("ATTENDANCE_ADD_SECRET")
@@ -259,18 +259,18 @@ def attendance(secret, rfid):
             u.rfid = None
         users[0].rfid = rfid
         db.session.commit()
-        name = users[0].student.name if users[0].user_type == 'student' else users[0].teacher.name
+        name = users[0].student.k_name if users[0].user_type == 'student' else users[0].teacher.k_name
         return jsonify({
             "status": "success",
             "received_secret": secret,
             "name" : name,
-            "received_message": "RFID added successfully"
+            "received_message": "RFID added"
         })
     return jsonify({
         "status": "failed",
         "received_secret": secret,
         "name" : "N/A",
-        "received_message": "RFID not recognized"
+        "received_message": "not found"
     })
 
 def student_attendance(user_id):
@@ -308,12 +308,12 @@ def teacher_attendance(user_id):
     attendance = TeacherAttendance.query.filter(TeacherAttendance.teacher_id == teacher.id,TeacherAttendance.date == bd_date).first()
     if attendance:
         if bd_time < datetime.strptime("11:00", "%H:%M").time():
-            return f"{teacher.name}"
+            return f"checked IN"
         if attendance.check_out_at:
-            return f"{teacher.name}"
+            return f"checked OUT"
         attendance.check_out_at = bd_time
         db.session.commit()
-        return f"{teacher.name}"
+        return f"checked OUT"
     if bd_time < datetime.strptime("11:00", "%H:%M").time():
         status = "present"
     else:
@@ -321,4 +321,4 @@ def teacher_attendance(user_id):
     attendance = TeacherAttendance(teacher_id=teacher.id,status=status,check_in_at=bd_time,check_out_at=None,date=bd_date)
     db.session.add(attendance)
     db.session.commit()
-    return f"{teacher.name}"
+    return f"checked IN"

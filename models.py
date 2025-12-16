@@ -266,6 +266,7 @@ class Teacher(db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
     user_id = db.Column(db.BigInteger, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     name = db.Column(db.String(200), nullable=False)
+    k_name = db.Column(db.String(200))
     position = db.Column(db.String(200))
     designation = db.Column(db.String(200))
     qualification = db.Column(db.String(200))
@@ -293,7 +294,8 @@ class Student(db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
     user_id = db.Column(db.BigInteger, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     name = db.Column(db.String(200), nullable=False)
-    studentID = db.Column(db.String(100), unique=True)   # your 'studentID' field
+    k_name = db.Column(db.String(200))
+    studentID = db.Column(db.String(100), unique=True)
     class_id = db.Column(db.BigInteger, db.ForeignKey('classes.id', ondelete='SET NULL'), nullable=True)
     roll = db.Column(db.String(50))
     phone = db.Column(db.String(50))

@@ -12,14 +12,30 @@
 <div class="table-card p-4">
     <form method="POST" action="{{ url_for('admin_bp.edit_student', student_id=student.id) }}">
         <div class="row g-3">
+
             <div class="col-md-6">
                 <label class="form-label">Full Name</label>
                 <input type="text" name="name" class="form-control" value="{{ student.name }}" required>
             </div>
+
             <div class="col-md-6">
-                <label class="form-label">Email</label>
-                <input type="email" name="email" class="form-control" value="{{ student.user.email if student.user else '' }}" required>
+                <label class="form-label">Email (optional)</label>
+                <input type="email" name="email" class="form-control"
+                       value="{{ student.user.email if student.user else '' }}">
             </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Father's Name</label>
+                <input type="text" name="father_name" class="form-control"
+                       value="{{ student.father_name or '' }}">
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Mother's Name</label>
+                <input type="text" name="mother_name" class="form-control"
+                       value="{{ student.mother_name or '' }}">
+            </div>
+
             <div class="col-md-6">
                 <label class="form-label">Class</label>
                 <select name="class_id" class="form-select" required>
@@ -30,18 +46,36 @@
                     {% endfor %}
                 </select>
             </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Group</label>
+                <select name="group" class="form-select">
+                    <option value="">Select Group</option>
+                    {% for g in ['General','Science','Arts','Commerce','Vocational'] %}
+                    <option value="{{ g }}" {% if student.group == g %}selected{% endif %}>
+                        {{ g }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
             <div class="col-md-6">
                 <label class="form-label">Batch</label>
-                <input type="number" name="batch" class="form-control" value="{{ student.batch or '' }}">
+                <input type="number" name="batch" class="form-control"
+                       value="{{ student.batch or '' }}">
             </div>
+
             <div class="col-md-6">
                 <label class="form-label">Roll</label>
-                <input type="number" name="roll" class="form-control" value="{{ student.roll or '' }}">
+                <input type="number" name="roll" class="form-control"
+                       value="{{ student.roll or '' }}">
             </div>
+
             <div class="col-12">
                 <label class="form-label">Address</label>
                 <textarea name="address" class="form-control" rows="2">{{ student.address or '' }}</textarea>
             </div>
+
         </div>
 
         <div class="mt-4 text-end">

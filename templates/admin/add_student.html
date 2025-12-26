@@ -12,16 +12,34 @@
 <div class="table-card p-4">
     <form method="POST" action="{{ url_for('admin_bp.add_student') }}">
         <div class="row g-3">
+
+            <!-- Student Name -->
             <div class="col-md-6">
-                <label class="form-label">Full Name</label>
+                <label class="form-label">Full Name <span class="text-danger">*</span></label>
                 <input type="text" name="name" class="form-control" placeholder="Enter full name" required>
             </div>
+
+            <!-- Email (optional) -->
             <div class="col-md-6">
-                <label class="form-label">Email</label>
-                <input type="email" name="email" class="form-control" placeholder="Enter student email" required>
+                <label class="form-label">Email (optional)</label>
+                <input type="email" name="email" class="form-control" placeholder="Auto-generated if empty">
             </div>
+
+            <!-- Father Name -->
             <div class="col-md-6">
-                <label class="form-label">Class</label>
+                <label class="form-label">Father's Name</label>
+                <input type="text" name="father_name" class="form-control" placeholder="Enter father's name">
+            </div>
+
+            <!-- Mother Name -->
+            <div class="col-md-6">
+                <label class="form-label">Mother's Name</label>
+                <input type="text" name="mother_name" class="form-control" placeholder="Enter mother's name">
+            </div>
+
+            <!-- Class -->
+            <div class="col-md-6">
+                <label class="form-label">Class <span class="text-danger">*</span></label>
                 <select name="class_id" class="form-select" required>
                     <option value="">Select Class</option>
                     {% for c in classes %}
@@ -29,18 +47,39 @@
                     {% endfor %}
                 </select>
             </div>
+
+            <!-- Group -->
             <div class="col-md-6">
-                <label class="form-label">Batch</label>
-                <input type="number" name="batch" class="form-control" placeholder="e.g. 2025">
+                <label class="form-label">Group <span class="text-danger">*</span></label>
+                <select name="group" class="form-select" required>
+                    <option value="">Select Group</option>
+                    <option value="General">General</option>
+                    <option value="Science">Science</option>
+                    <option value="Arts">Arts</option>
+                    <option value="Commerce">Commerce</option>
+                    <option value="Vocational">Vocational</option>
+                </select>
             </div>
+
+
+            <!-- Roll -->
             <div class="col-md-6">
-                <label class="form-label">Roll</label>
-                <input type="number" name="roll" class="form-control" placeholder="Roll number " required>
+                <label class="form-label">Roll <span class="text-danger">*</span></label>
+                <input type="number" name="roll" class="form-control" placeholder="Roll number" required>
             </div>
+
+            <!-- Student ID -->
+            <div class="col-md-6">
+                <label class="form-label">Student ID <span class="text-danger">*</span></label>
+                <input type="text" name="studentID" class="form-control" placeholder="Unique student ID" required>
+            </div>
+
+            <!-- Address -->
             <div class="col-12">
                 <label class="form-label">Address</label>
                 <textarea name="address" class="form-control" rows="2" placeholder="Enter address"></textarea>
             </div>
+
         </div>
 
         <div class="mt-4 text-end">

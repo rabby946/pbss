@@ -322,3 +322,8 @@ def teacher_attendance(user_id):
     db.session.add(attendance)
     db.session.commit()
     return f"checked IN"
+
+@public_bp.route("/<string:error>")
+def about(error):
+    
+    return render_template("error.html", error=error)

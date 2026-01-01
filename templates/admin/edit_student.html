@@ -10,70 +10,109 @@
 </div>
 
 <div class="table-card p-4">
-    <form method="POST" action="{{ url_for('admin_bp.edit_student', student_id=student.id) }}">
+    <form method="POST"
+          action="{{ url_for('admin_bp.edit_student', student_id=student.id) }}"
+          enctype="multipart/form-data">
+
         <div class="row g-3">
 
+            <!-- Full Name -->
             <div class="col-md-6">
                 <label class="form-label">Full Name</label>
-                <input type="text" name="name" class="form-control" value="{{ student.name }}" required>
+                <input type="text" name="name" class="form-control"
+                       value="{{ student.name }}" required>
             </div>
 
+            <!-- Email -->
             <div class="col-md-6">
                 <label class="form-label">Email (optional)</label>
                 <input type="email" name="email" class="form-control"
                        value="{{ student.user.email if student.user else '' }}">
             </div>
 
+            <!-- Father Name -->
             <div class="col-md-6">
                 <label class="form-label">Father's Name</label>
                 <input type="text" name="father_name" class="form-control"
                        value="{{ student.father_name or '' }}">
             </div>
 
+            <!-- Mother Name -->
             <div class="col-md-6">
                 <label class="form-label">Mother's Name</label>
                 <input type="text" name="mother_name" class="form-control"
                        value="{{ student.mother_name or '' }}">
             </div>
 
+            <!-- Class -->
             <div class="col-md-6">
                 <label class="form-label">Class</label>
                 <select name="class_id" class="form-select" required>
                     {% for c in classes %}
-                    <option value="{{ c.id }}" {% if student.class_id == c.id %}selected{% endif %}>
+                    <option value="{{ c.id }}"
+                        {% if student.class_id == c.id %}selected{% endif %}>
                         {{ c.name }} ({{ c.section }})
                     </option>
                     {% endfor %}
                 </select>
             </div>
 
+            <!-- Group -->
             <div class="col-md-6">
                 <label class="form-label">Group</label>
                 <select name="group" class="form-select">
                     <option value="">Select Group</option>
                     {% for g in ['General','Science','Arts','Commerce','Vocational'] %}
-                    <option value="{{ g }}" {% if student.group == g %}selected{% endif %}>
+                    <option value="{{ g }}"
+                        {% if student.group == g %}selected{% endif %}>
                         {{ g }}
                     </option>
                     {% endfor %}
                 </select>
             </div>
 
+            <!-- Batch -->
             <div class="col-md-6">
                 <label class="form-label">Batch</label>
                 <input type="number" name="batch" class="form-control"
                        value="{{ student.batch or '' }}">
             </div>
 
+            <!-- Roll -->
             <div class="col-md-6">
                 <label class="form-label">Roll</label>
                 <input type="number" name="roll" class="form-control"
                        value="{{ student.roll or '' }}">
             </div>
 
+            <!-- Address -->
             <div class="col-12">
                 <label class="form-label">Address</label>
-                <textarea name="address" class="form-control" rows="2">{{ student.address or '' }}</textarea>
+                <textarea name="address" class="form-control"
+                          rows="2">{{ student.address or '' }}</textarea>
+            </div>
+
+            <!-- Upload New Image -->
+            <div class="col-md-6">
+                <label class="form-label">
+                    Update Student Photo
+                    <small class="text-muted">(jpg, png)</small>
+                </label>
+                <input type="file"
+                       name="image"
+                       class="form-control"
+                       accept="image/*">
+            </div>
+
+            <!-- Current / Preview Image -->
+            <div class="col-md-6">
+                <label class="form-label">Current / Preview</label>
+                <div>
+                    <img id="imagePreview"
+                         src="{% if student.image_url %}{{ student.image_url }}{% else %}https://via.placeholder.com/150{% endif %}"
+                         class="img-thumbnail"
+                         style="max-height:150px;">
+                </div>
             </div>
 
         </div>
@@ -85,4 +124,17 @@
         </div>
     </form>
 </div>
+
+<script>
+document.querySelector('input[name="image"]').addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        document.getElementById('imagePreview').src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+});
+</script>
 {% endblock %}

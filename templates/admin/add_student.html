@@ -10,16 +10,19 @@
 </div>
 
 <div class="table-card p-4">
-    <form method="POST" action="{{ url_for('admin_bp.add_student') }}">
+    <form method="POST"
+          action="{{ url_for('admin_bp.add_student') }}"
+          enctype="multipart/form-data">
+
         <div class="row g-3">
 
-            <!-- Student Name -->
+            <!-- Full Name -->
             <div class="col-md-6">
                 <label class="form-label">Full Name <span class="text-danger">*</span></label>
                 <input type="text" name="name" class="form-control" placeholder="Enter full name" required>
             </div>
 
-            <!-- Email (optional) -->
+            <!-- Email -->
             <div class="col-md-6">
                 <label class="form-label">Email (optional)</label>
                 <input type="email" name="email" class="form-control" placeholder="Auto-generated if empty">
@@ -28,13 +31,13 @@
             <!-- Father Name -->
             <div class="col-md-6">
                 <label class="form-label">Father's Name</label>
-                <input type="text" name="father_name" class="form-control" placeholder="Enter father's name">
+                <input type="text" name="father_name" class="form-control">
             </div>
 
             <!-- Mother Name -->
             <div class="col-md-6">
                 <label class="form-label">Mother's Name</label>
-                <input type="text" name="mother_name" class="form-control" placeholder="Enter mother's name">
+                <input type="text" name="mother_name" class="form-control">
             </div>
 
             <!-- Class -->
@@ -61,23 +64,45 @@
                 </select>
             </div>
 
-
             <!-- Roll -->
             <div class="col-md-6">
                 <label class="form-label">Roll <span class="text-danger">*</span></label>
-                <input type="number" name="roll" class="form-control" placeholder="Roll number" required>
+                <input type="number" name="roll" class="form-control" required>
             </div>
 
             <!-- Student ID -->
             <div class="col-md-6">
                 <label class="form-label">Student ID <span class="text-danger">*</span></label>
-                <input type="text" name="studentID" class="form-control" placeholder="Unique student ID" required>
+                <input type="text" name="studentID" class="form-control" required>
             </div>
 
             <!-- Address -->
             <div class="col-12">
                 <label class="form-label">Address</label>
-                <textarea name="address" class="form-control" rows="2" placeholder="Enter address"></textarea>
+                <textarea name="address" class="form-control" rows="2"></textarea>
+            </div>
+
+            <!-- Student Image Upload -->
+            <div class="col-md-6">
+                <label class="form-label">
+                    Student Photo
+                    <small class="text-muted">(jpg, png)</small>
+                </label>
+                <input type="file"
+                       name="image"
+                       class="form-control"
+                       accept="image/*">
+            </div>
+
+            <!-- Image Preview -->
+            <div class="col-md-6">
+                <label class="form-label">Preview</label>
+                <div>
+                    <img id="imagePreview"
+                         src="https://via.placeholder.com/150"
+                         class="img-thumbnail"
+                         style="max-height: 150px;">
+                </div>
             </div>
 
         </div>
@@ -89,4 +114,17 @@
         </div>
     </form>
 </div>
+
+<script>
+document.querySelector('input[name="image"]').addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        document.getElementById('imagePreview').src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+});
+</script>
 {% endblock %}

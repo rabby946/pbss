@@ -3,7 +3,7 @@ from flask import (
 )
 from . import admin_bp
 from models import Student, User, db, SchoolClass, Teacher, Subject, RegisteredSubject
-from utils import admin_required
+from utils import admin_required, upload_image
 from werkzeug.security import generate_password_hash
 
 @admin_bp.route("/students", methods=["GET", "POST"])
@@ -64,7 +64,8 @@ def add_student():
         if Student.query.filter_by(studentID=studentID).first():
             flash(f'For student ID {studentID}, A student with this ID already exists. Maybe someone in this batch had the same roll number. Try with different roll number', "warning")
             return render_template("admin/add_student.html", classes=classes)
-        
+        image = request.files.get("image")
+        image_filename = upload_image(image) if image else None
         student_class = SchoolClass.query.get(class_id)
         class_name = student_class.name.upper()
         if class_name == "SIX":
@@ -77,12 +78,12 @@ def add_student():
             batch = 2028
         elif class_name == "TEN":
             batch = 2027
-            
+        
         hashed = (studentID)
         user = User(email=email, password=hashed, user_type="student")
         db.session.add(user)
         db.session.flush() 
-        student = Student(name=name,user_id=user.id,class_id=class_id,studentID=studentID,address=address,batch=batch,roll=roll,k_name=k_name,father_name=father_name,mother_name=mother_name,group=group)
+        student = Student(name=name,user_id=user.id,class_id=class_id,studentID=studentID,address=address,batch=batch,roll=roll,k_name=k_name,father_name=father_name,mother_name=mother_name,group=group, image_url=image_filename,)
         db.session.add(student)
         db.session.flush() 
         subjects = Subject.query.filter_by(class_id=class_id).all()
@@ -113,7 +114,10 @@ def edit_student(student_id):
         father_name = request.form.get("father_name", "").strip()
         mother_name = request.form.get("mother_name", "").strip()
         group = request.form.get("group", "").strip()
-
+        image = request.files.get("image")
+        if image:
+            image_filename = upload_image(image)
+            student.image_url = image_filename
         # studentID logic
         if batch and roll:
             studentID = f"{batch}-{roll}"

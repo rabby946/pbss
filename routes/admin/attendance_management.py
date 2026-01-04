@@ -4,6 +4,10 @@ from . import admin_bp
 from models import SchoolClass, Teacher, db, Student, Attendance, TeacherAttendance
 from utils import admin_required
 from datetime import datetime, date
+from flask import send_file
+from openpyxl import Workbook
+from io import BytesIO
+import calendar
 
 @admin_bp.route('/attendance/<int:student_id>', methods=['GET'])
 @admin_required
@@ -142,3 +146,79 @@ def add_leave(teacher_id):
     db.session.commit()
     flash(f"{teacher.name} marked as Leave on {selected_date.strftime('%d %b %Y')}", "success")
     return redirect(url_for('admin_bp.teacher_attendances', date=selected_date))
+
+@admin_bp.route('/teacher-attendance/export', methods=['GET'])
+@admin_required
+def export_teacher_attendance():
+   
+
+    try:
+        month = int(request.args.get('month'))
+        year = int(request.args.get('year'))
+        if month < 1 or month > 12:
+            raise ValueError
+    except (TypeError, ValueError):
+        flash("Invalid month or year", "danger")
+        return redirect(url_for('admin_bp.teacher_attendances'))
+
+    # Prevent future month export
+    today = date.today()
+    if year > today.year or (year == today.year and month > today.month):
+        flash("You cannot export future attendance.", "warning")
+        return redirect(url_for('admin_bp.teacher_attendances'))
+
+    # Date range for the month
+    start_date = date(year, month, 1)
+    end_date = date(year, month, calendar.monthrange(year, month)[1])
+
+    # Query attendance + teacher info
+    attendances = (
+        db.session.query(TeacherAttendance, Teacher)
+        .join(Teacher, TeacherAttendance.teacher_id == Teacher.id)
+        .filter(TeacherAttendance.date.between(start_date, end_date))
+        .order_by(TeacherAttendance.date.asc(), Teacher.position.asc())
+        .all()
+    )
+
+    # Create Excel workbook
+    wb = Workbook()
+    ws = wb.active
+    ws.title = f"{calendar.month_name[month]} {year}"
+
+    # Header
+    headers = [
+        "Date",
+        "Teacher ID",
+        "Teacher Name",
+        "Status",
+        "Check In Time",
+        "Check Out Time",
+        "Remark"
+    ]
+    ws.append(headers)
+
+    # Rows
+    for attendance, teacher in attendances:
+        ws.append([
+            attendance.date.strftime("%Y-%m-%d"),
+            teacher.id,
+            teacher.name,
+            attendance.status,
+            attendance.check_in_at.strftime("%H:%M:%S") if attendance.check_in_at else "",
+            attendance.check_out_at.strftime("%H:%M:%S") if attendance.check_out_at else "",
+            attendance.remark or ""
+        ])
+
+    # Save to memory
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    filename = f"teacher_attendance_{year}_{month:02d}.xlsx"
+
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name=filename,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )

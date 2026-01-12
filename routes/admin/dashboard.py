@@ -39,7 +39,7 @@ def login():
 @admin_bp.route("/logout")
 @admin_required
 def logout():
-    session["admin"] = False
+    session.pop("admin", None)
     flash("Logged out successfully ✔️", "success")
     return redirect(url_for("admin_bp.login"))
 

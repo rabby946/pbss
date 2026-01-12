@@ -1,0 +1,129 @@
+.welcome-card {
+    background: linear-gradient(135deg, var(--admin-brand), var(--admin-brand-dark));
+    color: #fff;
+    border: none;
+}
+
+.welcome-card h3 {
+    font-weight: 600;
+}
+
+/* "At a Glance" Stat Cards */
+.stat-card {
+    background-color: var(--admin-card-bg);
+    border: 1px solid var(--admin-border);
+    border-radius: var(--admin-radius, 1rem);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--admin-shadow);
+    border-color: var(--admin-brand);
+}
+
+.stat-card__icon {
+    font-size: 1.8rem;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.stat-card__info .value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--admin-text);
+}
+
+.stat-card__info .label {
+    font-size: 0.9rem;
+    color: var(--admin-text-muted);
+}
+
+/* Unique icon colors for each stat card */
+.icon-teachers {
+    background-color: var(--bs-blue-100);
+    color: var(--bs-blue-600);
+}
+
+.icon-students {
+    background-color: var(--bs-green-100);
+    color: var(--bs-green-600);
+}
+
+.icon-classes {
+    background-color: var(--bs-purple-100);
+    color: var(--bs-purple-600);
+}
+
+.icon-subjects {
+    background-color: var(--bs-orange-100);
+    color: var(--bs-orange-600);
+}
+
+
+/* General Content Cards */
+.content-card {
+    background-color: var(--admin-card-bg);
+    border: 1px solid var(--admin-border);
+    border-radius: var(--admin-radius, 1rem);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    height: 100%;
+}
+
+.content-card__header {
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--admin-border);
+}
+
+/* Quick Action Links */
+.quick-action-list a {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1.5rem;
+    color: var(--admin-text);
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 1px solid var(--admin-border);
+    transition: background-color 0.2s ease;
+}
+
+.quick-action-list a:last-child {
+    border-bottom: none;
+}
+
+.quick-action-list a:hover {
+    background-color: #f8fafc;
+}
+
+.quick-action-list .icon {
+    width: 20px;
+    text-align: center;
+    color: var(--admin-text-muted);
+}
+
+/* Animation */
+.animate-in {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -5,6 +5,7 @@ admin_bp = Blueprint("admin_bp", __name__, url_prefix="/admin")
 
 # Import route files (auto-registers all admin routes)
 from . import (
+    appscheduler,
     dashboard,
     teacher_management,
     student_management,
@@ -14,5 +15,4 @@ from . import (
     routine_management,
     attendance_management,
     committee_management,
-    accreditation_management,
 )
